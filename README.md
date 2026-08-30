@@ -1,4 +1,4 @@
-## Broker agnostic client library.
+## Broker agnostic messaging client library.
 Implement transactional inbox/outbox pattern as broker agnostic
 (*ongoing desing/architecture docs on [docs](./docs)*).
 
