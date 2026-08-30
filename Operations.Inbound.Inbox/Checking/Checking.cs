@@ -1,4 +1,4 @@
-using static Operations.Inbound.Inbox.CheckingStates;
+using static Operations.Inbound.Inbox.InboxStates;
 
 namespace Operations.Inbound.Inbox;
 

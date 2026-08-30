@@ -1,7 +1,7 @@
 
 namespace Operations.Inbound.DeadLetterEnvelope;
 
-internal static class CheckingStates
+static partial class DeadLetterEnvelopeStates
 {
   internal const string CheckRetryDeadLetterEnvelopeForRedirectingExhaustedState = "CheckRetryDeadLetterEnvelopeForRedirectingExhaustedState";
   internal const string CheckRetryDeadLetterEnvelopeForRedirectingNotExhaustedState = "CheckRetryDeadLetterEnvelopeForRedirectingNotExhaustedState";

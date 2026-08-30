@@ -1,13 +1,17 @@
+using Operations.Inbound.Inbox;
+using Persistence.RetryMessage;
 
 namespace Pipelines.Inbound;
 
 public interface IInboxServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>:
   IValidatingServices,
-  Operations.Inbound.Inbox.IInsertingServices<TKey, TPayload>,
+  IInsertingServices<TKey, TPayload>,
+  ICheckingServices,
   IHandlingServices<TKey, TPayload>,
   ITransactingServices<TKey, TPayload, TSession>,
-  Operations.Inbound.Inbox.ISchedulingServices<TKey, TPayload>,
-  Operations.Inbound.Inbox.IClosingServices<TKey, TPayload>,
-  Operations.Inbound.Inbox.IAbandoningServices<TKey, TPayload>,
-  IConvertingServices
+  ISchedulingServices<TKey, TPayload>,
+  IClosingServices<TKey, TPayload>,
+  IAbandoningServices<TKey, TPayload>,
+  IConvertingServices,
+  IUpsertingServices
   where TSession: IDisposable;

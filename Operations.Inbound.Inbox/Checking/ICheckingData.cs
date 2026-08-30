@@ -1,6 +1,6 @@
 
 namespace Operations.Inbound.Inbox;
 
-internal interface ICheckingData<TKey, TPayload>:
+public interface ICheckingData<TKey, TPayload>:
   IInboxMessageProp<TKey, TPayload>,
   IPipelineErrorProp;

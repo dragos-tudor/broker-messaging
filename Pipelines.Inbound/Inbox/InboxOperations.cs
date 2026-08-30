@@ -3,15 +3,17 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static Func<TServices, TData, CancellationToken, ValueTask<(TData, string, Exception?)>>? GetInboxOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>(InboxOperation action)
-    where TServices: IInboxServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
-    where TData: IInboxData<TKey, TValue, TMetadata, TConfirmation, TPayload>
-    where TSession: IDisposable
+internal static Func<TServices, TData, CancellationToken, ValueTask<(TData, string, Exception?)>>? GetInboxOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>(InboxOperation action)
+    where TServices : IInboxServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
+    where TData : IInboxData<TKey, TValue, TMetadata, TConfirmation, TPayload>
+    where TSession : IDisposable
     =>
     action switch
     {
       InboxOperation.Validating => ValidateInboxMessage<TServices, TData, TKey, TPayload>,
+      InboxOperation.CheckingRetry => CheckRetryInboxMessageForInsertingAsync<TServices, TData, TKey, TPayload>,
       InboxOperation.Inserting => InsertInboxMessageAsync<TServices, TData, TKey, TPayload>,
+      InboxOperation.UpsertingRetry => UpsertRetryInboxMessageAsync<TServices, TData, TKey, TPayload>,
       InboxOperation.Handling => HandleInboxMessageAsync<TServices, TData, TKey, TPayload>,
       InboxOperation.Transacting => TransactInboxMessageAsync<TServices, TData, TKey, TPayload, TSession>,
       InboxOperation.Abandoning => AbandonInboxMessageAsync<TServices, TData, TKey, TPayload>,
@@ -24,15 +26,17 @@ partial class InboundFuncs
 
 internal enum InboxOperation
 {
-    Validating,
-    Inserting,
-    Handling,
-    Transacting,
-    Abandoning,
-    Scheduling,
-    Converting,
-    Closing,
-    Unrecoverable,
-    Exit,
-    Unknown
+  Validating,
+  CheckingRetry,
+  Inserting,
+  UpsertingRetry,
+  Handling,
+  Transacting,
+  Abandoning,
+  Scheduling,
+  Converting,
+  Closing,
+  Unrecoverable,
+  Exit,
+  Unknown
 }

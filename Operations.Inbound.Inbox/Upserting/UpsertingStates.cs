@@ -1,7 +1,7 @@
 
 namespace Operations.Inbound.Inbox;
 
-internal static class UpsertingStates
+static partial class InboxStates
 {
   internal const string UpsertRetryInboxMessageSuccessState = "UpsertRetryInboxMessageSuccess";
   internal const string UpsertRetryInboxMessageErrorState = "UpsertRetryInboxMessageError";
