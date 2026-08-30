@@ -1,4 +1,4 @@
-# messaging-lib — Handoff (2026-08-28, Inbound Pipelines: Envelope + Inbox)
+# Broker-Messaging — Handoff (2026-08-28, Inbound Pipelines: Envelope + Inbox)
 
 This is a **continuation** handoff, written after a session that drew the
 first two concrete `Pipelines.Inbound` state→action tables and, along the

@@ -1,4 +1,4 @@
-# Kafka Library — Handoff (2026-08-26, Router/Pipeline Architecture session)
+# Broker-Messaging — Handoff (2026-08-26, Router/Pipeline Architecture session)
 
 This is a **continuation** handoff, written after a session that redesigned the
 project structure and routing model from the ground up. Load this **alongside**

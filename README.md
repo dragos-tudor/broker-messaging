@@ -152,8 +152,8 @@ Layer 2 — Operations     six projects, split by DIRECTION × INPUT ENTITY:
                           Operations.Outbound.Outbox
                           Operations.Outbound.Envelope
                                         │
-Layer 1 — Persistence /  Persistence.Inbox / .Outbox / .DeadLetter /
-          Transport      .RetryMessage, Transport.Envelope, ...
+Layer 1 — Persistence     / .Inbox / .Outbox / .DeadLetter / .RetryMessage
+          Transport       / .Envelope / .DeadLetterEnvelope
 ```
 
 Each layer references only the layer directly below it — a strict DAG,

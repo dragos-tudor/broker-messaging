@@ -1,4 +1,4 @@
-# messaging-lib — Handoff (2026-08-29, Retry/Exhaustion Redesign)
+# Broker-Messaging — Handoff (2026-08-29, Retry/Exhaustion Redesign)
 
 This is a **continuation** handoff, written after a live/voice brainstorming
 session that redesigned retry and exhaustion handling for side-effect
@@ -36,8 +36,7 @@ once its immediate retry budget is spent, or not?*
 
 ---
 
-## 2. The Router-owned generic retry-budget mechanism (replaces all
-    bespoke per-operation counters)
+## 2. The Router-owned generic retry-budget mechanism (replaces all bespoke per-operation counters)
 
 **Core decision:** retry-attempt counting and circuit-breaker behavior move
 **out of individual operations entirely** and become a single generic
@@ -81,8 +80,7 @@ is DB and still needs special handling; Confirming is broker and doesn't —
 the axis is about available next steps, not which external system is
 involved).
 
-### 3a. Pure infrastructure-failure operations — circuit-open-and-resume,
-     nothing else
+### 3a. Pure infrastructure-failure operations — circuit-open-and-resume, nothing else
 
 **`Closing`, `Abandoning`, `Scheduling`'s own error path.** These are
 simple status/field updates — nothing about the *message* can make these
@@ -92,8 +90,7 @@ circuit opens, then Router resumes the exact same action on the exact same
 message once the window elapses. No hand-off anywhere, no new state, no
 new table involvement. This was the "simple" case Dragos identified first.
 
-### 3b. Message-processing operations with a durable row already
-     persisted — hand off to Scheduling
+### 3b. Message-processing operations with a durable row already persisted — hand off to Scheduling
 
 **`Handling`, `Transacting`.** Same generic self-loop/circuit-open
 mechanism as 3a, but these are the two steps where a delayed retry
@@ -117,8 +114,7 @@ decide where (if anywhere) to redirect. This preserves the rule that
 operations are dumb leaf actions and all sequencing intelligence lives at
 the pipeline-table/Router level, not inside operation bodies.
 
-### 3c. Pre-durable operations with no row to schedule against — new
-     `RetryMessage` mechanism
+### 3c. Pre-durable operations with no row to schedule against — new `RetryMessage` mechanism
 
 **`Inserting`** (Inbox), and — parked for when those pipelines are drawn —
 **`Publishing`, `Producing`, `Redirecting`** (DeadLetterEnvelope). These
@@ -132,8 +128,7 @@ error has, but arising in a side-effect operation.
 
 Full design in §4.
 
-### 3d. No-alternative operations — infinite circuit-open, by design,
-     no table at all
+### 3d. No-alternative operations — infinite circuit-open, by design, no table at all
 
 **`Capturing`, `Confirming`** (Envelope pipeline). Explicitly and
 deliberately **excluded** from the §3c retry-table treatment, for a
@@ -193,8 +188,7 @@ row is created — Mapping has run (producing an in-memory `InboxMessage`),
 but Inserting hasn't succeeded, so there's no `InboxMessage` identity yet
 to key against.
 
-### 4c. Where Checking and Upserting live — SUPERSEDED 2026-08-30 evening,
-     see §9
+### 4c. Where Checking and Upserting live — SUPERSEDED 2026-08-30 evening, see §9
 
 > **Correction below in §9.** As first written, this subsection proposed
 > a new dedicated `Operations.Inbound.RetryMessage` project for Checking
@@ -215,8 +209,7 @@ Operations project at Layer 2 (naming TBD — something like
 living inside the Router's generic mechanism from §2 — deemed inconsistent
 with how every other piece of state in this system is treated.
 
-### 4d. The two operations: Checking and Upserting — REVISED 2026-08-30,
-     see §9
+### 4d. The two operations: Checking and Upserting — REVISED 2026-08-30, see §9
 
 > **This subsection was rewritten the morning after the session that
 > produced it, once Dragos actually sat down to implement it.** The
@@ -257,8 +250,7 @@ that, per §4f), no exhaustion, no escalation — same philosophy as §3d's
 infinite circuit, but applied here because the operation is provably
 always-eventually-succeeds-safe, not because there's nowhere else to go.
 
-### 4e. Where Checking and Upserting physically live — REVISED
-     2026-08-30 morning, SUPERSEDED again 2026-08-30 evening, see §9
+### 4e. Where Checking and Upserting physically live — REVISED 2026-08-30 morning, SUPERSEDED again 2026-08-30 evening, see §9
 
 Checking and Upserting live in their own small Operations project (e.g.
 `Operations.Inbound.RetryMessage`), exactly like the
@@ -290,8 +282,7 @@ earlier in the original session for the reasons described in the original
 §4e text below. Those rejections still hold; only the *wrapper's* location
 changed on 08-30, not whether a wrapper-shaped thing is needed at all.)
 
-### 4f. What the wrappers actually do — REVISED 2026-08-30 morning,
-     SUPERSEDED again 2026-08-30 evening, see §9
+### 4f. What the wrappers actually do — REVISED 2026-08-30 morning, SUPERSEDED again 2026-08-30 evening, see §9
 
 The wrappers are where all the type-specific and pipeline-specific work
 now concentrates — this is the single biggest shift from the original
@@ -518,8 +509,7 @@ reconsidering whether it's needed.
 
 ---
 
-## 8. Follow-up (2026-08-30) — Envelope vs. DeadLetterEnvelope gap found
-   during implementation, and its resolution
+## 8. Follow-up (2026-08-30) — Envelope vs. DeadLetterEnvelope gap found during implementation, and its resolution
 
 While actually implementing §4, Dragos hit a real design gap: Checking and
 Upserting as originally written implicitly assumed one shared data shape,
@@ -597,14 +587,12 @@ the design part.
 
 ---
 
-## 9. Follow-up (2026-08-30, evening) — final layering correction, plus
-   naming patterns
+## 9. Follow-up (2026-08-30, evening) — final layering correction, plus naming patterns
 
 Dragos implemented the 08-30-morning design (§8) and, in doing so, found
 one more placement problem — this time not about types, but about layers.
 
-### 9a. Checking/Upserting move down to Persistence; wrappers move up to
-     Operations
+### 9a. Checking/Upserting move down to Persistence; wrappers move up to Operations
 
 The dedicated `Operations.Inbound.RetryMessage` project proposed for
 Checking and Upserting (original §4c/§4e) was, on reflection, **artificial
@@ -634,8 +622,7 @@ the whole design that had needed an invented, one-off project just to
 exist, and both ends of the move land on layers that already have an
 established, consistent role for exactly this kind of code.
 
-### 9b. Wrappers now behave like every other operation — full count,
-     CORRECTED after seeing actual code
+### 9b. Wrappers now behave like every other operation — full count, CORRECTED after seeing actual code
 
 Because the wrappers now live in Operations, they fall back in line with
 how every other function in those projects already behaves: their own
@@ -714,9 +701,7 @@ what §4d originally specified — see §9e.
   longest single example raised), and Dragos confirmed that's an accepted
   tradeoff, not a problem to solve around.
 
-### 9d. Why Checking's *states* need per-guarded-operation disambiguation,
-     but Upserting's don't (extends to the wrapper *count* too, not just
-     naming — CORRECTED)
+### 9d. Why Checking's *states* need per-guarded-operation disambiguation, but Upserting's don't (extends to the wrapper *count* too, not just naming — CORRECTED)
 
 This took real back-and-forth to land on, so the reasoning is worth
 keeping, not just the conclusion. The 09-04-morning-vs-evening exchange
@@ -755,8 +740,7 @@ also clarified this cuts deeper than state naming — it determines the
   pair, since Upserting isn't answering a yes/no question, it's just
   performing a write that either succeeds or throws.
 
-### 9e. `UpsertRetryMessageAsync`'s signature grew one parameter —
-     CORRECTED, was missing from §4d
+### 9e. `UpsertRetryMessageAsync`'s signature grew one parameter — CORRECTED, was missing from §4d
 
 As actually implemented, the Upserting wrappers build an error message —
 `data.PipelineError ?? "Unknown upsert retry {entity} error"` — and pass
@@ -771,9 +755,6 @@ doubles as **"a genuine, queryable audit trail of poison envelopes"**
 would be hollow — there'd be nothing forensic to actually look at. With
 the error message persisted alongside the count, that claim is now
 actually true of the implementation, not just aspirational.
-
-
-
 
 
 ---
