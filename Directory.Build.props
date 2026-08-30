@@ -1,0 +1,23 @@
+<Project>
+
+  <PropertyGroup Label="Project props">
+    <TargetFramework>net10.0</TargetFramework>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <NoWarn>$(NoWarn);RS0036;RS0037;CA1031</NoWarn>
+
+    <!-- compiling -->
+    <ImplicitUsings>disable</ImplicitUsings>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Nullable>enable</Nullable>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+
+    <!-- analysing -->
+    <AnalysisMode>All</AnalysisMode>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+    <!-- <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild> -->
+  </PropertyGroup>
+
+</Project>

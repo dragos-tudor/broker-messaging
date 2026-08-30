@@ -1,0 +1,34 @@
+{
+	"dockerFile": "Dockerfile",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-dotnettools.csharp"
+			]
+		}
+	},
+	"mounts": [
+		{ "source": "nuget", "target": "/root/.nuget", "type": "volume" }
+	],
+	"containerEnv": {
+    "DEV_NETWORK": "dev-network",
+    "DEV_NETWORK_SUBNET": "10.99.1.0/24",
+    "DEV_NETWORK_DNS": "10.99.1.2",
+    "KAFKA_USERNAME": "admin",
+    "KAFKA_PASSWORD": "p@ssw0rd!",
+    "CONTAINERS_REGISTRIES_CONF": "/workspaces/messaging/.podman/registries.conf",
+    "CONTAINERS_STORAGE_CONF": "/workspaces/messaging/.podman/storage.conf",
+    "WORKSPACE_ROOT": "/workspaces/messaging"
+	},
+	"runArgs": [
+		"--name=messaging",
+		"--hostname=messaging",
+    "--add-host=host.containers.internal:host-gateway",
+    "--network=messaging-network",
+    "--dns=127.0.0.1", "--dns=8.8.8.8", "--dns=1.1.1.1",
+		"--privileged"
+	],
+	"initializeCommand": "chmod u+x .services/*.sh .scripts/*.sh; .services/initializing.sh",
+  "postCreateCommand": "chmod u+x .services/**/*.sh; .services/creating.sh",
+  "postStartCommand": ".services/starting.sh"
+}

@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../Directory.Testing.props" />
+
+  <PropertyGroup>
+    <Description>Pipelines inbound project.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Operations.Inbound.Envelope/Operations.Inbound.Envelope.csproj" />
+    <ProjectReference Include="../Operations.Inbound.Inbox/Operations.Inbound.Inbox.csproj" />
+    <ProjectReference Include="../Operations.Inbound.DeadLetter/Operations.Inbound.DeadLetter.csproj" />
+    <ProjectReference Include="../Operations.Inbound.DeadLetterEnvelope/Operations.Inbound.DeadLetterEnvelope.csproj" />
+  </ItemGroup>
+
+</Project>

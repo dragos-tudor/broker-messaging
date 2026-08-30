@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../Directory.Testing.props" />
+
+  <PropertyGroup>
+    <Description>Outbound pipelines project.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Operations.Outbound.Outbox/Operations.Outbound.Outbox.csproj" />
+    <ProjectReference Include="../Operations.Outbound.Envelope/Operations.Outbound.Envelope.csproj" />
+  </ItemGroup>
+
+</Project>

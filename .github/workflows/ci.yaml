@@ -1,0 +1,55 @@
+name: CI (build and test nuget packages)
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: self-hosted
+
+    steps:
+      # dev container self hosted GitHub agent!
+      # - name: Checkout
+      #   uses: actions/checkout@v4
+
+      # - name: Setup .NET
+      #   uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: |
+      #       10.0.x
+
+      - name: Determine workspace
+        id: workspace
+        shell: bash
+        run: |
+          echo "path=/workspaces/messaging" >> "$GITHUB_OUTPUT"
+
+      - name: Permissions
+        shell: bash
+        run: |
+          cd "${{ steps.workspace.outputs.path }}"
+          chmod u+x -R ./.scripts/*.sh
+
+      - name: Restore
+        shell: bash
+        run: |
+          cd "${{ steps.workspace.outputs.path }}"
+          ./.scripts/restoring.sh
+
+      - name: Build
+        shell: bash
+        run: |
+          cd "${{ steps.workspace.outputs.path }}"
+          ./.scripts/building.sh Release
+
+      - name: Test
+        shell: bash
+        run: |
+          cd "${{ steps.workspace.outputs.path }}"
+          ./.scripts/testing.sh Release

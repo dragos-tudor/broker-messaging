@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../Directory.Testing.props" />
+
+  <PropertyGroup>
+    <Description>Outbox operations project.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Persistence.OutboxMessage/Persistence.OutboxMessage.csproj" />
+    <ProjectReference Include="../Transport.Envelope/Transport.Envelope.csproj" />
+  </ItemGroup>
+
+</Project>

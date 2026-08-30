@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../Directory.Testing.props" />
+
+  <PropertyGroup>
+    <Description>Dead letter operations project.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Persistence.DeadLetterMessage/Persistence.DeadLetterMessage.csproj" />
+    <ProjectReference Include="../Persistence.RetryMessage/Persistence.RetryMessage.csproj" />
+    <ProjectReference Include="../Transport.DeadLetterEnvelope/Transport.DeadLetterEnvelope.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,20 @@
+<Project>
+
+  <!-- Keep normal builds test-aware for DEBUG and RELEASE, but exclude test-only items during packaging. -->
+  <PropertyGroup Condition="'$(PackOnly)' != 'true'">
+    <EnableMSTestRunner>true</EnableMSTestRunner>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(PackOnly)' != 'true'">
+    <PackageReference Include="MsTest" PrivateAssets="all"/>
+    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="Shouldly" PrivateAssets="all"/>
+  </ItemGroup>
+
+  <Target Name="RemovePackOnlyItems" BeforeTargets="BeforeBuild" Condition="'$(PackOnly)' == 'true'">
+    <ItemGroup>
+      <Compile Remove="**/*.Tests.cs" />
+    </ItemGroup>
+  </Target>
+
+</Project>

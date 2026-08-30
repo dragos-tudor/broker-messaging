@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../Directory.Testing.props" />
+
+  <PropertyGroup>
+    <Description>Envelope operations project.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Persistence.InboxMessage/Persistence.InboxMessage.csproj" />
+    <ProjectReference Include="../Transport.Envelope/Transport.Envelope.csproj" />
+    <ProjectReference Include="../Transport.DeadLetterEnvelope/Transport.DeadLetterEnvelope.csproj" />
+  </ItemGroup>
+
+</Project>

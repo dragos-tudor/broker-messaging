@@ -1,0 +1,15 @@
+{
+  "mstest": {
+    "parallelism": {
+      "enabled": true,
+      "scope": "method",
+      "workers": 4
+    },
+    "output": {
+      "captureTrace": false
+    },
+    "timeout": {
+      "test": 30000
+    }
+  }
+}

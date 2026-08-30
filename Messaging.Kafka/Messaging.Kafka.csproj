@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../Directory.Packing.props" />
+
+  <PropertyGroup>
+    <Description>Messaging kafka broker services. [metaproject]</Description>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeReferencedProjectInPackage</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+  	<None Include="../README.md" Pack="true" PackagePath="\"/>
+    <None Include="../LICENSE" Pack="true" PackagePath="\"/>
+
+    <ProjectReference Include="../Kafka.Clients/Kafka.Clients.csproj" />
+    <ProjectReference Include="../Kafka.Messages/Kafka.Messages.csproj" />
+    <ProjectReference Include="../Messaging.InboxOutbox/Messaging.InboxOutbox.csproj" />
+  </ItemGroup>
+
+  <Target Name="IncludeReferencedProjectInPackage">
+    <ItemGroup>
+      <!-- Include both DLL and PDB in the package output -->
+      <BuildOutputInPackage Include="$(OutputPath)Kafka.Clients.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Kafka.Clients.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Kafka.Messages.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Kafka.Messages.pdb" />
+    </ItemGroup>
+  </Target>
+
+</Project>

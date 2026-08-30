@@ -1,0 +1,28 @@
+<Project>
+
+  <PropertyGroup Label="Packing props">
+    <!-- packing -->
+    <IsPackable>true</IsPackable>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Deterministic>true</Deterministic>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <ContinuousIntegrationBuild>false</ContinuousIntegrationBuild>
+
+    <!-- package -->
+    <Authors>Dragos Tudor</Authors>
+    <Company>$(Authors)</Company>
+    <Copyright>Copyright @2026</Copyright>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageLicense>https://github.com/dragos-tudor/backend-kafka/blob/main/LICENSE</PackageLicense>
+
+    <!-- repository -->
+    <PackageProjectUrl>https://github.com/dragos-tudor/backend-kafka/tree/main/$(MSBuildProjectName)</PackageProjectUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <RepositoryRoot>$(MSBuildThisFileDirectory)</RepositoryRoot>
+    <RepositoryUrl>https://github.com/dragos-tudor/backend-kafka.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+</Project>

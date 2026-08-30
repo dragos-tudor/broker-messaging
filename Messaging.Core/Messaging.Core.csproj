@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../Directory.Packing.props" />
+
+  <PropertyGroup>
+    <Description>Transactional Inbox/Outbox pattern broker agnostic implementation. [metaproject]</Description>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeReferencedProjectInPackage</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+  	<None Include="../README.md" Pack="true" PackagePath="\"/>
+    <None Include="../LICENSE" Pack="true" PackagePath="\"/>
+
+    <ProjectReference Include="../Routing.Inbound/Routing.Inbound.csproj" />
+    <ProjectReference Include="../Routing.Outbound/Routing.Outbound.csproj" />
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+
+    <None Include="PublicAPI.Shipped.txt" Pack="true" PackagePath="apidocs\" />
+  </ItemGroup>
+
+  <Target Name="IncludeReferencedProjectInPackage">
+    <ItemGroup>
+      <!-- Include both DLL and PDB in the package output -->
+      <BuildOutputInPackage Include="$(OutputPath)Routing.Inbound.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Routing.Inbound.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Routing.Outbound.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Routing.Outbound.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Reliability.Resiliency.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Reliability.Resiliency.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Observability.Instrumentation.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Observability.Instrumentation.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Pipelines.Inbound.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Pipelines.Inbound.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Pipelines.Outbound.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Pipelines.Outbound.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Transport.Envelope.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Transport.Envelope.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Transport.DeadLetterEnvelope.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Transport.DeadLetterEnvelope.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Persistence.InboxMessage.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Persistence.InboxMessage.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Persistence.OutboxMessage.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Persistence.OutboxMessage.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Persistence.RetryMessage.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Persistence.RetryMessage.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Persistence.DeadLetterMessage.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Persistence.DeadLetterMessage.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Operations.Inbound.Envelope.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Operations.Inbound.Envelope.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Operations.Inbound.DeadLetterEnvelope.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Operations.Inbound.DeadLetterEnvelope.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Operations.Inbound.DeadLetter.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Operations.Inbound.DeadLetter.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Operations.Inbound.Inbox.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Operations.Inbound.Inbox.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Operations.Outbound.Envelope.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Operations.Outbound.Envelope.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Operations.Outbound.Outbox.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Operations.Outbound.Outbox.pdb" />
+    </ItemGroup>
+  </Target>
+
+</Project>

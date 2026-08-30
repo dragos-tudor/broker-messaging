@@ -1,0 +1,24 @@
+# IDE specific files
+.ionide/
+.vscode/
+
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# Project folders
+artifacts/
+.packages
+.runner
+.containers
+
+# Code Coverage results
+**/lcov.info
+
+# Test databases
+**/*.db
+
+**/dynamic-hosts
+
+
+
