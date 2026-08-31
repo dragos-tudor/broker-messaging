@@ -12,6 +12,12 @@ underneath without touching pipeline code.
 
 ---
 
+## AI Models Used
+- Design/Architecture sessions: Sonnet 5 (Thinking), GPT 4.5 Mini (Thinking) (web + live conversations).
+- Implementation plan and code generation: Sonnet 5 (Medium) (Github Copilot).
+- Implementation plan and tests generation: Gemini 3.7 Flash (Medium) (Google Antigravity VSCode extension).
+
+
 ## The core idea: an orchestrator, not a rigid state machine
 
 At any given moment, moving a message through the library means answering
@@ -215,3 +221,4 @@ trail of poison messages as a side benefit.
   - coredns is using to resolve the kafka containers names inside containers network and from dev container.
 - functional-style library [OOP-free].
 - podman-inside-of-podman.
+- gemini model discovered with almost 0-guidance the testing patterns and 95% for tests scenarios.

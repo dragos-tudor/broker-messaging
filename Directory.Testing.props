@@ -7,7 +7,7 @@
 
   <ItemGroup Condition="'$(PackOnly)' != 'true'">
     <PackageReference Include="MsTest" PrivateAssets="all"/>
-    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="NSubstitute" PrivateAssets="all"/>
     <PackageReference Include="Shouldly" PrivateAssets="all"/>
   </ItemGroup>
 
