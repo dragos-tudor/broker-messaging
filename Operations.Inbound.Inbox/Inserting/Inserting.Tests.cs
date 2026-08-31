@@ -9,7 +9,7 @@ public partial class InboxTests
   }
 
   [TestMethod]
-  public async Task inserting__insert_inbox_message__success_when_inserted()
+  public async Task inserting__insert_inbox_message__success_with_status_processing_when_inserted()
   {
     var services = Substitute.For<IInsertingServices<string, string>>();
     var message = new InboxMessage<string, string>
@@ -29,6 +29,7 @@ public partial class InboxTests
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.InboxMessage.ShouldBeSameAs(message);
+    resultData.InboxMessage.ShouldBeEquivalentTo(new { Status = InboxMessageStatus.Processing });
   }
 
   [TestMethod]
@@ -91,7 +92,7 @@ public partial class InboxTests
   }
 
   [TestMethod]
-  public async Task inserting__insert_inbox_message__error_when_service_throws_exception()
+  public async Task inserting__insert_inbox_message__error_with_status_mapping_when_service_throws_exception()
   {
     var services = Substitute.For<IInsertingServices<string, string>>();
     var message = new InboxMessage<string, string>
@@ -111,6 +112,7 @@ public partial class InboxTests
     state.ShouldBe(InsertInboxMessageErrorState);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("DB insert error");
+    resultData.InboxMessage.ShouldBeEquivalentTo(new { Status = InboxMessageStatus.Mapping });
   }
 
   [TestMethod]

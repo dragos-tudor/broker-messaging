@@ -22,4 +22,8 @@ partial class InboxMessageFuncs
     InboxMessage<TKey, TPayload> message,
     InboxMessageStatus status)
       { message.Status = status; return message; }
+
+  internal static InboxMessage<TKey, TPayload>? ResetInboxMessageStatus<TKey, TPayload>(
+    InboxMessage<TKey, TPayload>? message)
+      { message?.Status = InboxMessageStatus.Mapping; return message; }
 }

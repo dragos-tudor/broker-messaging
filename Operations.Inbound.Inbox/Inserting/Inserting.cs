@@ -13,6 +13,8 @@ partial class InboxFuncs
   {
     try {
       var message = RequireInboxMessage(data.InboxMessage);
+      SetInboxMessageStatus(message, InboxMessageStatus.Processing);
+
       var messageInserted = await services.InsertInboxMessageAsync(message, ct);
       if (messageInserted is false)
       {
@@ -25,6 +27,7 @@ partial class InboxFuncs
     catch (OperationCanceledException) { return default; }
     catch (Exception exception) {
       data.PipelineError = exception.Message;
+      ResetInboxMessageStatus(data.InboxMessage);
       return (data, InsertInboxMessageErrorState, exception);
     }
   }
