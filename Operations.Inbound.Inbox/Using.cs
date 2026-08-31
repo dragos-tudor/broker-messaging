@@ -10,6 +10,8 @@ global using Persistence.RetryMessage;
 global using static Persistence.InboxMessage.InboxMessageFuncs;
 global using static Persistence.DeadLetterMessage.DeadLetterMessageFuncs;
 global using static Persistence.RetryMessage.RetryMessageFuncs;
+global using static Operations.Inbound.Inbox.InboxFuncs;
+global using static Operations.Inbound.Inbox.InboxStates;
 using System.Runtime.CompilerServices;
 
 [assembly:InternalsVisibleTo("Pipelines.Inbound")]

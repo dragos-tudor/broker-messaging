@@ -7,6 +7,8 @@ global using Persistence.InboxMessage;
 global using Transport.Envelope;
 global using Transport.DeadLetterEnvelope;
 global using static Persistence.InboxMessage.InboxMessageFuncs;
+global using static Operations.Inbound.Envelope.EnvelopeFuncs;
+global using static Operations.Inbound.Envelope.EnvelopeStates;
 global using static Transport.Envelope.EnvelopeFuncs;
 using System.Runtime.CompilerServices;
 

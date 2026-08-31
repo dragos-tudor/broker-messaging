@@ -6,6 +6,8 @@ global using Persistence.OutboxMessage;
 global using Transport.Envelope;
 global using static Transport.Envelope.EnvelopeFuncs;
 global using static Persistence.OutboxMessage.OutboxMessageFuncs;
+global using static Operations.Outbound.Envelope.EnvelopeFuncs;
+global using static Operations.Outbound.Envelope.EnvelopeStates;
 using System.Runtime.CompilerServices;
 
 [assembly:InternalsVisibleTo("Pipelines.Outbound")]
