@@ -1,12 +1,6 @@
 ## Broker agnostic messaging client library.
 
-A broker-agnostic **transactional inbox/outbox** library for .NET, built
-around durable orchestrated pipelines rather than ad-hoc retry logic
-scattered through consumer/producer code. Ships as a base package
-(`Messaging.Core`) plus thin broker-specific packages
-(`Messaging.Kafka`, and RabbitMQ/Azure Service Bus following the same
-seam - wip) — write your consuming/producing logic once, swap the broker
-underneath without touching pipeline code.
+A high-throughput, **transactional inbox/outbox** messaging library as broker-backed systems built on .NET 10. Designed around a strict four-layer directed acyclic graph (DAG), uniform operation shapes, and an orchestrator pattern that keeps state machines pure and readable.
 
 (*ongoing design/architecture docs on [docs](./.docs)*).
 
@@ -17,60 +11,44 @@ underneath without touching pipeline code.
 - Implementation plan and code generation: Sonnet 5 (Medium) (Github Copilot).
 - Implementation plan and tests generation: Gemini 3.7 Flash (Medium) (Google Antigravity VSCode extension).
 
+---
 
 ## The core idea: an orchestrator, not a rigid state machine
 
-At any given moment, moving a message through the library means answering
-one of two genuinely different questions — and the architecture keeps
-them permanently separate, never letting one leak into the other:
+At any given moment, moving a message through the library means answering one of two genuinely different questions — and the architecture keeps them permanently separate:
 
-1. **"Given the shape of this data, which pipeline applies?"** — answered
-   once, by the **Router**, by inspecting the data itself (is this an
-   `Envelope`? An `InboxMessage` mid-processing? A message already marked
-   for dead-lettering?).
-2. **"Given what the last operation just returned, what runs next?"** —
-   answered repeatedly, by whichever **Pipeline** the Router picked, by
-   looking up the returned state string in a table.
+1. **"Given the current state of this workflow, what runs next?"** — answered by a **Pipeline**, which is a pure, inert lookup table mapping operation state strings to scoped action strings (`state → action`).
+2. **"Given what just happened across pipeline boundaries or in this data, how do we orchestrate it?"** — answered by the **Router**, which acts as the orchestrator.
 
 ```
-   ┌─────────────┐   1. picks pipeline   ┌──────────────┐
-   │   Router    │ ────────by data─────▶ │   Pipeline    │
-   │(orchestrator)│                      │ (pure lookup) │
-   │             │ ◀──2. picks operation─│               │
-   └──────┬──────┘        by state        └──────────────┘
+   ┌──────────────┐   1. evaluates state   ┌───────────────┐
+   │    Router    │ ─────────────────────▶ │   Pipeline    │
+   │(orchestrator)│                        │ (pure lookup) │
+   │              │ ◀──2. returns action───│ (state→action)│
+   └──────┬───────┘                        └───────────────┘
           │
-          │ actually calls/awaits the operation, gets a fresh
-          │ state back, and asks the same two questions again
+          │ 3. if action crosses pipelines:
+          │    calls MapInboundAction(action, config)
+          │
+          │ 4. dispatches operation delegate, gets fresh state
           ▼
-   ┌─────────────┐
-   │  Operation  │   a small, self-contained async function
-   └─────────────┘
+   ┌──────────────┐
+   │  Operation   │   a small, self-contained async function
+   └──────────────┘
 ```
 
-The distinction that matters: this is **not** just a state table being
-replayed. The **Router is the orchestrator** — it's the only place
-execution actually happens, and it carries real responsibilities beyond
-"look up the next step": retry budgets and circuit-breaking, resolving
-config-dependent branches a pipeline has no business deciding (Kafka
-producer vs. AMQP publisher), and stitching together the hand-offs
-*between* pipelines when one workflow's exit feeds another's entry.
-Pipelines, by contrast, are deliberately inert — pure `state → operation`
-lookup tables, one file, no execution, no memory of anything that
-happened before the current state. Keeping the orchestrator "smart" and
-every pipeline "dumb" is what makes each pipeline readable top-to-bottom,
-and what closed an entire bug class the earlier design had: states
-silently falling through because a pipeline's own internal loop and the
-router disagreed about who was actually driving.
+The distinction that matters: this is **not** a monolithic state machine replayed blindly. The **Router is the orchestrator** — it is the only place asynchronous execution and side effects happen. It carries responsibilities that pipelines have no business deciding: retry budgets, circuit-breaking, DI/configuration seams (AMQP publisher vs. Kafka producer), and stitching together hand-offs *between* pipelines.
+
+Pipelines, by contrast, are deliberately inert — pure `state → action` lookup tables, one file each, zero side effects, no memory of prior states.
 
 ---
 
 ## Small operations, one job, uniform shape
 
-Every operation in the library — `ValidateEnvelope`, `InsertInboxMessage`,
-`ConfirmEnvelope`, all ~30 of them — has the identical signature:
+Every operation across the library — `ValidateEnvelope`, `InsertInboxMessage`, `ConfirmEnvelope`, `PublishDeadLetterEnvelope` — follows the exact same signature:
 
 ```csharp
-  internal static async ValueTask<(TData, string, Exception?)> InsertInboxMessageAsync<TServices, TData, TKey, TPayload>(
+internal static async ValueTask<(TData, string, Exception?)> InsertInboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -78,63 +56,80 @@ Every operation in the library — `ValidateEnvelope`, `InsertInboxMessage`,
   where TData : IInsertingData<TKey, TPayload>
 ```
 
-Data in, data out, a state string describing what happened, and the
-exception if any. This uniformity is what lets the orchestrator treat
-*any* operation in the library identically through one delegate shape —
-no special-casing per operation, no operation that needs to know what
-kind of thing comes after it.
+Data in, mutated data out, a string constant describing the resulting state, and an exception if one occurred. This uniformity allows the orchestrator to resolve and dispatch *any* operation in the library through one delegate signature.
 
-Two disciplines every operation follows:
+Two strict disciplines every operation follows:
 
-- **Pure vs. side-effect, decided up front.** Pure operations (dev-supplied
-  transforms like `Mapping`/`Converting`, marked non-throwing-by-contract)
-  never self-loop on failure — retrying a pure function changes nothing,
-  so their errors route straight to `Unrecoverable`. Side-effect
-  operations (DB writes, broker calls) self-loop under a budget, because
-  a transient failure might genuinely succeed next time.
-- **Guard clauses, not defensive sprawl.** Each operation starts with a
-  `Require*` call that asserts its own invariants and throws
-  `InvalidOperationException` on violation — these are internal
-  contracts, not external input validation, and they keep every function
-  body reading as "the happy path, with the impossible cases fenced off
-  at the top."
+- **Pure vs. side-effect, decided up front.** Pure operations (dev-supplied transforms like `Mapping` or `Converting`) never self-loop on failure — retrying an in-memory transform changes nothing, so errors route straight to `Unrecoverable`. Side-effect operations (database writes, broker network calls) self-loop under a router budget or retry mechanism, because a transient failure may succeed next time.
+- **Guard clauses, not defensive sprawl.** Each operation begins with a `Require*` assertion that validates internal invariants (`RequireEnvelope`, `RequireInboxMessage`) and throws `InvalidOperationException` on violation. These represent internal contractual fences, keeping the body of the function focused purely on the happy path.
 
 ---
 
 ## Pipelines: readable, one-file lookup tables
 
-Here's a real one — the entire dispatch logic for the inbox path, retry
-mechanism included, in one switch statement:
+Each pipeline is a single, zero-allocation switch statement. Actions are modeled not as boxed enums, but as **unique, compile-time interpolated constant strings** scoped by domain (e.g. `Inbox.Inserting`, `Envelope.Confirming`):
 
 ```csharp
-internal static InboxOperation InboxPipeline(string state) => state switch
+internal static string InboxPipeline(string state) => state switch
 {
-    ValidateInboxMessageSuccessState => InboxOperation.CheckingRetry,
-    InsertInboxMessageSuccessState  => InboxOperation.Handling,
-    HandleInboxMessageSuccessState  => InboxOperation.Transacting,
-    HandleInboxMessageDomainErrorState => InboxOperation.Abandoning,
-    TransactInboxMessageSuccessState   => InboxOperation.Exit,
-    // ...
-    _ => InboxOperation.Unknown
+  ValidateInboxMessageSuccessState => InboxActions.Inserting,
+  ValidateInboxMessageErrorState => InboxActions.Unrecoverable,
+
+  // Inserting — durability achieved on success; ANY failure routes to retry check
+  InsertInboxMessageSuccessState => InboxActions.Inserted,
+  // ...
+  _ => InboxActions.Unknown
 };
 ```
 
-No hidden control flow, no operation that knows what comes after it —
-sequencing lives entirely in the table, which means the *whole shape* of
-a workflow (inbox handling, dead-lettering, outbox dispatch) is visible
-in one screen, not spread across the bodies of a dozen functions.
+## Cross-pipeline orchestration: the mapping function
 
-**Not every transition is a pure 1:1 lookup**, and rather than bolt a
-general mechanism onto the pipeline for the exceptions, each is resolved
-explicitly, in place, by the orchestrator — e.g. `Unrecoverable`/`Exit`
-are deliberately **non-dispatchable**: the pipeline names the transition
-but returns `null` for the delegate, forcing the Router to branch on it
-explicitly rather than call through blindly. The same pattern extends to
-genuinely cross-cutting decisions the pipeline table has no business
-making — like picking between a Kafka producer and an AMQP publisher —
-by naming a `Sending` state that the Router resolves against config,
-rather than smuggling a config parameter into an otherwise pure lookup
-function.
+When an operation produces an action that crosses into another pipeline, it flows through a central, pure mapping function (`MapInboundAction`).
+
+Organized along the natural lifecycle flow:
+
+```csharp
+partial class InboundFuncs
+{
+  internal static string? MapInboundAction(string action, InboundPipelineConfig config = default) =>
+    action switch
+    {
+      // 1. Envelope Pipeline actions
+      EnvelopeActions.Mapped => InboxActions.Validating,
+      EnvelopeActions.Converted => EphemeralDeadLetterEnvelopeActions.Redirecting,
+
+      ...
+      // Terminal, deferred, and non-dispatchable actions
+      _ => default
+    };
+}
+```
+
+### 1. Durability-Driven Sequential Confirmation
+
+Offset confirmation (`ConfirmEnvelope`) does not happen at the tail end of all business logic. Instead, **confirmation happens at the exact moment durability is established or safely given up on**:
+
+$$\text{Inserting} \xrightarrow{\text{Inserted}} \text{Confirming} \xrightarrow{\text{Confirmed}} \text{Handling} \xrightarrow{\text{Handled}} \text{Transacting}$$
+
+1. **`Inbox.Inserting` succeeds** $\to$ emits `InboxActions.Inserted`.
+2. **`MapInboundAction`** maps `Inserted` to `EnvelopeActions.Confirming`.
+3. **`ConfirmEnvelope` runs** $\to$ broker offset is durably committed $\to$ emits `EnvelopeActions.Confirmed`.
+4. **`MapInboundAction`** maps `Confirmed` to `InboxActions.Handling`.
+5. **The Router Guard**: The Router checks `data.InboxMessage?.Status == InboxMessageStatus.Processing`:
+   - For `Inserted`: message is in `Processing` $\to$ dispatches `Handling`.
+   - For `Idempotent` (duplicate cleared), `RetryExhausted` (insert failed), or `Redirected` (malformed payload): the condition is false $\to$ the Router terminates cleanly without dispatching `Handling`.
+
+Downstream business execution (`Handling`, `Transacting`, `Abandoning`, `Scheduling`) operates on an already-committed database row and never touches broker confirmation again.
+
+
+### 2. Decoupled Dead Letter Paths: Ephemeral vs. Persisted
+
+Dead lettering is split into two mutually exclusive paths:
+
+- **Ephemeral Path (`EphemeralDeadLetterEnvelopePipeline`)**:
+  Used when validation or mapping fails on the inbound envelope (`EnvelopeActions.Converted`). No database row exists. It attempts an in-memory redirect. Under failure, it follows pre-durable retries (`CheckingRetry` $\to$ `UpsertingRetry` $\to$ `Deferring`). On success or exhaustion (`Redirected` / `CheckedRetry`), it maps directly to `EnvelopeActions.Confirming`.
+- **Persisted Path (`DeadLetterEnvelopePipeline`)**:
+  Used when an inserted inbox message encounters a fatal business domain error (`InboxActions.Converted` $\to$ `DeadLetterActions.Inserting`). A durable `DeadLetterMessage` database row exists. `DeadLetterActions.Mapped` dynamically routes to `Publishing` or `Producing` via `InboundPipelineConfig`. On `Published`, it hands off to `DeadLetterActions.Closing`, which in turn triggers `InboxActions.Closing` to close both database records in a clean two-way roundtrip.
 
 ---
 
@@ -147,10 +142,10 @@ Layer 4 — Routing        Routing.Inbound / Routing.Outbound
                            cross-pipeline hand-offs)
                                         │
 Layer 3 — Pipelines      Pipelines.Inbound / Pipelines.Outbound
-                          (pure lookup tables, one folder per
-                           mirrored Operations project)
+                          (pure lookup tables, MapInboundAction,
+                           and pipeline configuration)
                                         │
-Layer 2 — Operations     six projects, split by DIRECTION × INPUT ENTITY:
+Layer 2 — Operations     split by DIRECTION × INPUT ENTITY:
                           Operations.Inbound.Envelope
                           Operations.Inbound.Inbox
                           Operations.Inbound.DeadLetter
@@ -158,59 +153,56 @@ Layer 2 — Operations     six projects, split by DIRECTION × INPUT ENTITY:
                           Operations.Outbound.Outbox
                           Operations.Outbound.Envelope
                                         │
-Layer 1 — Persistence     / .Inbox / .Outbox / .DeadLetter / .RetryMessage
+Layer 1 — Persistence     / .InboxMessage / .OutboxMessage
+                          / .DeadLetterMessage / .RetryMessage
           Transport       / .Envelope / .DeadLetterEnvelope
 ```
 
-Each layer references only the layer directly below it — a strict DAG,
-no exceptions. The Operations split (six projects, not three, not five)
-is the result of applying one rule consistently: **an operation lives in
-the project named for what it *consumes*, crossed with which direction
-it belongs to** — the same rule the library already uses for naming
-individual operations (`ConvertEnvelope` takes an `Envelope`; it lives in
-the Envelope project). This single rule resolved every awkward case —
-`Mapping`/`Converting` operations that straddle two entity types,
-`Envelope`-shaped operations that differ completely between inbound and
-outbound — without ever needing a special "boundary operations" bucket.
+Each layer references only the layer directly below it — a strict DAG. An operation lives in the project named for what it **consumes**, crossed with the **direction** it belongs to (`ConvertEnvelope` consumes an `Envelope` on inbound $\to$ `Operations.Inbound.Envelope`).
 
-Pipelines mirror this at folder granularity: `Pipelines.Inbound` has one
-folder per Operations project it dispatches into, so navigating from "I'm
-looking at `Operations.Inbound.Inbox`" to "here's its pipeline" is always
-a one-hop, same-name lookup.
+`Pipelines.Inbound` mirrors this at folder granularity (`Envelope`, `Inbox`, `DeadLetter`, `DeadLetterEnvelope`) alongside the centralized `Mapping.cs`.
 
 ---
 
-## Retry and exhaustion: one generic mechanism, three consequences
+## Retry and exhaustion: check-after-error and unified budgets
 
-Rather than every operation carrying its own bespoke retry counter, the
-orchestrator owns **one generic attempt-budget mechanism**, applied
-uniformly to every side-effect operation's error state. What varies is
-only the *consequence* once that budget is spent — and that consequence
-falls into exactly three categories, decided by asking one question per
-operation: *is there a legitimate next step once retries are exhausted,
-or not?*
+Rather than each operation maintaining custom retry logic, retry orchestration follows two distinct models based on whether durability has been reached:
 
-| Category | Examples | On exhaustion |
+| Category | Examples | Lifecycle Strategy |
 |---|---|---|
-| Infra-only failures | `Closing`, `Abandoning` | Circuit opens, resumes same action later |
-| Row already persisted | `Handling`, `Transacting` | Hands off to `Scheduling` (persisted retry) |
-| No durable row yet | `Inserting`, `Publishing`/`Producing`/`Redirecting` | New `RetryMessage` mechanism (below) |
-| No escape at all | `Capturing`, `Confirming` | Circuit-opens forever — by design, not oversight |
+| **Infra / Cleanup Operations** | `Closing`, `Abandoning` | Router-generic attempt budget; circuit opens on repeated failure. |
+| **Row Already Persisted** | `Handling`, `Transacting` | Router budget; upon exhaustion, hands off to `Scheduling` (database retry worker). |
+| **Pre-Durable Write Operations** | `Inserting`, `Redirecting` | Dedicated `RetryMessage` audit check-after-error mechanism (below). |
 
-For the "no durable row yet" case — a message that can fail before
-anything's been persisted to retry against — a small, dedicated
-`RetryMessage` mechanism kicks in: a pre-check gate (`Checking`) runs
-*before* the risky operation is even attempted, and an `Upserting` step
-writes a durable retry record only once that operation's own budget is
-truly spent. This record is deliberately **not a message store** — the
-envelope is always re-fetched fresh from the broker on retry, never
-deserialized from this table — which sidesteps an entire category of
-staleness/versioning problems, and doubles as a genuine, queryable audit
-trail of poison messages as a side benefit.
+### The Check-After-Error Pre-Durable Retry (`RetryMessage`)
 
+For messages that have not yet achieved durability (e.g. `Inserting` an `InboxMessage` or `Redirecting` an ephemeral dead-letter envelope):
 
-### Remarks
+1. The initial operation is attempted directly without pre-check overhead.
+2. If an error occurs (`InsertInboxMessageErrorState`), control passes to `CheckingRetry`.
+3. `CheckingRetry` inspects the durable `RetryMessage` store:
+   - **Not Exhausted**: routes to `UpsertingRetry`, records the attempt, and returns `Deferring`. The message is not confirmed; the broker will redeliver it after a backoff delay.
+   - **Exhausted**: routes to `RetryExhausted`, hands off to `EnvelopeActions.Confirming`. The poison envelope offset is committed so the broker partition does not stall, and `Handling` is skipped.
+
+The `RetryMessage` record is **not a message store** — the payload is always re-read fresh from the broker upon redelivery, preventing payload version skew while providing a fully queryable audit trail of poison message attempts.
+
 ---
+
+## Testing Strategy: Two-Tier Verification
+
+The pipeline and mapping architecture is tested across two complementary tiers using composite interfaces (`IInboundServices`, `IInboundData`):
+
+1. **Tier 1: Fast Graph Traversal Tests (Zero Mocks, <10ms)**: Validates pure string sequences (`Pipeline(state) → MapInboundAction(action)`) across every permutation of branches and error paths.
+2. **Tier 2: Async Scenario Runner Tests (NSubstitute Mocks)**: Executes the actual async operation delegates through `RunInboundPipelineAsync` to verify end-to-end data mutations, offset confirmation order, idempotency clearing, and status guards across all 5 canonical lifecycle scenarios:
+   - **Happy Path**: `Envelope.Mapped` $\to$ `Inbox.Inserted` $\to$ `Envelope.Confirmed` $\to$ `Inbox.Handled` $\to$ `Inbox.Transacted`.
+   - **Idempotent Duplicate**: Duplicate insert returns false $\to$ `Inbox.Idempotent` $\to$ `Envelope.Confirmed` $\to$ Router guard stops cleanly without `Handling`.
+   - **Insert Failure Exhaustion**: Insert error $\to$ `CheckingRetry` exhausts $\to$ `Envelope.Confirmed` $\to$ Router guard stops cleanly.
+   - **Malformed Envelope**: `Envelope.Converted` $\to$ `EphemeralDL.Redirecting` $\to$ `Envelope.Confirmed`.
+   - **Persisted Dead-Letter Two-Way Crossing**: Domain error $\to$ `Inbox.Converted` $\to$ `DeadLetter.Inserting` $\to$ `DeadLetter.Mapped` $\to$ `DLEnvelope.Published` $\to$ `DeadLetter.Closed` $\to$ `Inbox.Closed`.
+
+---
+
+## Remarks
 - all integration tests use podman containers [aspire testing NA].
 - dev container network is user-created. ensure isolation from host [messaging-netwok].
 - podman containers are isolated using dedicated network [dev-netwok].
@@ -221,4 +213,3 @@ trail of poison messages as a side benefit.
   - coredns is using to resolve the kafka containers names inside containers network and from dev container.
 - functional-style library [OOP-free].
 - podman-inside-of-podman.
-- gemini model discovered with almost 0-guidance the testing patterns and 95% for tests scenarios.

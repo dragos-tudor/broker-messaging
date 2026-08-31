@@ -4,12 +4,12 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  internal static async ValueTask<(TData, string, Exception?)> CheckRetryDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirming>(
+  internal static async ValueTask<(TData, string, Exception?)> CheckRetryDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
     TServices services,
     TData data,
     CancellationToken ct = default)
   where TServices : ICheckingRetryServices
-  where TData : ICheckingRetryData<TKey, TValue, TMetadata, TConfirming>
+  where TData : ICheckingRetryData<TKey, TValue, TMetadata, TConfirmation>
   {
     try
     {

@@ -1,7 +1,7 @@
 
 namespace Operations.Inbound.DeadLetterEnvelope;
 
-internal interface IUpsertingRetryData<TKey, TValue, TMetadata, TConfirming>:
-  IDeadLetterEnvelopeProp<TKey, TValue, TMetadata, TConfirming>,
+public interface IUpsertingRetryData<TKey, TValue, TMetadata, TConfirmation>:
+  IDeadLetterEnvelopeProp<TKey, TValue, TMetadata, TConfirmation>,
   IRetryMessageProp,
   IPipelineErrorProp;

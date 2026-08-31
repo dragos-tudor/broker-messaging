@@ -3,7 +3,7 @@ namespace Persistence.DeadLetterMessage;
 
 public interface IDeadLetterMessageInsertService<TKey, TPayload>
 {
-  internal Task<bool> InsertDeadLetterMessageAsync(
+  Task<bool> InsertDeadLetterMessageAsync(
     DeadLetterMessage<TKey, TPayload> message,
     CancellationToken ct = default);
 }

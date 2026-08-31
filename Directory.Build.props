@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
     <UseArtifactsOutput>true</UseArtifactsOutput>
-    <NoWarn>$(NoWarn);RS0036;RS0037;CA1031</NoWarn>
+    <NoWarn>$(NoWarn);RS0036;RS0037;CA1031;NU1900</NoWarn>
 
     <!-- compiling -->
     <ImplicitUsings>disable</ImplicitUsings>
