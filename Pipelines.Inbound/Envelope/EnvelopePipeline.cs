@@ -5,33 +5,44 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static EnvelopeOperation EnvelopePipeline(string state) => state switch
+  internal static string EnvelopePipeline(string state) => state switch
   {
-      // Capturing
-      NotCapturedEnvelopeState => EnvelopeOperation.Capturing,        // self-loop, nothing polled
-      CaptureEnvelopeErrorState => EnvelopeOperation.Capturing,       // self-loop, technical
-      CaptureEnvelopeSuccessState => EnvelopeOperation.Validating,
+      NotCapturedEnvelopeState => EnvelopeActions.Capturing,
+      CaptureEnvelopeErrorState => EnvelopeActions.Capturing,
+      CaptureEnvelopeSuccessState => EnvelopeActions.Validating,
 
-      // Validating
-      ValidateEnvelopeSuccessState => EnvelopeOperation.Mapping,
-      ValidateEnvelopeErrorState => EnvelopeOperation.Unrecoverable,     // pure validation violated non-throwing contract
-      ValidateEnvelopeInvalidErrorState => EnvelopeOperation.Unrecoverable,   // nulls too incomplete for Converting/Confirming
-      ValidateEnvelopeInvalidConfirmableErrorState => EnvelopeOperation.Confirming,   // invalid, but skip Converting — offset still confirmable
+      ValidateEnvelopeSuccessState => EnvelopeActions.Mapping,
+      ValidateEnvelopeErrorState => EnvelopeActions.Unrecoverable,
+      ValidateEnvelopeInvalidErrorState => EnvelopeActions.Unrecoverable,
+      ValidateEnvelopeInvalidConfirmableErrorState => EnvelopeActions.Confirming,
 
-      // Mapping
-      MapEnvelopeSuccessState => EnvelopeOperation.Exit,              // → InboxMessage populated, Status = Mapping
-      MapEnvelopeErrorState => EnvelopeOperation.Unrecoverable,       // dev pure mapper violated non-throwing contract
-      MapEnvelopeValueErrorState => EnvelopeOperation.Converting,     // bad message → DL path
+      MapEnvelopeSuccessState => EnvelopeActions.Mapped,
+      MapEnvelopeErrorState => EnvelopeActions.Unrecoverable,
+      MapEnvelopeValueErrorState => EnvelopeActions.Converting,
 
-      // Converting
-      ConvertEnvelopeSuccessState => EnvelopeOperation.Exit,          // → DeadLetterEnvelope populated
-      ConvertEnvelopeErrorState => EnvelopeOperation.Unrecoverable,   // dev pure FromEnvelope violated contract
-      ConvertEnvelopeInvalidState => EnvelopeOperation.Confirming,    // FromEnvelope returned null → skip Redirecting
+      ConvertEnvelopeSuccessState => EnvelopeActions.Converted,
+      ConvertEnvelopeErrorState => EnvelopeActions.Unrecoverable,
+      ConvertEnvelopeInvalidState => EnvelopeActions.Confirming,
 
-      // Confirming
-      ConfirmEnvelopeSuccessState => EnvelopeOperation.Exit,          // terminal, fully processed
-      ConfirmEnvelopeErrorState => EnvelopeOperation.Confirming,      // self-loop, technical
+      ConfirmEnvelopeSuccessState => EnvelopeActions.Confirmed,
+      ConfirmEnvelopeErrorState => EnvelopeActions.Confirming,
 
-      _ => EnvelopeOperation.Unknown
+      _ => EnvelopeActions.Unknown
   };
+}
+
+internal static class EnvelopeActions
+{
+  private const string Scope = "Envelope";
+
+  public const string Capturing = $"{Scope}.{nameof(Capturing)}";
+  public const string Validating = $"{Scope}.{nameof(Validating)}";
+  public const string Mapping = $"{Scope}.{nameof(Mapping)}";
+  public const string Mapped = $"{Scope}.{nameof(Mapped)}";
+  public const string Converting = $"{Scope}.{nameof(Converting)}";
+  public const string Converted = $"{Scope}.{nameof(Converted)}";
+  public const string Confirming = $"{Scope}.{nameof(Confirming)}";
+  public const string Confirmed = $"{Scope}.{nameof(Confirmed)}";
+  public const string Unrecoverable = $"{Scope}.{nameof(Unrecoverable)}";
+  public const string Unknown = $"{Scope}.{nameof(Unknown)}";
 }

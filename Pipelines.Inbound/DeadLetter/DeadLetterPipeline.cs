@@ -4,40 +4,43 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static DeadLetterOperation DeadLetterPipeline(string state) => state switch
+  internal static string DeadLetterPipeline(string state) => state switch
   {
-    // Inserting (side effect — creates the DeadLetterMessage row; self-loop on failure)
-    InsertDeadLetterMessageSuccessState => DeadLetterOperation.Mapping,
-    InsertDeadLetterMessageErrorState => DeadLetterOperation.Inserting,
-    IdempotentDeadLetterMessageState => DeadLetterOperation.Mapping,    // row already exists, but the envelope
-                                                                        // still needs building for this run —
-                                                                        // otherwise nothing gets published/produced
+    InsertDeadLetterMessageSuccessState => DeadLetterActions.Mapping,
+    InsertDeadLetterMessageErrorState => DeadLetterActions.Inserting,
+    IdempotentDeadLetterMessageState => DeadLetterActions.Mapping,
 
-    // Mapping (pure — DeadLetterMessage → DeadLetterEnvelope; no self-loop on failure)
-    MapDeadLetterMessageSuccessState => DeadLetterOperation.Exit,        // → Pipelines.Inbound.DeadLetterEnvelope
-    MapDeadLetterMessageErrorState => DeadLetterOperation.Unrecoverable,
-    MapDeadLetterMessagePayloadErrorState => DeadLetterOperation.Unrecoverable,
+    MapDeadLetterMessageSuccessState => DeadLetterActions.Mapped,
+    MapDeadLetterMessageErrorState => DeadLetterActions.Unrecoverable,
+    MapDeadLetterMessagePayloadErrorState => DeadLetterActions.Unrecoverable,
 
-    // Scheduling (side effect, §3b — same apparatus as Inbox's, keyed on DeadLetterMessage instead of
-    // InboxMessage; row already exists at this point since Inserting has succeeded). Reached only via
-    // cross-pipeline hand-off from Pipelines.Inbound.DeadLetterEnvelope's own exhaustion — not from any
-    // state within this table (same open-item shape as Inbox's Closing, Aug-28 §10). Only two real
-    // outcomes confirmed against code — no SuccessState row
-    ScheduleDeadLetterMessageExhaustedState => DeadLetterOperation.Abandoning,
-    ScheduleDeadLetterMessageRetryState => DeadLetterOperation.Exit,     // persisted, next job iteration picks it up
-    ScheduleDeadLetterMessageErrorState => DeadLetterOperation.Scheduling,
+    ScheduleDeadLetterMessageExhaustedState => DeadLetterActions.Abandoning,
+    ScheduleDeadLetterMessageRetryState => DeadLetterActions.Scheduled,
+    ScheduleDeadLetterMessageErrorState => DeadLetterActions.Scheduling,
 
-    // Abandoning (side effect, §3a) — TERMINAL here, unlike Inbox's Abandoning→Converting (Aug-26 §7:
-    // DL's Abandoned has nowhere further to hand off to)
-    AbandonDeadLetterMessageSuccessState => DeadLetterOperation.Exit,    // terminal, Status = Abandoned
-    AbandonDeadLetterMessageErrorState => DeadLetterOperation.Abandoning,
+    AbandonDeadLetterMessageSuccessState => DeadLetterActions.Abandoned,
+    AbandonDeadLetterMessageErrorState => DeadLetterActions.Abandoning,
 
-    // Closing (side effect, §3a) — terminal, Status = Closed. Entry point is cross-pipeline (presumably
-    // a successful send confirmed by DeadLetterEnvelope's pipeline) — same unresolved hand-off gap as
-    // Scheduling above
-    CloseDeadLetterMessageSuccessState => DeadLetterOperation.Exit,
-    CloseDeadLetterMessageErrorState => DeadLetterOperation.Closing,
+    CloseDeadLetterMessageSuccessState => DeadLetterActions.Closed,
+    CloseDeadLetterMessageErrorState => DeadLetterActions.Closing,
 
-    _ => DeadLetterOperation.Unknown
+    _ => DeadLetterActions.Unknown
   };
+}
+
+internal static class DeadLetterActions
+{
+  private const string Scope = "DeadLetter";
+
+  public const string Inserting = $"{Scope}.{nameof(Inserting)}";
+  public const string Mapping = $"{Scope}.{nameof(Mapping)}";
+  public const string Mapped = $"{Scope}.{nameof(Mapped)}";
+  public const string Scheduling = $"{Scope}.{nameof(Scheduling)}";
+  public const string Scheduled = $"{Scope}.{nameof(Scheduled)}";
+  public const string Abandoning = $"{Scope}.{nameof(Abandoning)}";
+  public const string Abandoned = $"{Scope}.{nameof(Abandoned)}";
+  public const string Closing = $"{Scope}.{nameof(Closing)}";
+  public const string Closed = $"{Scope}.{nameof(Closed)}";
+  public const string Unrecoverable = $"{Scope}.{nameof(Unrecoverable)}";
+  public const string Unknown = $"{Scope}.{nameof(Unknown)}";
 }

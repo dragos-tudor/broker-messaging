@@ -1,33 +1,57 @@
-
 using static Operations.Inbound.DeadLetterEnvelope.DeadLetterEnvelopeStates;
 
 namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static DeadLetterEnvelopeOperation DeadLetterEnvelopePipeline(string state) => state switch
+  internal static string EphemeralDeadLetterEnvelopePipeline(string state) => state switch
   {
-    // CheckingRetryForRedirecting (side effect — pre-check gate, before Redirecting is ever attempted)
-    CheckRetryDeadLetterEnvelopeExhaustedState => DeadLetterEnvelopeOperation.Exit,
-    CheckRetryDeadLetterEnvelopeNotExhaustedState => DeadLetterEnvelopeOperation.Redirecting,
-    CheckRetryDeadLetterEnvelopeErrorState => DeadLetterEnvelopeOperation.CheckingRetry,
+    RedirectDeadLetterEnvelopeSuccessState => EphemeralDeadLetterEnvelopeActions.Redirected,
+    RedirectDeadLetterEnvelopeErrorState => EphemeralDeadLetterEnvelopeActions.CheckingRetry,
 
-    // Redirecting (side effect — self-loop under Router-generic budget; exhaustion invokes UpsertingRetry directly)
-    RedirectDeadLetterEnvelopeSuccessState => DeadLetterEnvelopeOperation.Sending,   // non-dispatchable, see note above
-    RedirectDeadLetterEnvelopeErrorState => DeadLetterEnvelopeOperation.Redirecting,
+    CheckRetryDeadLetterEnvelopeExhaustedState => EphemeralDeadLetterEnvelopeActions.CheckedRetry,
+    CheckRetryDeadLetterEnvelopeNotExhaustedState => EphemeralDeadLetterEnvelopeActions.UpsertingRetry,
+    CheckRetryDeadLetterEnvelopeErrorState => EphemeralDeadLetterEnvelopeActions.CheckingRetry,
 
-    // Publishing (side effect)
-    PublishDeadLetterEnvelopeSuccessState => DeadLetterEnvelopeOperation.Exit,     // → Confirming, dead-letter delivered
-    PublishDeadLetterEnvelopeErrorState => DeadLetterEnvelopeOperation.Publishing,
+    UpsertRetryDeadLetterEnvelopeSuccessState => EphemeralDeadLetterEnvelopeActions.Deferring,
+    UpsertRetryDeadLetterEnvelopeErrorState => EphemeralDeadLetterEnvelopeActions.UpsertingRetry,
 
-    // Producing (side effect — present-tense success state, 08-26 §7's exemption pattern)
-    ProducingDeadLetterEnvelopeState => DeadLetterEnvelopeOperation.Deffering,     // → Deffering, dead-letter processing
-    ProduceDeadLetterEnvelopeErrorState => DeadLetterEnvelopeOperation.Producing,
-
-    // UpsertingRetry (side effect — shared across Redirecting/Publishing/Producing exhaustion, §4d/§9b)
-    UpsertRetryDeadLetterEnvelopeSuccessState => DeadLetterEnvelopeOperation.Deffering,  // → Deffering, dead-letter processing
-    UpsertRetryDeadLetterEnvelopeErrorState => DeadLetterEnvelopeOperation.UpsertingRetry,
-
-    _ => DeadLetterEnvelopeOperation.Unknown
+    _ => EphemeralDeadLetterEnvelopeActions.Unknown
   };
+
+ internal static string DeadLetterEnvelopePipeline(string state) => state switch
+  {
+    PublishDeadLetterEnvelopeSuccessState => DeadLetterEnvelopeActions.Published,
+    PublishDeadLetterEnvelopeErrorState => DeadLetterEnvelopeActions.Publishing,
+
+    ProducingDeadLetterEnvelopeState => DeadLetterEnvelopeActions.Deferring,
+    ProduceDeadLetterEnvelopeErrorState => DeadLetterEnvelopeActions.Producing,
+
+    _ => DeadLetterEnvelopeActions.Unknown
+  };
+}
+
+
+internal static class EphemeralDeadLetterEnvelopeActions
+{
+  private const string Scope = "EphemeralDeadLetterEnvelope";
+
+  public const string Redirecting = $"{Scope}.{nameof(Redirecting)}";
+  public const string Redirected = $"{Scope}.{nameof(Redirected)}";
+  public const string CheckingRetry = $"{Scope}.{nameof(CheckingRetry)}";
+  public const string CheckedRetry = $"{Scope}.{nameof(CheckedRetry)}";
+  public const string UpsertingRetry = $"{Scope}.{nameof(UpsertingRetry)}";
+  public const string Deferring = $"{Scope}.{nameof(Deferring)}";
+  public const string Unknown = $"{Scope}.{nameof(Unknown)}";
+}
+
+internal static class DeadLetterEnvelopeActions
+{
+  private const string Scope = "DeadLetterEnvelope";
+
+  public const string Publishing = $"{Scope}.{nameof(Publishing)}";
+  public const string Published = $"{Scope}.{nameof(Published)}";
+  public const string Producing = $"{Scope}.{nameof(Producing)}";
+  public const string Deferring = $"{Scope}.{nameof(Deferring)}";
+  public const string Unknown = $"{Scope}.{nameof(Unknown)}";
 }
