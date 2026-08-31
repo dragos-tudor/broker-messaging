@@ -11,11 +11,9 @@ partial class InboundFuncs
   where TData : IDeadLetterEnvelopeData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
     action switch
     {
-      DeadLetterEnvelopeOperation.CheckingRetryForRedirecting => CheckRetryDeadLetterEnvelopeForRedirectingAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>,
+      DeadLetterEnvelopeOperation.CheckingRetry => CheckRetryDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>,
       DeadLetterEnvelopeOperation.Redirecting => RedirectDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
-      DeadLetterEnvelopeOperation.CheckingRetryForPublishing => CheckRetryDeadLetterEnvelopeForPublishingAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>,
       DeadLetterEnvelopeOperation.Publishing => PublishDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
-      DeadLetterEnvelopeOperation.CheckingRetryForProducing => CheckRetryDeadLetterEnvelopeForProducingAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>,
       DeadLetterEnvelopeOperation.Producing => ProduceDeadLetterEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
       DeadLetterEnvelopeOperation.UpsertingRetry => UpsertRetryDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>,
       // Sending, Unrecoverable, Exit, Unknown all fall here — non-dispatchable, Router branches explicitly
@@ -25,12 +23,11 @@ partial class InboundFuncs
 
 internal enum DeadLetterEnvelopeOperation
 {
-  CheckingRetryForRedirecting,
+  CheckingRetry,
+  Deffering,
   Redirecting,
   Sending,                    // non-dispatchable — Router resolves to CheckingRetryForPublishing or ...ForProducing based on config
-  CheckingRetryForPublishing,
   Publishing,
-  CheckingRetryForProducing,
   Producing,
   UpsertingRetry,
   Unrecoverable,

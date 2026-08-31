@@ -4,7 +4,7 @@ namespace Pipelines.Inbound;
 
 public interface IInboxData<TKey, TValue, TMetadata, TConfirmation, TPayload>:
   IValidatingData<TKey, TPayload>,
-  ICheckingData<TKey, TPayload>,
+  ICheckingRetryData<TKey, TPayload>,
   IInsertingData<TKey, TPayload>,
   IHandlingData<TKey, TPayload>,
   ITransactingData<TKey, TPayload>,
@@ -12,4 +12,4 @@ public interface IInboxData<TKey, TValue, TMetadata, TConfirmation, TPayload>:
   IClosingData<TKey, TPayload>,
   IAbandoningData<TKey, TPayload>,
   IConvertingData<TKey, TPayload>,
-  IUpsertingData<TKey, TPayload>;
+  IUpsertingRetryData<TKey, TPayload>;

@@ -3,8 +3,8 @@ using Operations.Inbound.DeadLetterEnvelope;
 namespace Pipelines.Inbound;
 
 internal interface IDeadLetterEnvelopeData<TKey, TValue, TMetadata, TConfirmation, TPayload>:
-  ICheckingData<TKey, TValue, TMetadata, TConfirmation>,
+  ICheckingRetryData<TKey, TValue, TMetadata, TConfirmation>,
   IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>,
   IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload>,
   IRedirectingData<TKey, TValue, TMetadata, TConfirmation>,
-  IUpsertingData<TKey, TValue, TMetadata, TConfirmation>;
+  IUpsertingRetryData<TKey, TValue, TMetadata, TConfirmation>;

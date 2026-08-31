@@ -8,7 +8,7 @@ scattered through consumer/producer code. Ships as a base package
 seam - wip) — write your consuming/producing logic once, swap the broker
 underneath without touching pipeline code.
 
-(*ongoing design/architecture docs on [docs](./docs)*).
+(*ongoing design/architecture docs on [docs](./.docs)*).
 
 ---
 

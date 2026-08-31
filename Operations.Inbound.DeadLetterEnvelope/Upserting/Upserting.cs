@@ -9,14 +9,15 @@ partial class DeadLetterEnvelopeFuncs
     TData data,
     CancellationToken ct = default)
   where TServices : IUpsertingServices
-  where TData : IUpsertingData<TKey, TValue, TMetadata, TConfirming>
+  where TData : IUpsertingRetryData<TKey, TValue, TMetadata, TConfirming>
   {
     try
     {
       var envelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
-      var error = data.PipelineError ?? "Unknown upsert retry dead letter envelope error";
+      var retryMessage = data.RetryMessage ?? CreateRetryMessage(BuildRetryMessageId(envelope.Key, envelope.CreatedAt));
+      var error = data.PipelineError ?? "Unknown upsert retry inbox message error";
 
-      await UpsertRetryMessageAsync(services, envelope.Key, envelope.CreatedAt, error, ct);
+      await UpsertRetryMessageAsync(services, retryMessage, error, ct);
       return (data, UpsertRetryDeadLetterEnvelopeSuccessState, null);
     }
     catch (OperationCanceledException) { return default; }

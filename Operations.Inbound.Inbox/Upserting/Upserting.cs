@@ -8,15 +8,16 @@ partial class InboxFuncs
     TServices services,
     TData data,
     CancellationToken ct = default)
-  where TServices : IUpsertingServices
-  where TData : IUpsertingData<TKey, TPayload>
+  where TServices : IUpsertingRetryServices
+  where TData : IUpsertingRetryData<TKey, TPayload>
   {
     try
     {
       var message = RequireInboxMessage(data.InboxMessage);
+      var retryMessage = data.RetryMessage ?? CreateRetryMessage(BuildRetryMessageId(message.MessageKey, message.CreatedAt));
       var error = data.PipelineError ?? "Unknown upsert retry inbox message error";
 
-      await UpsertRetryMessageAsync(services, message.MessageKey, message.CreatedAt, error, ct);
+      await UpsertRetryMessageAsync(services, retryMessage, error, ct);
       return (data, UpsertRetryInboxMessageSuccessState, null);
     }
     catch (OperationCanceledException) { return default; }

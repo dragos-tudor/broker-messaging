@@ -3,15 +3,8 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 static partial class DeadLetterEnvelopeStates
 {
-  internal const string CheckRetryDeadLetterEnvelopeForRedirectingExhaustedState = "CheckRetryDeadLetterEnvelopeForRedirectingExhaustedState";
-  internal const string CheckRetryDeadLetterEnvelopeForRedirectingNotExhaustedState = "CheckRetryDeadLetterEnvelopeForRedirectingNotExhaustedState";
-  internal const string CheckRetryDeadLetterEnvelopeForRedirectingErrorState = "CheckRetryDeadLetterEnvelopeForRedirectingErrorState";
+  internal const string CheckRetryDeadLetterEnvelopeExhaustedState = "CheckRetryDeadLetterEnvelopeExhaustedState";
+  internal const string CheckRetryDeadLetterEnvelopeNotExhaustedState = "CheckRetryDeadLetterEnvelopeNotExhaustedState";
+  internal const string CheckRetryDeadLetterEnvelopeErrorState = "CheckRetryDeadLetterEnvelopeErrorState";
 
-  internal const string CheckRetryDeadLetterEnvelopeForPublishingExhaustedState = "CheckRetryDeadLetterEnvelopeForPublishingExhaustedState";
-  internal const string CheckRetryDeadLetterEnvelopeForPublishingNotExhaustedState = "CheckRetryDeadLetterEnvelopeForPublishingNotExhaustedState";
-  internal const string CheckRetryDeadLetterEnvelopeForPublishingErrorState = "CheckRetryDeadLetterEnvelopeForPublishingErrorState";
-
-  internal const string CheckRetryDeadLetterEnvelopeForProducingExhaustedState = "CheckRetryDeadLetterEnvelopeForProducingExhaustedState";
-  internal const string CheckRetryDeadLetterEnvelopeForProducingNotExhaustedState = "CheckRetryDeadLetterEnvelopeForProducingNotExhaustedState";
-  internal const string CheckRetryDeadLetterEnvelopeForProducingErrorState = "CheckRetryDeadLetterEnvelopeForProducingErrorState";
 }

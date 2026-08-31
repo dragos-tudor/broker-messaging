@@ -11,7 +11,7 @@ internal static Func<TServices, TData, CancellationToken, ValueTask<(TData, stri
     action switch
     {
       InboxOperation.Validating => ValidateInboxMessage<TServices, TData, TKey, TPayload>,
-      InboxOperation.CheckingRetry => CheckRetryInboxMessageForInsertingAsync<TServices, TData, TKey, TPayload>,
+      InboxOperation.CheckingRetry => CheckRetryInboxMessageAsync<TServices, TData, TKey, TPayload>,
       InboxOperation.Inserting => InsertInboxMessageAsync<TServices, TData, TKey, TPayload>,
       InboxOperation.UpsertingRetry => UpsertRetryInboxMessageAsync<TServices, TData, TKey, TPayload>,
       InboxOperation.Handling => HandleInboxMessageAsync<TServices, TData, TKey, TPayload>,
@@ -27,8 +27,8 @@ internal static Func<TServices, TData, CancellationToken, ValueTask<(TData, stri
 internal enum InboxOperation
 {
   Validating,
-  CheckingRetry,
   Inserting,
+  CheckingRetry,
   UpsertingRetry,
   Handling,
   Transacting,
@@ -37,6 +37,7 @@ internal enum InboxOperation
   Converting,
   Closing,
   Unrecoverable,
+  Deferring,
   Exit,
   Unknown
 }

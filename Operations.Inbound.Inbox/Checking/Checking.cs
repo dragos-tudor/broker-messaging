@@ -4,27 +4,30 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  internal static async ValueTask<(TData, string, Exception?)> CheckRetryInboxMessageForInsertingAsync<TServices, TData, TKey, TPayload>(
+  internal static async ValueTask<(TData, string, Exception?)> CheckRetryInboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
-  where TServices : ICheckingServices
-  where TData : ICheckingData<TKey, TPayload>
+  where TServices : ICheckingRetryServices
+  where TData : ICheckingRetryData<TKey, TPayload>
   {
     try
     {
       var message = RequireInboxMessage(data.InboxMessage);
-      var exhausted = await CheckRetryMessageExhaustedAsync(services, message.MessageKey, message.CreatedAt, ct);
+      var options = services.GetRetryMessageOptions();
+      var retryMessage = await GetRetryMessageAsync(services, message.MessageKey, message.CreatedAt, ct);
+      var exhausted = IsRetryMessageExhausted(retryMessage, options);
 
+      data.RetryMessage = retryMessage;
       return exhausted?
-        (data, CheckRetryInboxMessageForInsertingExhaustedState, null):
-        (data, CheckRetryInboxMessageForInsertingNotExhaustedState, null);
+        (data, CheckRetryInboxMessageExhaustedState, null):
+        (data, CheckRetryInboxMessageNotExhaustedState, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception)
     {
       data.PipelineError = exception.Message;
-      return (data, CheckRetryInboxMessageForInsertingErrorState, exception);
+      return (data, CheckRetryInboxMessageErrorState, exception);
     }
   }
 }

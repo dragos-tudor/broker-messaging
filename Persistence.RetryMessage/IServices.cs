@@ -2,8 +2,7 @@
 namespace Persistence.RetryMessage;
 
 public interface ICheckingServices :
-  IRetryMessageReaderService,
-  IRetryMessageOptionsReaderService;
+  IRetryMessageReaderService;
 
 public interface IUpsertingServices :
   IRetryMessageUpsertService,
