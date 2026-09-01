@@ -1,25 +1,38 @@
+
 namespace Kafka.Messages;
 
 partial class MessagesFuncs
 {
   static byte[]? GetKafkaHeaderValue(Headers headers, string headerName) =>
-    headers.GetLastBytes(headerName);
+    headers.TryGetLastBytes(headerName, out var bytes) ? bytes : null;
 
   internal static string? GetKafkaHeaderString(Headers headers, string headerName) =>
     DecodeString(GetKafkaHeaderValue(headers, headerName));
 
-  internal static Guid? GetCorrelationIdKafkaHeader(Headers headers) =>
-    Guid.TryParse(GetKafkaHeaderString(headers, CorrelationIdHeaderName), out var correlationId) ? correlationId : null;
+  internal static Guid? GetKafkaHeaderCorrelationId(Headers headers) =>
+    TryParseGuidValue(GetKafkaHeaderString(headers, CorrelationIdHeaderName));
 
-  internal static Guid GetMessageIdKafkaHeader(Headers headers) =>
-    Guid.Parse(GetKafkaHeaderString(headers, MessageIdHeaderName)!);
+  internal static Guid? GetKafkaHeaderMessageId(Headers headers) =>
+    TryParseGuidValue(GetKafkaHeaderString(headers, MessageIdHeaderName)!);
 
-  static string? GetSchemaTypeKafkaHeader(Headers headers) =>
+  internal static string? GetKafkaHeaderSchemaType(Headers headers) =>
     GetKafkaHeaderString(headers, SchemaTypeHeaderName);
 
-  static int? GetSchemaVersionKafkaHeader(Headers headers) =>
-    GetKafkaHeaderString(headers, SchemaVersionHeaderName) is string versionString ? int.Parse(versionString, CultureInfo.InvariantCulture) : default;
+  internal static int? GetKafkaHeaderSchemaVersion(Headers headers) =>
+    TryParseIntValue(GetKafkaHeaderString(headers, SchemaVersionHeaderName));
 
-  internal static string? GetTraceParentKafkaHeader(Headers? headers) =>
-    headers is null ? null : GetKafkaHeaderString(headers, TraceParentHeaderName);
+  internal static long? GetKafkaHeaderOriginalOffset(Headers headers) =>
+    TryParseLongValue(GetKafkaHeaderString(headers, OriginalOffsetHeaderName));
+
+  internal static int? GetKafkaHeaderOriginalPartition(Headers headers) =>
+    TryParseIntValue(GetKafkaHeaderString(headers, OriginalPartitionHeaderName));
+
+  internal static string? GetKafkaHeaderOriginalTopic(Headers headers) =>
+    GetKafkaHeaderString(headers, OriginalTopicHeaderName);
+
+  internal static int? GetKafkaHeaderOriginalEpochLeader(Headers headers) =>
+    TryParseIntValue(GetKafkaHeaderString(headers, OriginalEpochLeaderHeaderName));
+
+  public static string? GetKafkaHeaderTraceParent(Headers headers) =>
+    GetKafkaHeaderString(headers, TraceParentHeaderName);
 }

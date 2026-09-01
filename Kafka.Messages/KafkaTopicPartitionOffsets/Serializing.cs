@@ -1,9 +1,9 @@
 
-namespace Messaging.Messages;
+namespace Kafka.Messages;
 
 partial class MessagesFuncs
 {
-  static string SerializeTopicPartitionOffset(TopicPartitionOffset topicPartitionOffset) =>
+  internal static string SerializeTopicPartitionOffset(TopicPartitionOffset topicPartitionOffset) =>
     FormatTopicPartitionOffset(
       topicPartitionOffset.Topic,
       topicPartitionOffset.Partition.Value.ToString(CultureInfo.InvariantCulture),

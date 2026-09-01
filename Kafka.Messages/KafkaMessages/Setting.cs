@@ -1,5 +1,5 @@
 
-namespace Messaging.Messages;
+namespace Kafka.Messages;
 
 partial class MessagesFuncs
 {
@@ -10,9 +10,8 @@ partial class MessagesFuncs
     int? schemaVersion,
     Guid? correlationId)
   =>
-    headers
-      .SetCorrelationIdKafkaHeader(correlationId)
-      .SetMessageIdKafkaHeader(messageId)
-      .SetSchemaVersionKafkaHeader(schemaVersion)
-      .SetSchemaTypeKafkaHeader(schemaType);
+    SetKafkaHeaderCorrelationId(headers, correlationId).
+    SetKafkaHeaderMessageId(messageId).
+    SetKafkaHeaderSchemaVersion(schemaVersion).
+    SetKafkaHeaderSchemaType(schemaType);
 }

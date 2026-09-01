@@ -1,5 +1,5 @@
-namespace Kafka.Messages
-;
+
+namespace Kafka.Messages;
 
 partial class MessagesFuncs
 {

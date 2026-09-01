@@ -3,7 +3,7 @@ namespace Kafka.Messages;
 
 partial class MessagesFuncs
 {
-  internal static Message<TKey, TValue> CreateKafkaMessage<TKey, TValue>(
+  public static Message<TKey, TValue> CreateKafkaMessage<TKey, TValue>(
     TKey key,
     TValue value,
     Headers headers,

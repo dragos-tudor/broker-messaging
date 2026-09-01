@@ -9,9 +9,9 @@ partial class MessagesFuncs
   const string SchemaVersionHeaderName = "x-schema-version";
   const string TraceParentHeaderName = "traceparent";
 
-  internal const string FailureReasonHeaderName = "x-deadletter-reason";
-  internal const string OriginalOffsetHeaderName = "x-original-offset";
-  internal const string OriginalPartitionHeaderName = "x-original-partition";
-  internal const string OriginalTopicHeaderName = "x-original-topic";
-  internal const string OriginalEpochLeaderHeaderName = "x-original-epoch-leader";
+  const string FailureReasonHeaderName = "x-deadletter-reason";
+  const string OriginalOffsetHeaderName = "x-original-offset";
+  const string OriginalPartitionHeaderName = "x-original-partition";
+  const string OriginalTopicHeaderName = "x-original-topic";
+  const string OriginalEpochLeaderHeaderName = "x-original-epoch-leader";
 }

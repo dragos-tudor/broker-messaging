@@ -1,5 +1,5 @@
 
-global using Microsoft.Extensions.Logging.Abstractions;
+global using Shouldly;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Kafka.Messages;

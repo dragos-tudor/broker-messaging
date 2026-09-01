@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Confluent.Kafka" />
+    <ProjectReference Include="../Messaging.Core/Messaging.Core.csproj" />
   </ItemGroup>
 
 </Project>
