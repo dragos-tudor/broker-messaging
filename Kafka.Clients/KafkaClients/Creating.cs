@@ -1,6 +1,6 @@
 #pragma warning disable CA2000
 
-namespace Messaging.Kafka.Clients;
+namespace Kafka.Clients;
 
 partial class ClientsFuncs
 {

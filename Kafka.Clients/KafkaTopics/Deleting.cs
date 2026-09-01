@@ -1,4 +1,4 @@
-namespace Messaging.Kafka.Clients;
+namespace Kafka.Clients;
 
 partial class ClientsFuncs
 {

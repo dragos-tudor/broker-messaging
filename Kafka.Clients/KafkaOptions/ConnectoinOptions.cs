@@ -1,5 +1,5 @@
 
-namespace Messaging.Kafka.Clients;
+namespace Kafka.Clients;
 
 public abstract record ConnectionOptions
 {

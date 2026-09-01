@@ -1,4 +1,4 @@
-namespace Messaging.Kafka.Clients;
+namespace Kafka.Clients;
 
 partial class ClientsFuncs
 {
@@ -39,67 +39,4 @@ partial class ClientsFuncs
       SessionTimeout = sessionTimeout ?? TimeSpan.FromSeconds(30),
       IsolationLevel = isolationlevel ?? IsolationLevel.ReadCommitted
     };
-
-  public static KafkaOptions CreateKafkaOptionsFromEnvironment(
-    string bootstrapServersName = "KAFKA_BOOTSTRAP_SERVERS",
-    string userName = "KAFKA_USERNAME",
-    string passwordName = "KAFKA_PASSWORD",
-    string defaultTopicName = "KAFKA_TOPIC",
-    string groupIdName = "KAFKA_GROUP_ID",
-    string clientIdName = "KAFKA_CLIENT_ID",
-    string securityProtocolName = "KAFKA_SECURITY_PROTOCOL",
-    string saslMechanismName = "KAFKA_SASL_MECHANISM",
-    string autoOffsetResetName = "KAFKA_AUTO_OFFSET_RESET",
-    string enableAutoCommitName = "KAFKA_ENABLE_AUTO_COMMIT",
-    string enableAutoOffsetStoreName = "KAFKA_ENABLE_AUTO_OFFSET_STORE",
-    string connectTimeoutSecondsName = "KAFKA_CONNECT_TIMEOUT_SECONDS",
-    string operationTimeoutMillisecondsName = "KAFKA_OPERATION_TIMEOUT_MS",
-    string maxRetryAttemptsName = "KAFKA_MAX_RETRY_ATTEMPTS",
-    string retryBaseDelayMillisecondsName = "KAFKA_RETRY_BASE_DELAY_MS",
-    string retryBackoffFactorName = "KAFKA_RETRY_BACKOFF_FACTOR",
-    string maxRetryDelayMillisecondsName = "KAFKA_MAX_RETRY_DELAY_MS",
-    string deadLetterTopicSuffixName = "KAFKA_DLQ_SUFFIX",
-    string maxPollRecordsName = "KAFKA_MAX_POLL_RECORDS",
-    string sessionTimeoutName = "KAFKA_SESSION_TIMEOUT",
-    string isolationLevelName = "KAFKA_ISOLATION_LEVEL")
-  {
-    var endpoints = SplitKafkaEndpoints(Environment.GetEnvironmentVariable(bootstrapServersName));
-    var user = Environment.GetEnvironmentVariable(userName);
-    var password = Environment.GetEnvironmentVariable(passwordName);
-    var defaultTopic = Environment.GetEnvironmentVariable(defaultTopicName);
-    var groupId = Environment.GetEnvironmentVariable(groupIdName);
-    var clientId = Environment.GetEnvironmentVariable(clientIdName);
-
-    var securityProtocol = ParseEnumValue(Environment.GetEnvironmentVariable(securityProtocolName), SecurityProtocol.SaslPlaintext);
-    var saslMechanism = ParseEnumValue(Environment.GetEnvironmentVariable(saslMechanismName), SaslMechanism.ScramSha512);
-    var autoOffsetReset = ParseEnumValue(Environment.GetEnvironmentVariable(autoOffsetResetName), AutoOffsetReset.Earliest);
-
-    var enableAutoCommit = ParseBoolValue(Environment.GetEnvironmentVariable(enableAutoCommitName), false);
-    var enableAutoOffsetStore = ParseBoolValue(Environment.GetEnvironmentVariable(enableAutoOffsetStoreName), false);
-    var connectTimeout = TimeSpan.FromSeconds(ParseIntValue(Environment.GetEnvironmentVariable(connectTimeoutSecondsName), 15));
-    var operationTimeout = TimeSpan.FromMilliseconds(ParseIntValue(Environment.GetEnvironmentVariable(operationTimeoutMillisecondsName), 1000));
-    var deadLetterTopicSuffix = Environment.GetEnvironmentVariable(deadLetterTopicSuffixName) ?? "-dlq";
-    var maxPollRecords = ParseIntValue(Environment.GetEnvironmentVariable(maxPollRecordsName), 500);
-    var sessionTimeout = TimeSpan.FromMilliseconds(ParseIntValue(Environment.GetEnvironmentVariable(sessionTimeoutName), 30000));
-    var isolationLevel = ParseEnumValue(Environment.GetEnvironmentVariable(isolationLevelName), IsolationLevel.ReadCommitted);
-
-    return CreateKafkaOptions(
-      endpoints,
-      user,
-      password,
-      defaultTopic,
-      groupId,
-      clientId,
-      securityProtocol,
-      saslMechanism,
-      autoOffsetReset,
-      enableAutoCommit,
-      enableAutoOffsetStore,
-      connectTimeout,
-      operationTimeout,
-      deadLetterTopicSuffix,
-      maxPollRecords,
-      sessionTimeout,
-      isolationLevel);
-  }
 }

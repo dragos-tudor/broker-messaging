@@ -1,5 +1,7 @@
 
-namespace Messaging.Kafka.Clients;
+using System.Text.Json;
+
+namespace Kafka.Clients;
 
 public sealed partial class ClientsTests
 {
@@ -8,7 +10,7 @@ public sealed partial class ClientsTests
   {
     using var producer = CreateKafkaProducer<string, byte[]>(options);
     var payload = new TestMessage(1, "test");
-    var message = CreateKafkaMessage("key3", SerializeJson(payload), []);
+    var message = CreateKafkaMessage("key3", JsonSerializer.SerializeToUtf8Bytes(payload), []);
     var tcs = new TaskCompletionSource<DeliveryResult<string, byte[]>>();
 
     ProduceMessage(producer, publishTopicName, message, report =>
@@ -29,7 +31,7 @@ public sealed partial class ClientsTests
     var tcs = new TaskCompletionSource<DeliveryResult<string, byte[]>>();
     var payload = new TestMessage(1, "test");
 
-    var message = CreateKafkaMessage("key4", SerializeJson(payload), []);
+    var message = CreateKafkaMessage("key4", JsonSerializer.SerializeToUtf8Bytes(payload), []);
     ProduceMessage(producer, publishTopicName, message, report =>
     {
       try { tcs.SetResult(report); }
@@ -39,7 +41,7 @@ public sealed partial class ClientsTests
     producer.Flush(cancellationToken);
     var result = await tcs.Task;
     result.Message.Key.ShouldBe("key4");
-    DeserializeJson<TestMessage>(result.Message.Value).ShouldBe(payload);
+    JsonSerializer.Deserialize<TestMessage>(result.Message.Value).ShouldBe(payload);
   }
 
   [TestMethod]
@@ -47,8 +49,8 @@ public sealed partial class ClientsTests
   {
     using var producer = CreateKafkaProducer<string, byte[]>(options);
     Message<string, byte[]>[] messages = [
-      CreateKafkaMessage("key5", SerializeJson(new TestMessage(1, "test")), []),
-      CreateKafkaMessage("key6", SerializeJson(new TestMessage(2, "test")), []),
+      CreateKafkaMessage("key5", JsonSerializer.SerializeToUtf8Bytes(new TestMessage(1, "test")), []),
+      CreateKafkaMessage("key6", JsonSerializer.SerializeToUtf8Bytes(new TestMessage(2, "test")), []),
     ];
     var tcs = new TaskCompletionSource<DeliveryResult<string, byte[]>>();
     var results = new List<DeliveryResult<string, byte[]>>();

@@ -1,4 +1,4 @@
-namespace Messaging.Kafka.Clients;
+namespace Kafka.Clients;
 
 public record KafkaOptions: ConnectionOptions
 {

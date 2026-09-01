@@ -28,8 +28,8 @@
   <Project Path="Routing.Outbound/Routing.Outbound.csproj" />
 
   <!-- Messaging.Kafka projects -->
-  <!-- <Project Path="Kafka.Clients/Kafka.Clients.csproj" />
-  <Project Path="Kafka.Messages/Kafka.Messages.csproj" /> -->
+  <Project Path="Kafka.Clients/Kafka.Clients.csproj" />
+  <Project Path="Kafka.Messages/Kafka.Messages.csproj" />
 
   <!-- Messaging packages: Metadata projects -->
   <Project Path="Messaging.Core/Messaging.Core.csproj" />

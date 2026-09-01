@@ -1,5 +1,5 @@
 
-namespace Messaging.Kafka.Clients;
+namespace Kafka.Clients;
 
 public sealed partial class ClientsTests
 {
@@ -10,7 +10,7 @@ public sealed partial class ClientsTests
   {
     using var producer = CreateKafkaProducer<string, byte[]>(options);
     var payload = new TestMessage(1, "test");
-    var message = CreateKafkaMessage("key1", SerializeJson(payload), []);
+    var message = CreateKafkaMessage("key1", JsonSerializer.SerializeToUtf8Bytes(payload), []);
     var result = await PublishMessageAsync(producer, publishTopicName, message, cancellationToken);
 
     result.Status.ShouldBe(PersistenceStatus.Persisted);
@@ -21,10 +21,10 @@ public sealed partial class ClientsTests
   {
     using var producer = CreateKafkaProducer<string, byte[]>(options);
     var payload = new TestMessage(1, "test");
-    var message = CreateKafkaMessage("key2", SerializeJson(payload), []);
+    var message = CreateKafkaMessage("key2", JsonSerializer.SerializeToUtf8Bytes(payload), []);
     var result = await PublishMessageAsync(producer, publishTopicName, message, cancellationToken);
 
     result.Message.Key.ShouldBe("key2");
-    DeserializeJson<TestMessage>(result.Message.Value).ShouldBe(payload);
+    JsonSerializer.Deserialize<TestMessage>(result.Message.Value).ShouldBe(payload);
   }
 }

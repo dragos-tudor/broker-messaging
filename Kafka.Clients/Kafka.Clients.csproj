@@ -3,7 +3,7 @@
   <Import Project="../Directory.Testing.props" />
 
   <PropertyGroup>
-    <Description>Convenient functions for Kafka admin clients, Kafka publishers and Kafka consumers.</Description>
+    <Description>Kafka clients project.</Description>
   </PropertyGroup>
 
   <ItemGroup>

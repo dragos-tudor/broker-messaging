@@ -3,17 +3,16 @@
   <Import Project="../Directory.Packing.props" />
 
   <PropertyGroup>
-    <Description>Messaging kafka broker services. [metaproject]</Description>
+    <Description>Messaging kafka package. [metaproject]</Description>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeReferencedProjectInPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
   <ItemGroup>
-  	<None Include="../README.md" Pack="true" PackagePath="\"/>
-    <None Include="../LICENSE" Pack="true" PackagePath="\"/>
-
     <ProjectReference Include="../Kafka.Clients/Kafka.Clients.csproj" />
     <ProjectReference Include="../Kafka.Messages/Kafka.Messages.csproj" />
-    <ProjectReference Include="../Messaging.InboxOutbox/Messaging.InboxOutbox.csproj" />
+
+  	<None Include="../README.md" Pack="true" PackagePath="\"/>
+    <None Include="../LICENSE" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <Target Name="IncludeReferencedProjectInPackage">
