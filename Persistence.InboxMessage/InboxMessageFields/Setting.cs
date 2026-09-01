@@ -23,7 +23,11 @@ partial class InboxMessageFuncs
     InboxMessageStatus status)
       { message.Status = status; return message; }
 
-  internal static InboxMessage<TKey, TPayload>? ResetInboxMessageStatus<TKey, TPayload>(
+  internal static InboxMessage<TKey, TPayload>? SetInboxMessageInitialStatus<TKey, TPayload>(
     InboxMessage<TKey, TPayload>? message)
-      { message?.Status = InboxMessageStatus.Mapping; return message; }
+      { message?.Status = InboxMessageStatus.Initial; return message; }
+
+  internal static InboxMessage<TKey, TPayload>? SetInboxMessageProcessingStatus<TKey, TPayload>(
+    InboxMessage<TKey, TPayload>? message)
+      { message?.Status = InboxMessageStatus.Processing; return message; }
 }

@@ -9,7 +9,7 @@ public record InboxMessage<TKey, TPayload>
   [MaxLength(PayloadMaxLength)]
   public required TPayload Payload { get; init; }
   public required DateTime CreatedAt { get; init; }
-  public InboxMessageStatus Status { get; set; } = InboxMessageStatus.Processing;
+  public InboxMessageStatus Status { get; set; } = InboxMessageStatus.Initial;
   public DateTime ReceivedAt { get; init; } = DateTime.UtcNow;
   [MaxLength(TypeMaxLength)]
   public string? Type { get; init; }

@@ -3,11 +3,11 @@ namespace Transport.Envelope;
 
 public interface IEnvelope<TKey, TValue, TMetadata, TConfirmation>
 {
-  TKey Key { get; init; }
-  TValue Value { get; init; }
-  DateTime CreatedAt { get; init; }
-  string Type { get; init; }
-  TMetadata Metadata { get; init; }
+  TKey Key { get; }
+  TValue Value { get; }
+  DateTime CreatedAt { get; }
+  string? Type { get; }
+  TMetadata Metadata { get; }
   string Queue { get; init; }
-  TConfirmation? Confirmation { get; init; }
+  TConfirmation? Confirmation { get; }
 }
