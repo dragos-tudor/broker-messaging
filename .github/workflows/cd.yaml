@@ -37,7 +37,7 @@ jobs:
         id: workspace
         shell: bash
         run: |
-          echo "path=/workspaces/messaging" >> "$GITHUB_OUTPUT"
+          echo "path=/workspaces/broker-messaging" >> "$GITHUB_OUTPUT"
 
       - name: Determine version
         id: version

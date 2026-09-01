@@ -15,13 +15,13 @@
     <Copyright>Copyright @2026</Copyright>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageLicense>https://github.com/dragos-tudor/backend-kafka/blob/main/LICENSE</PackageLicense>
+    <PackageLicense>https://github.com/dragos-tudor/broker-messaging/blob/main/LICENSE</PackageLicense>
 
     <!-- repository -->
-    <PackageProjectUrl>https://github.com/dragos-tudor/backend-kafka/tree/main/$(MSBuildProjectName)</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/dragos-tudor/broker-messaging/tree/main/$(MSBuildProjectName)</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <RepositoryRoot>$(MSBuildThisFileDirectory)</RepositoryRoot>
-    <RepositoryUrl>https://github.com/dragos-tudor/backend-kafka.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/dragos-tudor/broker-messaging.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 

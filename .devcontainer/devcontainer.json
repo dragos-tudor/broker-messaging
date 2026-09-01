@@ -16,9 +16,9 @@
     "DEV_NETWORK_DNS": "10.99.1.2",
     "KAFKA_USERNAME": "admin",
     "KAFKA_PASSWORD": "p@ssw0rd!",
-    "CONTAINERS_REGISTRIES_CONF": "/workspaces/messaging/.podman/registries.conf",
-    "CONTAINERS_STORAGE_CONF": "/workspaces/messaging/.podman/storage.conf",
-    "WORKSPACE_ROOT": "/workspaces/messaging"
+    "CONTAINERS_REGISTRIES_CONF": "/workspaces/broker-messaging/.podman/registries.conf",
+    "CONTAINERS_STORAGE_CONF": "/workspaces/broker-messaging/.podman/storage.conf",
+    "WORKSPACE_ROOT": "/workspaces/broker-messaging"
 	},
 	"runArgs": [
 		"--name=messaging",

@@ -7,7 +7,7 @@ A high-throughput, **transactional inbox/outbox** messaging library as broker-ba
 ---
 
 ## AI Models Used
-- Design/Architecture sessions: Sonnet 5 (Thinking), GPT 4.5 Mini (Thinking) (web + live conversations).
+- Design/Architecture sessions: Sonnet 5 (Thinking), GPT-5.6 Luna (Thinking) (web + live conversations).
 - Implementation plan and code generation: Sonnet 5 (Medium) (Github Copilot).
 - Implementation plan and tests generation: Gemini 3.7 Flash (Medium) (Google Antigravity VSCode extension).
 

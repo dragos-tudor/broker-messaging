@@ -20,8 +20,8 @@ description: 'Coding instructions and guidelines for the project.'
 - **Global usings:** Centralize commonly used usings in a Using.cs per project and commonly used test usings in a Using.Tests.cs per project.
 
 ## **Naming Conventions**
-- **Types:** PascalCase (e.g., `InboxMessageRetryOptions`, `DeadLetterEnvelope`).
-- **Static helper classes:** PascalCase + `Funcs` suffix (e.g., `InboundFuncs`, `EngineTests`).
+- **Types:** PascalCase (e.g., `InboxMessageOptions`, `DeadLetterEnvelope`).
+- **Static helper classes:** PascalCase + `Funcs` suffix (e.g., `InboundFuncs`, `InboundTests`).
 - **Methods:** PascalCase; async methods suffixed with `Async` (e.g., `InsertInboxMessageAsync`).
 - **Generic parameters:** `T...` style (e.g., `T1`, `T2`, `TResult`).
 - **Parameters & locals:** camelCase (e.g., `source`, `value`, `cancellationToken`).
@@ -84,7 +84,7 @@ description: 'Coding instructions and guidelines for the project.'
 - Return results or allow callers to handle missing data via nullable returns or options.
 
 ## **Testing Conventions**
-- Tests use `MSTest` and `Shouldly` for assertions.
+- Tests use `MSTest`, `Shouldly` for assertions, `NSubstitute` for mocking.
 - Use `CancellationToken.None` or `default` explicitly in test calls.
 - Keep test files adjacent to the code they test (e.g., Verifying.Tests.cs next to Verifying.cs).
 
