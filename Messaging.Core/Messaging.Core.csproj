@@ -3,19 +3,18 @@
   <Import Project="../Directory.Packing.props" />
 
   <PropertyGroup>
-    <Description>Transactional Inbox/Outbox pattern broker agnostic implementation. [metaproject]</Description>
+    <Description>Messaging core package. [metaproject]</Description>
     <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeReferencedProjectInPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
   <ItemGroup>
-  	<None Include="../README.md" Pack="true" PackagePath="\"/>
-    <None Include="../LICENSE" Pack="true" PackagePath="\"/>
-
     <ProjectReference Include="../Routing.Inbound/Routing.Inbound.csproj" />
     <ProjectReference Include="../Routing.Outbound/Routing.Outbound.csproj" />
     <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
 
+  	<None Include="../README.md" Pack="true" PackagePath="\"/>
+    <None Include="../LICENSE" Pack="true" PackagePath="\"/>
     <None Include="PublicAPI.Shipped.txt" Pack="true" PackagePath="apidocs\" />
   </ItemGroup>
 
