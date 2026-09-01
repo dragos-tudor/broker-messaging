@@ -9,4 +9,3 @@ public interface IProducingCallbackServices<TKey, TPayload>:
   IDeadLetterMessageUpdateService<TKey, TPayload>,
   IInstrumentationService;
 
- public interface IInstrumentationService { void InstrumentException(Exception exception); }
