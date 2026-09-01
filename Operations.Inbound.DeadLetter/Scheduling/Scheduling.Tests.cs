@@ -5,7 +5,7 @@ public partial class DeadLetterTests
   sealed class SchedulingTestData : ISchedulingData<string, string>
   {
     public DeadLetterMessage<string, string>? DeadLetterMessage { get; set; }
-    public string PipelineError { get; set; } = string.Empty;
+    public string? PipelineError { get; set; } = string.Empty;
   }
 
   [TestMethod]

@@ -23,12 +23,12 @@ public partial class EnvelopeTests
       MessageKey = "msg-key",
       Payload = "mapped-payload",
       CreatedAt = fixedDate,
-      Status = InboxMessageStatus.Mapping
+      Status = InboxMessageStatus.Initial
     };
 
     services.FromEnvelopeValue("raw-value").Returns("mapped-payload");
     services.GetUtcDateTime().Returns(fixedDate);
-    services.FromEnvelope(envelope, "mapped-payload", fixedDate, InboxMessageStatus.Mapping).Returns(inboxMessage);
+    services.FromEnvelope(envelope, "mapped-payload", fixedDate, InboxMessageStatus.Initial).Returns(inboxMessage);
 
     var data = new MappingTestData { Envelope = envelope };
 

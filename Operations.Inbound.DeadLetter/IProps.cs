@@ -11,11 +11,4 @@ public interface IDeadLetterMessageProp<TKey, TPayload>
   DeadLetterMessage<TKey, TPayload>? DeadLetterMessage { get; set; }
 }
 
-public interface IPipelineErrorProp { string PipelineError { get; set; } }
-
-partial class DeadLetterFuncs
-{
-  static DeadLetterMessage<TKey, TPayload> RequireDeadLetterMessage<TKey, TPayload>(
-    DeadLetterMessage<TKey, TPayload>? message) =>
-    message ?? throw new InvalidOperationException("Dead letter message is required.");
-}
+public interface IPipelineErrorProp { string? PipelineError { get; set; } }

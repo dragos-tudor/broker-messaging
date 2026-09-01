@@ -6,7 +6,7 @@ public partial class DeadLetterEnvelopeTests
   {
     public IDeadLetterEnvelope<string, string, string, string>? DeadLetterEnvelope { get; set; }
     public RetryMessage? RetryMessage { get; set; }
-    public string PipelineError { get; set; } = string.Empty;
+    public string? PipelineError { get; set; } = string.Empty;
   }
 
   [TestMethod]

@@ -5,7 +5,7 @@ public partial class DeadLetterEnvelopeTests
   sealed class PublishingTestData : IPublishingData<string, string, string, string, string>
   {
     public IDeadLetterEnvelope<string, string, string, string>? DeadLetterEnvelope { get; set; }
-    public string PipelineError { get; set; } = string.Empty;
+    public string? PipelineError { get; set; } = string.Empty;
   }
 
   [TestMethod]

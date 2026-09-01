@@ -7,4 +7,4 @@ public interface IEnvelopeProp<TKey, TData, TMetadata, TConfirmation> {
 
 public interface IOutboxMessageProp<TKey, TPayload> { OutboxMessage<TKey, TPayload>? OutboxMessage { get; set; } }
 
-public interface IPipelineErrorProp { string PipelineError { get; set; } }
+public interface IPipelineErrorProp { string? PipelineError { get; set; } }

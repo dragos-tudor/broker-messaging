@@ -6,7 +6,7 @@ public partial class DeadLetterTests
   {
     public DeadLetterMessage<string, string>? DeadLetterMessage { get; set; }
     public IDeadLetterEnvelope<string, string, string, string>? DeadLetterEnvelope { get; set; }
-    public string PipelineError { get; set; } = string.Empty;
+    public string? PipelineError { get; set; } = string.Empty;
   }
 
   [TestMethod]

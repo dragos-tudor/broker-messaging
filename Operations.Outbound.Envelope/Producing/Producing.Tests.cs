@@ -6,7 +6,7 @@ public partial class EnvelopeTests
   {
     public IEnvelope<string, string, string, string>? Envelope { get; set; }
     public OutboxMessage<string, string>? OutboxMessage { get; set; }
-    public string PipelineError { get; set; } = string.Empty;
+    public string? PipelineError { get; set; } = string.Empty;
   }
 
   [TestMethod]

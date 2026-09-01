@@ -5,7 +5,7 @@ public partial class InboxTests
   sealed class InsertingTestData : IInsertingData<string, string>
   {
     public InboxMessage<string, string>? InboxMessage { get; set; }
-    public string PipelineError { get; set; } = string.Empty;
+    public string? PipelineError { get; set; } = string.Empty;
   }
 
   [TestMethod]
@@ -112,7 +112,7 @@ public partial class InboxTests
     state.ShouldBe(InsertInboxMessageErrorState);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("DB insert error");
-    resultData.InboxMessage.ShouldBeEquivalentTo(new { Status = InboxMessageStatus.Mapping });
+    resultData.InboxMessage.ShouldBeEquivalentTo(new { Status = InboxMessageStatus.Initial });
   }
 
   [TestMethod]

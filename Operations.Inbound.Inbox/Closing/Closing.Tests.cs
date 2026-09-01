@@ -5,7 +5,7 @@ public partial class InboxTests
   sealed class ClosingTestData : IClosingData<string, string>
   {
     public InboxMessage<string, string>? InboxMessage { get; set; }
-    public string PipelineError { get; set; } = string.Empty;
+    public string? PipelineError { get; set; } = string.Empty;
   }
 
   [TestMethod]

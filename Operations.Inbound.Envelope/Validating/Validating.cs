@@ -1,6 +1,4 @@
 
-using static Operations.Inbound.Envelope.EnvelopeStates;
-
 namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs

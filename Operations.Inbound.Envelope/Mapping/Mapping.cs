@@ -1,4 +1,3 @@
-using static Operations.Inbound.Envelope.EnvelopeStates;
 
 namespace Operations.Inbound.Envelope;
 
@@ -20,8 +19,8 @@ partial class EnvelopeFuncs
         return new ((data, MapEnvelopeValueErrorState, CreateValidationException(data.PipelineError)));
       }
 
-      var inboxMessage = services.FromEnvelope(envelope, payload, services.GetUtcDateTime(), InboxMessageStatus.Mapping);
-      data.InboxMessage = inboxMessage;
+      var inboxMessage = services.FromEnvelope(envelope, payload, services.GetUtcDateTime());
+      data.InboxMessage = SetInboxMessageInitialStatus(inboxMessage);
       return new ((data, MapEnvelopeSuccessState, null));
     }
     catch (Exception exception) {

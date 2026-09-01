@@ -14,7 +14,7 @@ public interface IEnvelopeMapperService<TKey, TValue, TMetadata, TConfirmation, 
     IEnvelope<TKey, TValue, TMetadata, TConfirmation> envelope,
     TPayload payload,
     DateTime utcDateTime,
-    InboxMessageStatus status);
+    InboxMessageStatus status = InboxMessageStatus.Initial);
 }
 
 public interface IUtcDateService { DateTime GetUtcDateTime(); }

@@ -7,7 +7,7 @@ public interface IInboxMessageProp<TKey, TPayload> { InboxMessage<TKey, TPayload
 
 public interface IModelProp { object? Model { get; set; } }
 
-public interface IPipelineErrorProp { string PipelineError { get; set; } }
+public interface IPipelineErrorProp { string? PipelineError { get; set; } }
 
 public interface IRetryMessageProp { RetryMessage? RetryMessage { get; set; } }
 

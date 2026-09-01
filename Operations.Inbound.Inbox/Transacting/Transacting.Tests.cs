@@ -6,7 +6,7 @@ public partial class InboxTests
   {
     public InboxMessage<string, string>? InboxMessage { get; set; }
     public object? Model { get; set; }
-    public string PipelineError { get; set; } = string.Empty;
+    public string? PipelineError { get; set; } = string.Empty;
   }
 
   [TestMethod]

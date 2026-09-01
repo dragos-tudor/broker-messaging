@@ -5,7 +5,7 @@ public partial class InboxTests
   sealed class ValidatingTestData : IValidatingData<string, string>
   {
     public InboxMessage<string, string>? InboxMessage { get; set; }
-    public string PipelineError { get; set; } = string.Empty;
+    public string? PipelineError { get; set; } = string.Empty;
   }
 
   [TestMethod]
@@ -51,7 +51,7 @@ public partial class InboxTests
     exception.ShouldNotBeNull();
     exception.Message.ShouldContain("MessageId is empty.");
     resultData.InboxMessage.ShouldBeNull();
-    resultData.PipelineError.ShouldContain("MessageId is empty.");
+    resultData.PipelineError?.ShouldContain("MessageId is empty.");
   }
 
   [TestMethod]

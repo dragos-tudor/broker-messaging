@@ -1,3 +1,4 @@
+
 namespace Operations.Inbound.Envelope;
 
 public interface IDeadLetterEnvelopeProp<TKey, TValue, TMetadata, TConfirmation> {

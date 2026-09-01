@@ -1,4 +1,3 @@
-using static Operations.Inbound.Inbox.InboxStates;
 
 namespace Operations.Inbound.Inbox;
 
@@ -13,7 +12,7 @@ partial class InboxFuncs
   {
     try {
       var message = RequireInboxMessage(data.InboxMessage);
-      SetInboxMessageStatus(message, InboxMessageStatus.Processing);
+      SetInboxMessageProcessingStatus(message);
 
       var messageInserted = await services.InsertInboxMessageAsync(message, ct);
       if (messageInserted is false)
@@ -27,7 +26,7 @@ partial class InboxFuncs
     catch (OperationCanceledException) { return default; }
     catch (Exception exception) {
       data.PipelineError = exception.Message;
-      ResetInboxMessageStatus(data.InboxMessage);
+      SetInboxMessageInitialStatus(data.InboxMessage);
       return (data, InsertInboxMessageErrorState, exception);
     }
   }
