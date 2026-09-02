@@ -5,7 +5,7 @@ public partial class DeadLetterEnvelopeTests
   sealed class CheckingTestData : ICheckingRetryData<string, string, string, string>
   {
     public IDeadLetterEnvelope<string, string, string, string>? DeadLetterEnvelope { get; set; }
-    public RetryMessage? RetryMessage { get; set; }
+    public RetryPlan? RetryPlan { get; set; }
     public string? PipelineError { get; set; } = string.Empty;
   }
 
@@ -18,9 +18,9 @@ public partial class DeadLetterEnvelopeTests
     envelope.Key.Returns("dl-order-1");
     envelope.CreatedAt.Returns(createdAt);
 
-    var retryId = BuildRetryMessageId("dl-order-1", createdAt);
-    services.GetRetryMessageOptions().Returns(new RetryMessageOptions { MaxRetryAttempts = 5 });
-    services.GetRetryMessageByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns((RetryMessage?)null);
+    var retryId = BuildRetryPlanId("dl-order-1", createdAt);
+    services.GetRetryPlanOptions().Returns(new RetryPlanOptions { MaxRetryAttempts = 5 });
+    services.GetRetryPlanByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns((RetryPlan?)null);
 
     var data = new CheckingTestData { DeadLetterEnvelope = envelope };
 
@@ -29,7 +29,7 @@ public partial class DeadLetterEnvelopeTests
     state.ShouldBe(CheckRetryDeadLetterEnvelopeNotExhaustedState);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
-    resultData.RetryMessage.ShouldBeNull();
+    resultData.RetryPlan.ShouldBeNull();
   }
 
   [TestMethod]
@@ -41,9 +41,9 @@ public partial class DeadLetterEnvelopeTests
     envelope.Key.Returns("dl-order-1");
     envelope.CreatedAt.Returns(createdAt);
 
-    var retryId = BuildRetryMessageId("dl-order-1", createdAt);
-    services.GetRetryMessageOptions().Returns(new RetryMessageOptions { MaxRetryAttempts = 0 });
-    services.GetRetryMessageByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns((RetryMessage?)null);
+    var retryId = BuildRetryPlanId("dl-order-1", createdAt);
+    services.GetRetryPlanOptions().Returns(new RetryPlanOptions { MaxRetryAttempts = 0 });
+    services.GetRetryPlanByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns((RetryPlan?)null);
 
     var data = new CheckingTestData { DeadLetterEnvelope = envelope };
 
@@ -52,7 +52,7 @@ public partial class DeadLetterEnvelopeTests
     state.ShouldBe(CheckRetryDeadLetterEnvelopeExhaustedState);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
-    resultData.RetryMessage.ShouldBeNull();
+    resultData.RetryPlan.ShouldBeNull();
   }
 
   [TestMethod]
@@ -64,15 +64,15 @@ public partial class DeadLetterEnvelopeTests
     envelope.Key.Returns("dl-order-2");
     envelope.CreatedAt.Returns(createdAt);
 
-    var retryId = BuildRetryMessageId("dl-order-2", createdAt);
-    var retryMessage = new RetryMessage
+    var retryId = BuildRetryPlanId("dl-order-2", createdAt);
+    var retryPlan = new RetryPlan
     {
       RetryId = retryId,
       RetryCount = 2
     };
 
-    services.GetRetryMessageOptions().Returns(new RetryMessageOptions { MaxRetryAttempts = 5 });
-    services.GetRetryMessageByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns(retryMessage);
+    services.GetRetryPlanOptions().Returns(new RetryPlanOptions { MaxRetryAttempts = 5 });
+    services.GetRetryPlanByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns(retryPlan);
 
     var data = new CheckingTestData { DeadLetterEnvelope = envelope };
 
@@ -81,7 +81,7 @@ public partial class DeadLetterEnvelopeTests
     state.ShouldBe(CheckRetryDeadLetterEnvelopeNotExhaustedState);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
-    resultData.RetryMessage.ShouldBeSameAs(retryMessage);
+    resultData.RetryPlan.ShouldBeSameAs(retryPlan);
   }
 
   [TestMethod]
@@ -93,15 +93,15 @@ public partial class DeadLetterEnvelopeTests
     envelope.Key.Returns("dl-order-3");
     envelope.CreatedAt.Returns(createdAt);
 
-    var retryId = BuildRetryMessageId("dl-order-3", createdAt);
-    var retryMessage = new RetryMessage
+    var retryId = BuildRetryPlanId("dl-order-3", createdAt);
+    var retryPlan = new RetryPlan
     {
       RetryId = retryId,
       RetryCount = 5
     };
 
-    services.GetRetryMessageOptions().Returns(new RetryMessageOptions { MaxRetryAttempts = 5 });
-    services.GetRetryMessageByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns(retryMessage);
+    services.GetRetryPlanOptions().Returns(new RetryPlanOptions { MaxRetryAttempts = 5 });
+    services.GetRetryPlanByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns(retryPlan);
 
     var data = new CheckingTestData { DeadLetterEnvelope = envelope };
 
@@ -110,7 +110,7 @@ public partial class DeadLetterEnvelopeTests
     state.ShouldBe(CheckRetryDeadLetterEnvelopeExhaustedState);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
-    resultData.RetryMessage.ShouldBeSameAs(retryMessage);
+    resultData.RetryPlan.ShouldBeSameAs(retryPlan);
   }
 
   [TestMethod]
@@ -136,9 +136,9 @@ public partial class DeadLetterEnvelopeTests
     envelope.Key.Returns("dl-order-4");
     envelope.CreatedAt.Returns(createdAt);
 
-    var retryId = BuildRetryMessageId("dl-order-4", createdAt);
-    services.GetRetryMessageOptions().Returns(new RetryMessageOptions { MaxRetryAttempts = 5 });
-    services.GetRetryMessageByIdAsync(retryId, Arg.Any<CancellationToken>()).Throws(new OperationCanceledException());
+    var retryId = BuildRetryPlanId("dl-order-4", createdAt);
+    services.GetRetryPlanOptions().Returns(new RetryPlanOptions { MaxRetryAttempts = 5 });
+    services.GetRetryPlanByIdAsync(retryId, Arg.Any<CancellationToken>()).Throws(new OperationCanceledException());
 
     var data = new CheckingTestData { DeadLetterEnvelope = envelope };
 
@@ -159,7 +159,7 @@ public partial class DeadLetterEnvelopeTests
     envelope.CreatedAt.Returns(createdAt);
 
     var expectedException = new InvalidOperationException("Storage error");
-    services.GetRetryMessageOptions().Throws(expectedException);
+    services.GetRetryPlanOptions().Throws(expectedException);
 
     var data = new CheckingTestData { DeadLetterEnvelope = envelope };
 
@@ -179,9 +179,9 @@ public partial class DeadLetterEnvelopeTests
     envelope.Key.Returns("dl-order-6");
     envelope.CreatedAt.Returns(createdAt);
 
-    var retryId = BuildRetryMessageId("dl-order-6", createdAt);
-    services.GetRetryMessageOptions().Returns(new RetryMessageOptions { MaxRetryAttempts = 5 });
-    services.GetRetryMessageByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns((RetryMessage?)null);
+    var retryId = BuildRetryPlanId("dl-order-6", createdAt);
+    services.GetRetryPlanOptions().Returns(new RetryPlanOptions { MaxRetryAttempts = 5 });
+    services.GetRetryPlanByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns((RetryPlan?)null);
 
     var data = new CheckingTestData { DeadLetterEnvelope = envelope };
     using var cts = new CancellationTokenSource();
@@ -189,7 +189,7 @@ public partial class DeadLetterEnvelopeTests
 
     await CheckRetryDeadLetterEnvelopeAsync<ICheckingRetryServices, CheckingTestData, string, string, string, string>(services, data, ct);
 
-    await services.Received(1).GetRetryMessageByIdAsync(retryId, ct);
+    await services.Received(1).GetRetryPlanByIdAsync(retryId, ct);
   }
 }
 

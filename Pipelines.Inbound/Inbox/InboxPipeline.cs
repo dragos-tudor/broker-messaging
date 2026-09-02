@@ -15,11 +15,11 @@ partial class InboundFuncs
     IdempotentInboxMessageState => InboxActions.Idempotent,
 
     CheckRetryInboxMessageExhaustedState => InboxActions.RetryExhausted,
-    CheckRetryInboxMessageNotExhaustedState => InboxActions.UpsertingRetry,
+    CheckRetryInboxMessageNotExhaustedState => InboxActions.RegisteringRetry,
     CheckRetryInboxMessageErrorState => InboxActions.CheckingRetry,
 
-    UpsertRetryInboxMessageSuccessState => InboxActions.Exit,
-    UpsertRetryInboxMessageErrorState => InboxActions.UpsertingRetry,
+    RegisterRetryInboxMessageSuccessState => InboxActions.Exit,
+    RegisterRetryInboxMessageErrorState => InboxActions.RegisteringRetry,
 
     HandleInboxMessageSuccessState => InboxActions.Transacting,
     HandleInboxMessageDomainErrorState => InboxActions.Abandoning,

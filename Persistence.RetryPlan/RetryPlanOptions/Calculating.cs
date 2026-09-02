@@ -1,14 +1,14 @@
-namespace Persistence.RetryMessage;
+namespace Persistence.RetryPlan;
 
-partial class RetryMessageFuncs
+partial class RetryPlanFuncs
 {
-  static DateTime CalculateNextAttemptAt(int retryCount, DateTime date, RetryMessageOptions options)
+  static DateTime CalculateNextAttemptAt(int retryCount, DateTime date, RetryPlanOptions options)
   {
     var retryInterval = CalculateNextRetryInterval(retryCount, options);
     return date.Add(retryInterval);
   }
 
-  static TimeSpan CalculateNextRetryInterval(int retryCount, RetryMessageOptions options)
+  static TimeSpan CalculateNextRetryInterval(int retryCount, RetryPlanOptions options)
   {
     var retryFactor = Math.Pow(options.RetryBackoffFactor, retryCount);
     var retryInterval = options.RetryBaseDelay * retryFactor;

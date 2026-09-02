@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../Persistence.DeadLetterMessage/Persistence.DeadLetterMessage.csproj" />
-    <ProjectReference Include="../Persistence.RetryMessage/Persistence.RetryMessage.csproj" />
+    <ProjectReference Include="../Persistence.RetryPlan/Persistence.RetryPlan.csproj" />
     <ProjectReference Include="../Transport.DeadLetterEnvelope/Transport.DeadLetterEnvelope.csproj" />
   </ItemGroup>
 

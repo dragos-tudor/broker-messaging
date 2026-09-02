@@ -5,7 +5,7 @@ public partial class InboxTests
   sealed class CheckingTestData : ICheckingRetryData<string, string>
   {
     public InboxMessage<string, string>? InboxMessage { get; set; }
-    public RetryMessage? RetryMessage { get; set; }
+    public RetryPlan? RetryPlan { get; set; }
     public string? PipelineError { get; set; } = string.Empty;
   }
 
@@ -22,15 +22,15 @@ public partial class InboxTests
       CreatedAt = createdAt
     };
 
-    var retryId = BuildRetryMessageId("order-123", createdAt);
-    var retryMessage = new RetryMessage
+    var retryId = BuildRetryPlanId("order-123", createdAt);
+    var retryPlan = new RetryPlan
     {
       RetryId = retryId,
       RetryCount = 2
     };
 
-    services.GetRetryMessageOptions().Returns(new RetryMessageOptions { MaxRetryAttempts = 5 });
-    services.GetRetryMessageByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns(retryMessage);
+    services.GetRetryPlanOptions().Returns(new RetryPlanOptions { MaxRetryAttempts = 5 });
+    services.GetRetryPlanByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns(retryPlan);
 
     var data = new CheckingTestData { InboxMessage = message };
 
@@ -39,7 +39,7 @@ public partial class InboxTests
     state.ShouldBe(CheckRetryInboxMessageNotExhaustedState);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
-    resultData.RetryMessage.ShouldBeSameAs(retryMessage);
+    resultData.RetryPlan.ShouldBeSameAs(retryPlan);
   }
 
   [TestMethod]
@@ -55,15 +55,15 @@ public partial class InboxTests
       CreatedAt = createdAt
     };
 
-    var retryId = BuildRetryMessageId("order-123", createdAt);
-    var retryMessage = new RetryMessage
+    var retryId = BuildRetryPlanId("order-123", createdAt);
+    var retryPlan = new RetryPlan
     {
       RetryId = retryId,
       RetryCount = 5
     };
 
-    services.GetRetryMessageOptions().Returns(new RetryMessageOptions { MaxRetryAttempts = 5 });
-    services.GetRetryMessageByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns(retryMessage);
+    services.GetRetryPlanOptions().Returns(new RetryPlanOptions { MaxRetryAttempts = 5 });
+    services.GetRetryPlanByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns(retryPlan);
 
     var data = new CheckingTestData { InboxMessage = message };
 
@@ -72,7 +72,7 @@ public partial class InboxTests
     state.ShouldBe(CheckRetryInboxMessageExhaustedState);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
-    resultData.RetryMessage.ShouldBeSameAs(retryMessage);
+    resultData.RetryPlan.ShouldBeSameAs(retryPlan);
   }
 
   [TestMethod]
@@ -88,9 +88,9 @@ public partial class InboxTests
       CreatedAt = createdAt
     };
 
-    var retryId = BuildRetryMessageId("order-123", createdAt);
-    services.GetRetryMessageOptions().Returns(new RetryMessageOptions { MaxRetryAttempts = 5 });
-    services.GetRetryMessageByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns((RetryMessage?)null);
+    var retryId = BuildRetryPlanId("order-123", createdAt);
+    services.GetRetryPlanOptions().Returns(new RetryPlanOptions { MaxRetryAttempts = 5 });
+    services.GetRetryPlanByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns((RetryPlan?)null);
 
     var data = new CheckingTestData { InboxMessage = message };
 
@@ -99,7 +99,7 @@ public partial class InboxTests
     state.ShouldBe(CheckRetryInboxMessageNotExhaustedState);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
-    resultData.RetryMessage.ShouldBeNull();
+    resultData.RetryPlan.ShouldBeNull();
   }
 
   [TestMethod]
@@ -115,9 +115,9 @@ public partial class InboxTests
       CreatedAt = createdAt
     };
 
-    var retryId = BuildRetryMessageId("order-123", createdAt);
-    services.GetRetryMessageOptions().Returns(new RetryMessageOptions { MaxRetryAttempts = 0 });
-    services.GetRetryMessageByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns((RetryMessage?)null);
+    var retryId = BuildRetryPlanId("order-123", createdAt);
+    services.GetRetryPlanOptions().Returns(new RetryPlanOptions { MaxRetryAttempts = 0 });
+    services.GetRetryPlanByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns((RetryPlan?)null);
 
     var data = new CheckingTestData { InboxMessage = message };
 
@@ -126,7 +126,7 @@ public partial class InboxTests
     state.ShouldBe(CheckRetryInboxMessageExhaustedState);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
-    resultData.RetryMessage.ShouldBeNull();
+    resultData.RetryPlan.ShouldBeNull();
   }
 
   [TestMethod]
@@ -156,9 +156,9 @@ public partial class InboxTests
       CreatedAt = createdAt
     };
 
-    var retryId = BuildRetryMessageId("order-123", createdAt);
-    services.GetRetryMessageOptions().Returns(new RetryMessageOptions { MaxRetryAttempts = 5 });
-    services.GetRetryMessageByIdAsync(retryId, Arg.Any<CancellationToken>()).Throws(new OperationCanceledException());
+    var retryId = BuildRetryPlanId("order-123", createdAt);
+    services.GetRetryPlanOptions().Returns(new RetryPlanOptions { MaxRetryAttempts = 5 });
+    services.GetRetryPlanByIdAsync(retryId, Arg.Any<CancellationToken>()).Throws(new OperationCanceledException());
 
     var data = new CheckingTestData { InboxMessage = message };
 
@@ -183,7 +183,7 @@ public partial class InboxTests
     };
 
     var expectedException = new InvalidOperationException("Storage failure");
-    services.GetRetryMessageOptions().Throws(expectedException);
+    services.GetRetryPlanOptions().Throws(expectedException);
 
     var data = new CheckingTestData { InboxMessage = message };
 
@@ -207,9 +207,9 @@ public partial class InboxTests
       CreatedAt = createdAt
     };
 
-    var retryId = BuildRetryMessageId("order-123", createdAt);
-    services.GetRetryMessageOptions().Returns(new RetryMessageOptions { MaxRetryAttempts = 5 });
-    services.GetRetryMessageByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns((RetryMessage?)null);
+    var retryId = BuildRetryPlanId("order-123", createdAt);
+    services.GetRetryPlanOptions().Returns(new RetryPlanOptions { MaxRetryAttempts = 5 });
+    services.GetRetryPlanByIdAsync(retryId, Arg.Any<CancellationToken>()).Returns((RetryPlan?)null);
 
     var data = new CheckingTestData { InboxMessage = message };
     using var cts = new CancellationTokenSource();
@@ -217,7 +217,7 @@ public partial class InboxTests
 
     await CheckRetryInboxMessageAsync<ICheckingRetryServices, CheckingTestData, string, string>(services, data, ct);
 
-    await services.Received(1).GetRetryMessageByIdAsync(retryId, ct);
+    await services.Received(1).GetRetryPlanByIdAsync(retryId, ct);
   }
 }
 

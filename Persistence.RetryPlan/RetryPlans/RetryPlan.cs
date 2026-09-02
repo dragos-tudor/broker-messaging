@@ -1,7 +1,7 @@
 
-namespace Persistence.RetryMessage;
+namespace Persistence.RetryPlan;
 
-public record RetryMessage
+public record RetryPlan
 {
   public required string RetryId { get; init; }
   public int RetryCount { get; set; }

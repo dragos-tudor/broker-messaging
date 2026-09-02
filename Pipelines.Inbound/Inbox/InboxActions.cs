@@ -9,7 +9,7 @@ static class InboxActions
   internal const string Inserted = $"{Scope}.{nameof(Inserted)}";
   internal const string Idempotent = $"{Scope}.{nameof(Idempotent)}";
   internal const string CheckingRetry = $"{Scope}.{nameof(CheckingRetry)}";
-  internal const string UpsertingRetry = $"{Scope}.{nameof(UpsertingRetry)}";
+  internal const string RegisteringRetry = $"{Scope}.{nameof(RegisteringRetry)}";
   internal const string RetryExhausted = $"{Scope}.{nameof(RetryExhausted)}";
   internal const string Handling = $"{Scope}.{nameof(Handling)}";
   internal const string Transacting = $"{Scope}.{nameof(Transacting)}";

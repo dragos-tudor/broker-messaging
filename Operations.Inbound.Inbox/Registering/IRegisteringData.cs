@@ -1,7 +1,7 @@
 
 namespace Operations.Inbound.Inbox;
 
-public interface ICheckingRetryData<TKey, TPayload>:
+public interface IRegisteringRetryData<TKey, TPayload>:
   IInboxMessageProp<TKey, TPayload>,
   IRetryPlanProp,
   IPipelineErrorProp;

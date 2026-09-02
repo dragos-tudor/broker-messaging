@@ -7,7 +7,7 @@
   <Project Path="Persistence.InboxMessage/Persistence.InboxMessage.csproj" />
   <Project Path="Persistence.OutboxMessage/Persistence.OutboxMessage.csproj" />
   <Project Path="Persistence.DeadLetterMessage/Persistence.DeadLetterMessage.csproj" />
-  <Project Path="Persistence.RetryMessage/Persistence.RetryMessage.csproj" />
+  <Project Path="Persistence.RetryPlan/Persistence.RetryPlan.csproj" />
   <Project Path="Transport.Envelope/Transport.Envelope.csproj" />
   <Project Path="Transport.DeadLetterEnvelope/Transport.DeadLetterEnvelope.csproj" />
 

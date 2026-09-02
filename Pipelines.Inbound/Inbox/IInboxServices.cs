@@ -12,5 +12,5 @@ public interface IInboxServices<TKey, TValue, TMetadata, TConfirmation, TPayload
   IClosingServices<TKey, TPayload>,
   IAbandoningServices<TKey, TPayload>,
   IConvertingServices,
-  IUpsertingRetryServices
+  IRegisteringRetryServices
   where TSession: IDisposable;

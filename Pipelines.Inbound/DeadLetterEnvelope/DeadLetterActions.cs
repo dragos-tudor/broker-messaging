@@ -8,7 +8,7 @@ static class EphemeralDeadLetterEnvelopeActions
   internal const string Redirected = $"{Scope}.{nameof(Redirected)}";
   internal const string CheckingRetry = $"{Scope}.{nameof(CheckingRetry)}";
   internal const string RetryExhausted = $"{Scope}.{nameof(RetryExhausted)}";
-  internal const string UpsertingRetry = $"{Scope}.{nameof(UpsertingRetry)}";
+  internal const string RegisteringRetry = $"{Scope}.{nameof(RegisteringRetry)}";
   internal const string Exit = $"{Scope}.{nameof(Exit)}";
 }
 

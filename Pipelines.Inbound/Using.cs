@@ -4,7 +4,7 @@ global using System.Threading;
 global using System.Threading.Tasks;
 global using Persistence.DeadLetterMessage;
 global using Persistence.InboxMessage;
-global using Persistence.RetryMessage;
+global using Persistence.RetryPlan;
 global using Transport.DeadLetterEnvelope;
 global using Transport.Envelope;
 global using static Operations.Inbound.Envelope.EnvelopeFuncs;

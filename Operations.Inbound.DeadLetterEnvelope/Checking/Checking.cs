@@ -13,11 +13,11 @@ partial class DeadLetterEnvelopeFuncs
     try
     {
       var envelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
-      var options = services.GetRetryMessageOptions();
-      var retryMessage = await GetRetryMessageAsync(services, envelope.Key, envelope.CreatedAt, ct);
-      var exhausted = IsRetryMessageExhausted(retryMessage, options);
+      var options = services.GetRetryPlanOptions();
+      var retryPlan = await GetRetryPlanAsync(services, envelope.Key, envelope.CreatedAt, ct);
+      var exhausted = IsRetryPlanExhausted(retryPlan, options);
 
-      data.RetryMessage = retryMessage;
+      data.RetryPlan = retryPlan;
       return exhausted?
         (data, CheckRetryDeadLetterEnvelopeExhaustedState, null):
         (data, CheckRetryDeadLetterEnvelopeNotExhaustedState, null);

@@ -178,9 +178,9 @@ partial class InboundTests
       .Returns(Task.FromException<bool>(new InvalidOperationException("DB error")));
 
     // Mock Checking to return exhausted retry message
-    services.GetRetryMessageOptions().Returns(new RetryMessageOptions { MaxRetryAttempts = 2 });
-    services.GetRetryMessageByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-      .Returns(Task.FromResult<RetryMessage?>(new RetryMessage
+    services.GetRetryPlanOptions().Returns(new RetryPlanOptions { MaxRetryAttempts = 2 });
+    services.GetRetryPlanByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+      .Returns(Task.FromResult<RetryPlan?>(new RetryPlan
       {
         RetryId = "retry-id",
         RetryCount = 2,

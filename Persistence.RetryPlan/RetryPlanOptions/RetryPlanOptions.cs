@@ -1,6 +1,6 @@
-namespace Persistence.RetryMessage;
+namespace Persistence.RetryPlan;
 
-public record RetryMessageOptions
+public record RetryPlanOptions
 {
   public int MaxRetryAttempts { get; init; } = 5;
   public TimeSpan RetryBaseDelay { get; init; } = TimeSpan.FromSeconds(1);

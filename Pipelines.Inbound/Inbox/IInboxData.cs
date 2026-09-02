@@ -12,4 +12,4 @@ public interface IInboxData<TKey, TValue, TMetadata, TConfirmation, TPayload>:
   IClosingData<TKey, TPayload>,
   IAbandoningData<TKey, TPayload>,
   IConvertingData<TKey, TPayload>,
-  IUpsertingRetryData<TKey, TPayload>;
+  IRegisteringRetryData<TKey, TPayload>;

@@ -41,8 +41,8 @@
       <BuildOutputInPackage Include="$(OutputPath)Persistence.InboxMessage.pdb" />
       <BuildOutputInPackage Include="$(OutputPath)Persistence.OutboxMessage.dll" />
       <BuildOutputInPackage Include="$(OutputPath)Persistence.OutboxMessage.pdb" />
-      <BuildOutputInPackage Include="$(OutputPath)Persistence.RetryMessage.dll" />
-      <BuildOutputInPackage Include="$(OutputPath)Persistence.RetryMessage.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Persistence.RetryPlan.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Persistence.RetryPlan.pdb" />
       <BuildOutputInPackage Include="$(OutputPath)Persistence.DeadLetterMessage.dll" />
       <BuildOutputInPackage Include="$(OutputPath)Persistence.DeadLetterMessage.pdb" />
       <BuildOutputInPackage Include="$(OutputPath)Operations.Inbound.Envelope.dll" />

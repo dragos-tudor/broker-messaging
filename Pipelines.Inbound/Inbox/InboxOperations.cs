@@ -13,7 +13,7 @@ partial class InboundFuncs
         InboxActions.Validating => ValidateInboxMessage<TServices, TData, TKey, TPayload>,
         InboxActions.CheckingRetry => CheckRetryInboxMessageAsync<TServices, TData, TKey, TPayload>,
         InboxActions.Inserting => InsertInboxMessageAsync<TServices, TData, TKey, TPayload>,
-        InboxActions.UpsertingRetry => UpsertRetryInboxMessageAsync<TServices, TData, TKey, TPayload>,
+        InboxActions.RegisteringRetry => RegisterRetryInboxMessageAsync<TServices, TData, TKey, TPayload>,
         InboxActions.Handling => HandleInboxMessageAsync<TServices, TData, TKey, TPayload>,
         InboxActions.Transacting => TransactInboxMessageAsync<TServices, TData, TKey, TPayload, TSession>,
         InboxActions.Abandoning => AbandonInboxMessageAsync<TServices, TData, TKey, TPayload>,

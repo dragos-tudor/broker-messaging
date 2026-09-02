@@ -127,7 +127,7 @@ Downstream business execution (`Handling`, `Transacting`, `Abandoning`, `Schedul
 Dead lettering is split into two mutually exclusive paths:
 
 - **Ephemeral Path (`EphemeralDeadLetterEnvelopePipeline`)**:
-  Used when validation or mapping fails on the inbound envelope (`EnvelopeActions.Converted`). No database row exists. It attempts an in-memory redirect. Under failure, it follows pre-durable retries (`CheckingRetry` $\to$ `UpsertingRetry` $\to$ `Deferring`). On success or exhaustion (`Redirected` / `CheckedRetry`), it maps directly to `EnvelopeActions.Confirming`.
+  Used when validation or mapping fails on the inbound envelope (`EnvelopeActions.Converted`). No database row exists. It attempts an in-memory redirect. Under failure, it follows pre-durable retries (`CheckingRetry` $\to$ `RegisteringRetry` $\to$ `Deferring`). On success or exhaustion (`Redirected` / `CheckedRetry`), it maps directly to `EnvelopeActions.Confirming`.
 - **Persisted Path (`DeadLetterEnvelopePipeline`)**:
   Used when an inserted inbox message encounters a fatal business domain error (`InboxActions.Converted` $\to$ `DeadLetterActions.Inserting`). A durable `DeadLetterMessage` database row exists. `DeadLetterActions.Mapped` dynamically routes to `Publishing` or `Producing` via `InboundPipelineConfig`. On `Published`, it hands off to `DeadLetterActions.Closing`, which in turn triggers `InboxActions.Closing` to close both database records in a clean two-way roundtrip.
 
@@ -154,7 +154,7 @@ Layer 2 — Operations     split by DIRECTION × INPUT ENTITY:
                           Operations.Outbound.Envelope
                                         │
 Layer 1 — Persistence     / .InboxMessage / .OutboxMessage
-                          / .DeadLetterMessage / .RetryMessage
+                          / .DeadLetterMessage / .RetryPlan
           Transport       / .Envelope / .DeadLetterEnvelope
 ```
 
@@ -172,19 +172,19 @@ Rather than each operation maintaining custom retry logic, retry orchestration f
 |---|---|---|
 | **Infra / Cleanup Operations** | `Closing`, `Abandoning` | Router-generic attempt budget; circuit opens on repeated failure. |
 | **Row Already Persisted** | `Handling`, `Transacting` | Router budget; upon exhaustion, hands off to `Scheduling` (database retry worker). |
-| **Pre-Durable Write Operations** | `Inserting`, `Redirecting` | Dedicated `RetryMessage` audit check-after-error mechanism (below). |
+| **Pre-Durable Write Operations** | `Inserting`, `Redirecting` | Dedicated `RetryPlan` audit check-after-error mechanism (below). |
 
-### The Check-After-Error Pre-Durable Retry (`RetryMessage`)
+### The Check-After-Error Pre-Durable Retry (`RetryPlan`)
 
 For messages that have not yet achieved durability (e.g. `Inserting` an `InboxMessage` or `Redirecting` an ephemeral dead-letter envelope):
 
 1. The initial operation is attempted directly without pre-check overhead.
 2. If an error occurs (`InsertInboxMessageErrorState`), control passes to `CheckingRetry`.
-3. `CheckingRetry` inspects the durable `RetryMessage` store:
-   - **Not Exhausted**: routes to `UpsertingRetry`, records the attempt, and returns `Deferring`. The message is not confirmed; the broker will redeliver it after a backoff delay.
+3. `CheckingRetry` inspects the durable `RetryPlan` store:
+   - **Not Exhausted**: routes to `RegisteringRetry`, records the attempt, and returns `Deferring`. The message is not confirmed; the broker will redeliver it after a backoff delay.
    - **Exhausted**: routes to `RetryExhausted`, hands off to `EnvelopeActions.Confirming`. The poison envelope offset is committed so the broker partition does not stall, and `Handling` is skipped.
 
-The `RetryMessage` record is **not a message store** — the payload is always re-read fresh from the broker upon redelivery, preventing payload version skew while providing a fully queryable audit trail of poison message attempts.
+The `RetryPlan` record is **not a message store** — the payload is always re-read fresh from the broker upon redelivery, preventing payload version skew while providing a fully queryable audit trail of poison message attempts.
 
 ---
 

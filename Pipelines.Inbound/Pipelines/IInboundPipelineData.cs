@@ -13,7 +13,7 @@ public class InboundPipelineData<TKey, TValue, TMetadata, TConfirmation, TPayloa
   public IEnvelope<TKey, TValue, TMetadata, TConfirmation>? Envelope { get; set; }
   public IDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation>? DeadLetterEnvelope { get; set; }
   public InboxMessage<TKey, TPayload>? InboxMessage { get; set; }
-  public RetryMessage? RetryMessage { get; set; }
+  public RetryPlan? RetryPlan { get; set; }
   public DeadLetterMessage<TKey, TPayload>? DeadLetterMessage { get; set; }
   public object? Model { get; set; }
   public string? PipelineError { get; set; } = string.Empty;

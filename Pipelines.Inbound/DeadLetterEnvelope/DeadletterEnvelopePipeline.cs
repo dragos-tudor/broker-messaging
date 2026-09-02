@@ -10,11 +10,11 @@ partial class InboundFuncs
     RedirectDeadLetterEnvelopeErrorState => EphemeralDeadLetterEnvelopeActions.CheckingRetry,
 
     CheckRetryDeadLetterEnvelopeExhaustedState => EphemeralDeadLetterEnvelopeActions.RetryExhausted,
-    CheckRetryDeadLetterEnvelopeNotExhaustedState => EphemeralDeadLetterEnvelopeActions.UpsertingRetry,
+    CheckRetryDeadLetterEnvelopeNotExhaustedState => EphemeralDeadLetterEnvelopeActions.RegisteringRetry,
     CheckRetryDeadLetterEnvelopeErrorState => EphemeralDeadLetterEnvelopeActions.CheckingRetry,
 
-    UpsertRetryDeadLetterEnvelopeSuccessState => EphemeralDeadLetterEnvelopeActions.Exit,
-    UpsertRetryDeadLetterEnvelopeErrorState => EphemeralDeadLetterEnvelopeActions.UpsertingRetry,
+    RegisterRetryDeadLetterEnvelopeSuccessState => EphemeralDeadLetterEnvelopeActions.Exit,
+    RegisterRetryDeadLetterEnvelopeErrorState => EphemeralDeadLetterEnvelopeActions.RegisteringRetry,
 
     _ => default
   };

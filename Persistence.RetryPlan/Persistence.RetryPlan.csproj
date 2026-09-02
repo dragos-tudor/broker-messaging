@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Persistence retry message project.</Description>
+    <Description>Persistence retry plan project.</Description>
   </PropertyGroup>
 
 </Project>

@@ -13,4 +13,4 @@ public interface IDeadLetterMessageProp<TKey, TPayload>
 
 public interface IPipelineErrorProp { string? PipelineError { get; set; } }
 
-public interface IRetryMessageProp { RetryMessage? RetryMessage { get; set; } }
+public interface IRetryPlanProp { RetryPlan? RetryPlan { get; set; } }

@@ -7,6 +7,6 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("Operations.Inbound.Inbox")]
 [assembly: InternalsVisibleTo("Operations.Inbound.DeadLetterEnvelope")]
 
-namespace Persistence.RetryMessage;
+namespace Persistence.RetryPlan;
 
-public static partial class RetryMessageFuncs;
+public static partial class RetryPlanFuncs;

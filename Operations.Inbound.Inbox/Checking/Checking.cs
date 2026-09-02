@@ -13,11 +13,11 @@ partial class InboxFuncs
     try
     {
       var message = RequireInboxMessage(data.InboxMessage);
-      var options = services.GetRetryMessageOptions();
-      var retryMessage = await GetRetryMessageAsync(services, message.MessageKey, message.CreatedAt, ct);
-      var exhausted = IsRetryMessageExhausted(retryMessage, options);
+      var options = services.GetRetryPlanOptions();
+      var retryPlan = await GetRetryPlanAsync(services, message.MessageKey, message.CreatedAt, ct);
+      var exhausted = IsRetryPlanExhausted(retryPlan, options);
 
-      data.RetryMessage = retryMessage;
+      data.RetryPlan = retryPlan;
       return exhausted?
         (data, CheckRetryInboxMessageExhaustedState, null):
         (data, CheckRetryInboxMessageNotExhaustedState, null);

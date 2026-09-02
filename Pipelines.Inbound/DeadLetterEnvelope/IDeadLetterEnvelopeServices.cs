@@ -7,4 +7,4 @@ public interface IDeadLetterEnvelopeServices<TKey, TValue, TMetadata, TConfirmat
   IProducingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>,
   IPublishingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>,
   IRedirectingServices<TKey, TValue, TMetadata, TConfirmation>,
-  IUpsertingRetryServices;
+  IRegisteringRetryServices;
