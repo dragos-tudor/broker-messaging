@@ -26,7 +26,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await CloseInboxMessageAsync<IClosingServices<string, string>, ClosingTestData, string, string>(services, data);
 
-    state.ShouldBe(CloseInboxMessageSuccessState);
+    state.ShouldBe(ClosingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     capturedUpdate.ShouldNotBeNull();
@@ -42,7 +42,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await CloseInboxMessageAsync<IClosingServices<string, string>, ClosingTestData, string, string>(services, data);
 
-    state.ShouldBe(CloseInboxMessageErrorState);
+    state.ShouldBe(ClosingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
   }
@@ -89,7 +89,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await CloseInboxMessageAsync<IClosingServices<string, string>, ClosingTestData, string, string>(services, data);
 
-    state.ShouldBe(CloseInboxMessageErrorState);
+    state.ShouldBe(ClosingError);
     exception.ShouldBeSameAs(expectedException);
   }
 
@@ -113,4 +113,3 @@ public partial class InboxTests
     await services.Received(1).UpdateInboxMessageAsync(message, Arg.Any<Func<InboxMessage<string, string>, InboxMessage<string, string>>>(), ct);
   }
 }
-

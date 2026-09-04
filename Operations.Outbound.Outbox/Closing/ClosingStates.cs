@@ -3,6 +3,6 @@ namespace Operations.Outbound.Outbox;
 
 static partial class OutboxStates
 {
-  internal const string CloseOutboxMessageSuccessState = "CloseOutboxMessageSuccessState";
-  internal const string CloseOutboxMessageErrorState = "CloseOutboxMessageErrorState";
+  internal const string ClosingSuccess = $"{Scope}.{nameof(ClosingSuccess)}";
+  internal const string ClosingError = $"{Scope}.{nameof(ClosingError)}";
 }

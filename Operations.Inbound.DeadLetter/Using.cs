@@ -9,7 +9,8 @@ global using static Operations.Inbound.DeadLetter.DeadLetterFuncs;
 global using static Operations.Inbound.DeadLetter.DeadLetterStates;
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("Pipelines.Inbound")]
+[assembly: InternalsVisibleTo("Pipelines.Inbound")]
+[assembly: InternalsVisibleTo("Routing.Inbound")]
 
 namespace Operations.Inbound.DeadLetter;
 

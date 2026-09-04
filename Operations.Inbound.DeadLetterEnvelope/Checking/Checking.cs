@@ -19,14 +19,14 @@ partial class DeadLetterEnvelopeFuncs
 
       data.RetryPlan = retryPlan;
       return exhausted?
-        (data, CheckRetryDeadLetterEnvelopeExhaustedState, null):
-        (data, CheckRetryDeadLetterEnvelopeNotExhaustedState, null);
+        (data, CheckingRetryExhausted, null):
+        (data, CheckingRetryNotExhausted, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception)
     {
       data.PipelineError = exception.Message;
-      return (data, CheckRetryDeadLetterEnvelopeErrorState, exception);
+      return (data, CheckingRetryError, exception);
     }
   }
 }

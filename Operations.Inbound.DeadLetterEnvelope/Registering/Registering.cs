@@ -17,13 +17,13 @@ partial class DeadLetterEnvelopeFuncs
       var error = data.PipelineError ?? "Unknown register retry dead letter envelope error";
 
       await ScheduleRetryPlanAsync(services, retryPlan, error, ct);
-      return (data, RegisterRetryDeadLetterEnvelopeSuccessState, null);
+      return (data, RegisteringRetrySuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception)
     {
       data.PipelineError = exception.Message;
-      return (data, RegisterRetryDeadLetterEnvelopeErrorState, exception);
+      return (data, RegisteringRetryError, exception);
     }
   }
 }

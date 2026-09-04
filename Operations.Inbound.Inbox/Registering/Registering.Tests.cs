@@ -41,7 +41,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await RegisterRetryInboxMessageAsync<IRegisteringRetryServices, RegisteringTestData, string, string>(services, data);
 
-    state.ShouldBe(RegisterRetryInboxMessageSuccessState);
+    state.ShouldBe(RegisteringRetrySuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     await services.Received(1).ScheduleRetryPlanAsync(existingRetry, Arg.Any<Func<RetryPlan, RetryPlan>>(), Arg.Any<CancellationToken>());
@@ -74,7 +74,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await RegisterRetryInboxMessageAsync<IRegisteringRetryServices, RegisteringTestData, string, string>(services, data);
 
-    state.ShouldBe(RegisterRetryInboxMessageSuccessState);
+    state.ShouldBe(RegisteringRetrySuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     await services.Received(1).ScheduleRetryPlanAsync(
@@ -112,7 +112,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await RegisterRetryInboxMessageAsync<IRegisteringRetryServices, RegisteringTestData, string, string>(services, data);
 
-    state.ShouldBe(RegisterRetryInboxMessageSuccessState);
+    state.ShouldBe(RegisteringRetrySuccess);
     exception.ShouldBeNull();
     capturedUpdate.ShouldNotBeNull();
     var dummyRetry = new RetryPlan { RetryId = "dummy" };
@@ -128,7 +128,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await RegisterRetryInboxMessageAsync<IRegisteringRetryServices, RegisteringTestData, string, string>(services, data);
 
-    state.ShouldBe(RegisterRetryInboxMessageErrorState);
+    state.ShouldBe(RegisteringRetryError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Inbox message is required.");
@@ -180,7 +180,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await RegisterRetryInboxMessageAsync<IRegisteringRetryServices, RegisteringTestData, string, string>(services, data);
 
-    state.ShouldBe(RegisterRetryInboxMessageErrorState);
+    state.ShouldBe(RegisteringRetryError);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("Upsert DB failure");
   }

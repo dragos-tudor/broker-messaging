@@ -19,14 +19,14 @@ partial class InboxFuncs
 
       data.RetryPlan = retryPlan;
       return exhausted?
-        (data, CheckRetryInboxMessageExhaustedState, null):
-        (data, CheckRetryInboxMessageNotExhaustedState, null);
+        (data, CheckingRetryExhausted, null):
+        (data, CheckingRetryNotExhausted, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception)
     {
       data.PipelineError = exception.Message;
-      return (data, CheckRetryInboxMessageErrorState, exception);
+      return (data, CheckingRetryError, exception);
     }
   }
 }

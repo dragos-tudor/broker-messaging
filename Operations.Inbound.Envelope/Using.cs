@@ -12,7 +12,8 @@ global using static Operations.Inbound.Envelope.EnvelopeStates;
 global using static Transport.Envelope.EnvelopeFuncs;
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("Pipelines.Inbound")]
+[assembly: InternalsVisibleTo("Pipelines.Inbound")]
+[assembly: InternalsVisibleTo("Routing.Inbound")]
 
 namespace Operations.Inbound.Envelope;
 

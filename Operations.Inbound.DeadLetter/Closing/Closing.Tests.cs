@@ -27,7 +27,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await CloseDeadLetterMessageAsync<IClosingServices<string, string>, ClosingTestData, string, string>(services, data, default);
 
-    state.ShouldBe(CloseDeadLetterMessageSuccessState);
+    state.ShouldBe(ClosingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     capturedUpdate.ShouldNotBeNull();
@@ -43,7 +43,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await CloseDeadLetterMessageAsync<IClosingServices<string, string>, ClosingTestData, string, string>(services, data, default);
 
-    state.ShouldBe(CloseDeadLetterMessageErrorState);
+    state.ShouldBe(ClosingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Dead letter message is required.");
@@ -95,7 +95,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await CloseDeadLetterMessageAsync<IClosingServices<string, string>, ClosingTestData, string, string>(services, data, default);
 
-    state.ShouldBe(CloseDeadLetterMessageErrorState);
+    state.ShouldBe(ClosingError);
     exception.ShouldBeSameAs(expectedException);
   }
 

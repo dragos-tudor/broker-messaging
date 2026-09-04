@@ -38,7 +38,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await ScheduleOutboxMessageAsync<ISchedulingServices<string, string>, SchedulingTestData, string, string, string>(services, data);
 
-    state.ShouldBe(ScheduleOutboxMessageRetryState);
+    state.ShouldBe(SchedulingRetry);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     capturedUpdate.ShouldNotBeNull();
@@ -78,7 +78,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await ScheduleOutboxMessageAsync<ISchedulingServices<string, string>, SchedulingTestData, string, string, string>(services, data);
 
-    state.ShouldBe(ScheduleOutboxMessageExhaustedState);
+    state.ShouldBe(SchedulingExhausted);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     capturedUpdate.ShouldNotBeNull();
@@ -117,7 +117,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await ScheduleOutboxMessageAsync<ISchedulingServices<string, string>, SchedulingTestData, string, string, string>(services, data);
 
-    state.ShouldBe(ScheduleOutboxMessageRetryState);
+    state.ShouldBe(SchedulingRetry);
     exception.ShouldBeNull();
     capturedUpdate.ShouldNotBeNull();
     var updated = capturedUpdate(message);
@@ -132,7 +132,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await ScheduleOutboxMessageAsync<ISchedulingServices<string, string>, SchedulingTestData, string, string, string>(services, data);
 
-    state.ShouldBe(ScheduleOutboxMessageErrorState);
+    state.ShouldBe(SchedulingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Outbox message is required.");
@@ -188,7 +188,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await ScheduleOutboxMessageAsync<ISchedulingServices<string, string>, SchedulingTestData, string, string, string>(services, data);
 
-    state.ShouldBe(ScheduleOutboxMessageErrorState);
+    state.ShouldBe(SchedulingError);
     exception.ShouldNotBeNull();
     exception.Message.ShouldBe("Failed options");
   }

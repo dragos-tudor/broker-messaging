@@ -39,7 +39,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await ScheduleDeadLetterMessageAsync<ISchedulingServices<string, string>, SchedulingTestData, string, string>(services, data, default);
 
-    state.ShouldBe(ScheduleDeadLetterMessageRetryState);
+    state.ShouldBe(SchedulingNotExhausted);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     capturedUpdate.ShouldNotBeNull();
@@ -80,7 +80,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await ScheduleDeadLetterMessageAsync<ISchedulingServices<string, string>, SchedulingTestData, string, string>(services, data, default);
 
-    state.ShouldBe(ScheduleDeadLetterMessageExhaustedState);
+    state.ShouldBe(SchedulingExhausted);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     capturedUpdate.ShouldNotBeNull();
@@ -120,7 +120,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await ScheduleDeadLetterMessageAsync<ISchedulingServices<string, string>, SchedulingTestData, string, string>(services, data, default);
 
-    state.ShouldBe(ScheduleDeadLetterMessageRetryState);
+    state.ShouldBe(SchedulingNotExhausted);
     exception.ShouldBeNull();
     capturedUpdate.ShouldNotBeNull();
     var updated = capturedUpdate(message);
@@ -135,7 +135,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await ScheduleDeadLetterMessageAsync<ISchedulingServices<string, string>, SchedulingTestData, string, string>(services, data, default);
 
-    state.ShouldBe(ScheduleDeadLetterMessageErrorState);
+    state.ShouldBe(SchedulingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Dead letter message is required.");
@@ -191,7 +191,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await ScheduleDeadLetterMessageAsync<ISchedulingServices<string, string>, SchedulingTestData, string, string>(services, data, default);
 
-    state.ShouldBe(ScheduleDeadLetterMessageErrorState);
+    state.ShouldBe(SchedulingError);
     exception.ShouldNotBeNull();
     exception.Message.ShouldBe("Failed options");
   }
@@ -224,4 +224,3 @@ public partial class DeadLetterTests
     await services.Received(1).UpdateDeadLetterMessageAsync(message, Arg.Any<Func<DeadLetterMessage<string, string>, DeadLetterMessage<string, string>>>(), ct);
   }
 }
-

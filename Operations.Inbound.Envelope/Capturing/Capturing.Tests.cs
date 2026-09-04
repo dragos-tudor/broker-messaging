@@ -19,7 +19,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await CaptureEnvelope<ICapturingServices<string, string, string, string>, CapturingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(CaptureEnvelopeSuccessState);
+    state.ShouldBe(CapturingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.Envelope.ShouldBeSameAs(envelope);
@@ -36,7 +36,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await CaptureEnvelope<ICapturingServices<string, string, string, string>, CapturingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(NotCapturedEnvelopeState);
+    state.ShouldBe(CapturingNotCaptured);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.Envelope.ShouldBeNull();
@@ -54,7 +54,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await CaptureEnvelope<ICapturingServices<string, string, string, string>, CapturingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(CaptureEnvelopeErrorState);
+    state.ShouldBe(CapturingError);
     exception.ShouldBeSameAs(expectedException);
     resultData.ShouldBeSameAs(data);
     resultData.PipelineError.ShouldBe("Reader failure");
@@ -77,4 +77,3 @@ public partial class EnvelopeTests
     await services.Received(1).ReadEnvelope(ct);
   }
 }
-

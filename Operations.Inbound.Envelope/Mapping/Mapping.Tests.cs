@@ -34,7 +34,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await MapEnvelope<IMappingServices<string, string, string, string, string>, MappingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(MapEnvelopeSuccessState);
+    state.ShouldBe(MappingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.InboxMessage.ShouldBeSameAs(inboxMessage);
@@ -55,7 +55,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await MapEnvelope<IMappingServices<string, string, string, string, string>, MappingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(MapEnvelopeValueErrorState);
+    state.ShouldBe(MappingValueError);
     exception.ShouldNotBeNull();
     exception.Message.ShouldContain("Envelope msg-key-abc value mapped to null payload");
     resultData.PipelineError.ShouldBe("Envelope msg-key-abc value mapped to null payload");
@@ -70,7 +70,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await MapEnvelope<IMappingServices<string, string, string, string, string>, MappingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(MapEnvelopeErrorState);
+    state.ShouldBe(MappingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Envelope is required.");
@@ -91,9 +91,8 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await MapEnvelope<IMappingServices<string, string, string, string, string>, MappingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(MapEnvelopeErrorState);
+    state.ShouldBe(MappingError);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("Mapping serialization error");
   }
 }
-

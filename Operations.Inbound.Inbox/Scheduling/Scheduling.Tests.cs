@@ -38,7 +38,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await ScheduleInboxMessageAsync<ISchedulingServices<string, string>, SchedulingTestData, string, string>(services, data, default);
 
-    state.ShouldBe(ScheduleInboxMessageRetryState);
+    state.ShouldBe(SchedulingNotExhausted);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     capturedUpdate.ShouldNotBeNull();
@@ -78,7 +78,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await ScheduleInboxMessageAsync<ISchedulingServices<string, string>, SchedulingTestData, string, string>(services, data, default);
 
-    state.ShouldBe(ScheduleInboxMessageExhaustedState);
+    state.ShouldBe(SchedulingExhausted);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     capturedUpdate.ShouldNotBeNull();
@@ -95,7 +95,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await ScheduleInboxMessageAsync<ISchedulingServices<string, string>, SchedulingTestData, string, string>(services, data, default);
 
-    state.ShouldBe(ScheduleInboxMessageErrorState);
+    state.ShouldBe(SchedulingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
   }
@@ -150,7 +150,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await ScheduleInboxMessageAsync<ISchedulingServices<string, string>, SchedulingTestData, string, string>(services, data, default);
 
-    state.ShouldBe(ScheduleInboxMessageErrorState);
+    state.ShouldBe(SchedulingError);
     exception.ShouldNotBeNull();
     exception.Message.ShouldBe("Options failure");
   }
@@ -182,4 +182,3 @@ public partial class InboxTests
     await services.Received(1).UpdateInboxMessageAsync(message, Arg.Any<Func<InboxMessage<string, string>, InboxMessage<string, string>>>(), ct);
   }
 }
-

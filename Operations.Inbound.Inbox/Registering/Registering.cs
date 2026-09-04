@@ -17,13 +17,13 @@ partial class InboxFuncs
       var error = data.PipelineError ?? "Unknown register retry inbox message error";
 
       await ScheduleRetryPlanAsync(services, retryPlan, error, ct);
-      return (data, RegisterRetryInboxMessageSuccessState, null);
+      return (data, RegisteringRetrySuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception)
     {
       data.PipelineError = exception.Message;
-      return (data, RegisterRetryInboxMessageErrorState, exception);
+      return (data, RegisteringRetryError, exception);
     }
   }
 }

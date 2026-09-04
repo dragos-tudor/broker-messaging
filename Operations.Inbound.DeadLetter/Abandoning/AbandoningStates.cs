@@ -3,6 +3,7 @@ namespace Operations.Inbound.DeadLetter;
 
 internal static partial class DeadLetterStates
 {
-  internal const string AbandonDeadLetterMessageSuccessState = "AbandonDeadLetterMessageSuccessState";
-  internal const string AbandonDeadLetterMessageErrorState = "AbandonDeadLetterMessageErrorState";
+  const string Scope = nameof(DeadLetterStates);
+  internal const string AbandoningSuccess = $"{Scope}.{nameof(AbandoningSuccess)}";
+  internal const string AbandoningError = $"{Scope}.{nameof(AbandoningError)}";
 }

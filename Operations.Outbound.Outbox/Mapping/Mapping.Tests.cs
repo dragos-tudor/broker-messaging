@@ -30,7 +30,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await MapOutboxMessage<IMappingServices<string, string, string, string, string>, MappingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(MapOutboxMessageSuccessState);
+    state.ShouldBe(MappingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.Envelope.ShouldBeSameAs(envelope);
@@ -55,7 +55,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await MapOutboxMessage<IMappingServices<string, string, string, string, string>, MappingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(MapOutboxMessagePayloadErrorState);
+    state.ShouldBe(MappingPayloadError);
     exception.ShouldNotBeNull();
     exception.Message.ShouldContain($"Outbox message {messageId} mapped to null value");
     resultData.PipelineError.ShouldBe($"Outbox message {messageId} mapped to null value");
@@ -70,7 +70,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await MapOutboxMessage<IMappingServices<string, string, string, string, string>, MappingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(MapOutboxMessageErrorState);
+    state.ShouldBe(MappingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Outbox message is required.");
@@ -95,9 +95,8 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await MapOutboxMessage<IMappingServices<string, string, string, string, string>, MappingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(MapOutboxMessageErrorState);
+    state.ShouldBe(MappingError);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("Mapping payload failure");
   }
 }
-

@@ -3,8 +3,8 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 static partial class DeadLetterEnvelopeStates
 {
-  internal const string RedirectDeadLetterEnvelopeSuccessState = "RedirectDeadLetterEnvelopeSuccessState";
-  internal const string RedirectDeadLetterEnvelopeCircuitOpenState = "RedirectDeadLetterEnvelopeCircuitOpenState";
-  internal const string RedirectDeadLetterEnvelopeErrorState = "RedirectDeadLetterEnvelopeErrorState";
-  internal const string RedirectDeadLetterEnvelopeExhaustedState = "RedirectDeadLetterEnvelopeExhaustedState";
+  internal const string RedirectingSuccess = $"{Scope}.{nameof(RedirectingSuccess)}";
+  internal const string RedirectingCircuitOpen = $"{Scope}.{nameof(RedirectingCircuitOpen)}";
+  internal const string RedirectingError = $"{Scope}.{nameof(RedirectingError)}";
+  internal const string RedirectingExhausted = $"{Scope}.{nameof(RedirectingExhausted)}";
 }

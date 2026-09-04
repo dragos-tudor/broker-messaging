@@ -29,12 +29,12 @@ partial class OutboxFuncs
         ct);
 
       return status == OutboxMessageStatus.Processing?
-        (data, ScheduleOutboxMessageRetryState, null):
-        (data, ScheduleOutboxMessageExhaustedState, null);
+        (data, SchedulingRetry, null):
+        (data, SchedulingExhausted, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception) {
-      return (data, ScheduleOutboxMessageErrorState, exception);
+      return (data, SchedulingError, exception);
     }
   }
 }

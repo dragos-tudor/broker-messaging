@@ -17,7 +17,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await RedirectDeadLetterEnvelopeAsync<IRedirectingServices<string, string, string, string>, RedirectingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(RedirectDeadLetterEnvelopeSuccessState);
+    state.ShouldBe(RedirectingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     await services.Received(1).PublishDeadLetterEnvelopeAsync(envelope, Arg.Any<CancellationToken>());
@@ -31,7 +31,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await RedirectDeadLetterEnvelopeAsync<IRedirectingServices<string, string, string, string>, RedirectingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(RedirectDeadLetterEnvelopeErrorState);
+    state.ShouldBe(RedirectingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Dead letter envelope is required.");
@@ -69,7 +69,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await RedirectDeadLetterEnvelopeAsync<IRedirectingServices<string, string, string, string>, RedirectingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(RedirectDeadLetterEnvelopeErrorState);
+    state.ShouldBe(RedirectingError);
     exception.ShouldBeSameAs(expectedException);
   }
 
@@ -88,4 +88,3 @@ public partial class DeadLetterEnvelopeTests
     await services.Received(1).PublishDeadLetterEnvelopeAsync(envelope, ct);
   }
 }
-

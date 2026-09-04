@@ -3,7 +3,7 @@ namespace Operations.Outbound.Outbox;
 
 static partial class OutboxStates
 {
-  internal const string MapOutboxMessageSuccessState = "MapOutboxMessageSuccessState";
-  internal const string MapOutboxMessageErrorState = "MapOutboxMessageErrorState";
-  internal const string MapOutboxMessagePayloadErrorState = "MapOutboxMessagePayloadErrorState";
+  internal const string MappingSuccess = $"{Scope}.{nameof(MappingSuccess)}";
+  internal const string MappingError = $"{Scope}.{nameof(MappingError)}";
+  internal const string MappingPayloadError = $"{Scope}.{nameof(MappingPayloadError)}";
 }

@@ -16,13 +16,13 @@ partial class DeadLetterEnvelopeFuncs
 
       await services.PublishDeadLetterEnvelopeAsync(deadLetterEnvelope, ct);
 
-      return (data, PublishDeadLetterEnvelopeSuccessState, null);
+      return (data, PublishingSuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception)
     {
       data.PipelineError = exception.Message;
-      return (data, PublishDeadLetterEnvelopeErrorState, exception);
+      return (data, PublishingError, exception);
     }
   }
 }

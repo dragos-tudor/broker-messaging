@@ -3,7 +3,7 @@ namespace Operations.Inbound.Envelope;
 
 static partial class EnvelopeStates
 {
-  internal const string ConvertEnvelopeSuccessState = "ConvertEnvelopeSuccessState";
-  internal const string ConvertEnvelopeInvalidState = "ConvertEnvelopeInvalidState";
-  internal const string ConvertEnvelopeErrorState = "ConvertEnvelopeErrorState";
+  internal const string ConvertingSuccess = $"{Scope}.{nameof(ConvertingSuccess)}";
+  internal const string ConvertingInvalid = $"{Scope}.{nameof(ConvertingInvalid)}";
+  internal const string ConvertingError = $"{Scope}.{nameof(ConvertingError)}";
 }

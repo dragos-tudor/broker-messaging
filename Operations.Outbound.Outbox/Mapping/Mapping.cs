@@ -17,17 +17,17 @@ partial class OutboxFuncs
       var value = services.FromOutboxMessagePayload(outboxMessage.Payload);
       if (value is null) {
         data.PipelineError = $"Outbox message {outboxMessage.MessageId} mapped to null value";
-        return new ((data, MapOutboxMessagePayloadErrorState, CreateValidationException(data.PipelineError)));
+        return new ((data, MappingPayloadError, CreateValidationException(data.PipelineError)));
       }
 
       var envelope = services.FromOutboxMessage(outboxMessage, value, outboxMessage.CreatedAt);
       data.Envelope = envelope;
 
-      return new ((data, MapOutboxMessageSuccessState, null));
+      return new ((data, MappingSuccess, null));
     }
     catch (Exception exception) {
       data.PipelineError = exception.Message;
-      return new ((data, MapOutboxMessageErrorState, exception));
+      return new ((data, MappingError, exception));
     }
   }
 }

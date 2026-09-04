@@ -14,7 +14,8 @@ global using static Operations.Inbound.Inbox.InboxFuncs;
 global using static Operations.Inbound.Inbox.InboxStates;
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("Pipelines.Inbound")]
+[assembly: InternalsVisibleTo("Pipelines.Inbound")]
+[assembly: InternalsVisibleTo("Routing.Inbound")]
 
 namespace Operations.Inbound.Inbox;
 

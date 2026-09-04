@@ -24,7 +24,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await ValidateInboxMessage<IValidatingServices, ValidatingTestData, string, string>(services, data);
 
-    state.ShouldBe(ValidateInboxMessageSuccessState);
+    state.ShouldBe(ValidatingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.InboxMessage.ShouldBeSameAs(message);
@@ -47,7 +47,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await ValidateInboxMessage<IValidatingServices, ValidatingTestData, string, string>(services, data);
 
-    state.ShouldBe(ValidateInboxMessageInvalidErrorState);
+    state.ShouldBe(ValidatingInvalidError);
     exception.ShouldNotBeNull();
     exception.Message.ShouldContain("MessageId is empty.");
     resultData.InboxMessage.ShouldBeNull();
@@ -62,11 +62,10 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await ValidateInboxMessage<IValidatingServices, ValidatingTestData, string, string>(services, data);
 
-    state.ShouldBe(ValidateInboxMessageErrorState);
+    state.ShouldBe(ValidatingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.InboxMessage.ShouldBeNull();
     resultData.PipelineError.ShouldBe("Inbox message is required.");
   }
 }
-

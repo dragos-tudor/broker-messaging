@@ -26,7 +26,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await CloseOutboxMessageAsync<IClosingServices<string, string>, ClosingTestData, string, string>(services, data);
 
-    state.ShouldBe(CloseOutboxMessageSuccessState);
+    state.ShouldBe(ClosingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     capturedUpdate.ShouldNotBeNull();
@@ -42,7 +42,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await CloseOutboxMessageAsync<IClosingServices<string, string>, ClosingTestData, string, string>(services, data);
 
-    state.ShouldBe(CloseOutboxMessageErrorState);
+    state.ShouldBe(ClosingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Outbox message is required.");
@@ -92,7 +92,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await CloseOutboxMessageAsync<IClosingServices<string, string>, ClosingTestData, string, string>(services, data);
 
-    state.ShouldBe(CloseOutboxMessageErrorState);
+    state.ShouldBe(ClosingError);
     exception.ShouldBeSameAs(expectedException);
   }
 
@@ -117,4 +117,3 @@ public partial class OutboxTests
     await services.Received(1).UpdateOutboxMessageAsync(message, Arg.Any<Func<OutboxMessage<string, string>, OutboxMessage<string, string>>>(), ct);
   }
 }
-

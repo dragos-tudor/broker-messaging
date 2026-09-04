@@ -12,7 +12,8 @@ global using static Operations.Inbound.DeadLetterEnvelope.DeadLetterEnvelopeStat
 global using static Transport.DeadLetterEnvelope.DeadLetterEnvelopeFuncs;
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("Pipelines.Inbound")]
+[assembly: InternalsVisibleTo("Pipelines.Inbound")]
+[assembly: InternalsVisibleTo("Routing.Inbound")]
 
 namespace Operations.Inbound.DeadLetterEnvelope;
 

@@ -3,8 +3,9 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 static partial class DeadLetterEnvelopeStates
 {
-  internal const string CheckRetryDeadLetterEnvelopeExhaustedState = "CheckRetryDeadLetterEnvelopeExhaustedState";
-  internal const string CheckRetryDeadLetterEnvelopeNotExhaustedState = "CheckRetryDeadLetterEnvelopeNotExhaustedState";
-  internal const string CheckRetryDeadLetterEnvelopeErrorState = "CheckRetryDeadLetterEnvelopeErrorState";
+  const string Scope = nameof(DeadLetterEnvelopeStates);
+  internal const string CheckingRetryExhausted = $"{Scope}.{nameof(CheckingRetryExhausted)}";
+  internal const string CheckingRetryNotExhausted = $"{Scope}.{nameof(CheckingRetryNotExhausted)}";
+  internal const string CheckingRetryError = $"{Scope}.{nameof(CheckingRetryError)}";
 
 }

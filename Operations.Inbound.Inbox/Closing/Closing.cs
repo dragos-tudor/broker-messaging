@@ -18,11 +18,11 @@ partial class InboxFuncs
         SetInboxMessageStatus(message, InboxMessageStatus.Closed),
         ct);
 
-      return (data, CloseInboxMessageSuccessState, null);
+      return (data, ClosingSuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception) {
-      return (data, CloseInboxMessageErrorState, exception);
+      return (data, ClosingError, exception);
     }
   }
 }

@@ -19,11 +19,11 @@ partial class InboxFuncs
         SetInboxMessageLastError(error),
         ct);
 
-      return (data, AbandonInboxMessageSuccessState, null);
+      return (data, AbandoningSuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception) {
-      return (data, AbandonInboxMessageErrorState, exception);
+      return (data, AbandoningError, exception);
     }
   }
 }

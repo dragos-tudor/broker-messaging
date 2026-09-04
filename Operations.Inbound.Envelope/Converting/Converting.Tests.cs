@@ -29,7 +29,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ConvertEnvelope<IConvertingServices<string, string, string, string>, ConvertingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(ConvertEnvelopeSuccessState);
+    state.ShouldBe(ConvertingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.DeadLetterEnvelope.ShouldBeSameAs(deadLetterEnvelope);
@@ -55,7 +55,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ConvertEnvelope<IConvertingServices<string, string, string, string>, ConvertingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(ConvertEnvelopeSuccessState);
+    state.ShouldBe(ConvertingSuccess);
     exception.ShouldBeNull();
     resultData.DeadLetterEnvelope.ShouldBeSameAs(deadLetterEnvelope);
     services.Received(1).FromEnvelope(envelope, "dead-letter-topic", "Unknown converting envelope error", fixedDate);
@@ -81,7 +81,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ConvertEnvelope<IConvertingServices<string, string, string, string>, ConvertingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(ConvertEnvelopeInvalidState);
+    state.ShouldBe(ConvertingInvalid);
     exception.ShouldNotBeNull();
     exception.Message.ShouldContain("Envelope msg-key-123 converted to null dead letter envelope.");
     resultData.DeadLetterEnvelope.ShouldBeNull();
@@ -95,7 +95,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ConvertEnvelope<IConvertingServices<string, string, string, string>, ConvertingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(ConvertEnvelopeErrorState);
+    state.ShouldBe(ConvertingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Envelope is required.");
@@ -113,8 +113,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ConvertEnvelope<IConvertingServices<string, string, string, string>, ConvertingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(ConvertEnvelopeErrorState);
+    state.ShouldBe(ConvertingError);
     exception.ShouldBeSameAs(expectedException);
   }
 }
-

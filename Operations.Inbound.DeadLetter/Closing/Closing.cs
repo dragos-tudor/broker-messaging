@@ -16,11 +16,11 @@ partial class DeadLetterFuncs
           SetDeadLetterMessageStatus(message, DeadLetterMessageStatus.Published),
           ct);
 
-      return (data, CloseDeadLetterMessageSuccessState, null);
+      return (data, ClosingSuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception) {
-      return (data, CloseDeadLetterMessageErrorState, exception);
+      return (data, ClosingError, exception);
     }
   }
 }

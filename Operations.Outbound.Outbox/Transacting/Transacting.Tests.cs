@@ -45,7 +45,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await TransactOutboxMessageAsync<ITransactingServices<string, string, IDisposable>, TransactingTestData, string, string, IDisposable>(services, data);
 
-    state.ShouldBe(TransactOutboxMessageSuccessState);
+    state.ShouldBe(TransactingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
 
@@ -69,7 +69,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await TransactOutboxMessageAsync<ITransactingServices<string, string, IDisposable>, TransactingTestData, string, string, IDisposable>(services, data);
 
-    state.ShouldBe(TransactOutboxMessageErrorState);
+    state.ShouldBe(TransactingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Outbox message is required.");
@@ -95,7 +95,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await TransactOutboxMessageAsync<ITransactingServices<string, string, IDisposable>, TransactingTestData, string, string, IDisposable>(services, data);
 
-    state.ShouldBe(TransactOutboxMessageErrorState);
+    state.ShouldBe(TransactingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Model is required.");
@@ -168,7 +168,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await TransactOutboxMessageAsync<ITransactingServices<string, string, IDisposable>, TransactingTestData, string, string, IDisposable>(services, data);
 
-    state.ShouldBe(TransactOutboxMessageErrorState);
+    state.ShouldBe(TransactingError);
     exception.ShouldBeSameAs(expectedException);
     session.Received(1).Dispose();
   }
@@ -206,4 +206,3 @@ public partial class OutboxTests
       ct);
   }
 }
-

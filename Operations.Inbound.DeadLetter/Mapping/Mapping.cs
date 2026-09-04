@@ -19,19 +19,19 @@ partial class DeadLetterFuncs
       if (value is null)
       {
         data.PipelineError = $"Dead letter message {deadLetterMessage.MessageId} mapped to null value";
-        return new((data, MapDeadLetterMessagePayloadErrorState, CreateValidationException(data.PipelineError)));
+        return new((data, MappingPayloadError, CreateValidationException(data.PipelineError)));
       }
 
       var queue = service.GetDeadLetterQueueName(deadLetterMessage);
       var deadLetterEnvelope = service.FromDeadLetterMessage(deadLetterMessage, queue, value, deadLetterMessage.OriginatedAt);
       data.DeadLetterEnvelope = deadLetterEnvelope;
 
-      return new((data, MapDeadLetterMessageSuccessState, null));
+      return new((data, MappingSuccess, null));
     }
     catch (Exception exception)
     {
       data.PipelineError = exception.Message;
-      return new((data, MapDeadLetterMessageErrorState, exception));
+      return new((data, MappingError, exception));
     }
   }
 }

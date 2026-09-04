@@ -23,7 +23,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await ValidateOutboxMessage<IValidatingServices<string, string>, ValidatingTestData, string, string>(services, data);
 
-    state.ShouldBe(ValidateOutboxMessageSuccessState);
+    state.ShouldBe(ValidatingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.OutboxMessage.ShouldBeSameAs(message);
@@ -45,7 +45,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await ValidateOutboxMessage<IValidatingServices<string, string>, ValidatingTestData, string, string>(services, data);
 
-    state.ShouldBe(ValidateOutboxMessageInvalidErrorState);
+    state.ShouldBe(ValidatingInvalidError);
     exception.ShouldNotBeNull();
     exception.Message.ShouldContain("MessageId is empty.");
     resultData.OutboxMessage.ShouldBeNull();
@@ -59,11 +59,10 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await ValidateOutboxMessage<IValidatingServices<string, string>, ValidatingTestData, string, string>(services, data);
 
-    state.ShouldBe(ValidateOutboxMessageErrorState);
+    state.ShouldBe(ValidatingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Outbox message is required.");
     resultData.OutboxMessage.ShouldBeNull();
   }
 }
-

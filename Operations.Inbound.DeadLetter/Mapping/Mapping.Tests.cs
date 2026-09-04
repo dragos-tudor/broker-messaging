@@ -32,7 +32,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await MapDeadLetterMessage<IMappingServices<string, string, string, string, string>, MappingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(MapDeadLetterMessageSuccessState);
+    state.ShouldBe(MappingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.DeadLetterEnvelope.ShouldBeSameAs(envelope);
@@ -58,7 +58,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await MapDeadLetterMessage<IMappingServices<string, string, string, string, string>, MappingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(MapDeadLetterMessagePayloadErrorState);
+    state.ShouldBe(MappingPayloadError);
     exception.ShouldNotBeNull();
     exception.Message.ShouldContain($"Dead letter message {messageId} mapped to null value");
     resultData.PipelineError.ShouldBe($"Dead letter message {messageId} mapped to null value");
@@ -73,7 +73,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await MapDeadLetterMessage<IMappingServices<string, string, string, string, string>, MappingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(MapDeadLetterMessageErrorState);
+    state.ShouldBe(MappingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Dead letter message is required.");
@@ -99,9 +99,8 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await MapDeadLetterMessage<IMappingServices<string, string, string, string, string>, MappingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(MapDeadLetterMessageErrorState);
+    state.ShouldBe(MappingError);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("Mapping payload failure");
   }
 }
-

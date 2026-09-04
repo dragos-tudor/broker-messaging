@@ -16,13 +16,13 @@ partial class DeadLetterFuncs
 
       var deadLetterInserted = await services.InsertDeadLetterMessageAsync(deadLetterMessage, ct);
       return deadLetterInserted
-        ? (data, InsertDeadLetterMessageSuccessState, null)
-        : (data, IdempotentDeadLetterMessageState, null);
+        ? (data, InsertingSuccess, null)
+        : (data, Idempotent, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception)
     {
-      return (data, InsertDeadLetterMessageErrorState, exception);
+      return (data, InsertingError, exception);
     }
   }
 }

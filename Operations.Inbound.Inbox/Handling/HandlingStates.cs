@@ -3,8 +3,8 @@ namespace Operations.Inbound.Inbox;
 
 static partial class InboxStates
 {
-  internal const string HandleInboxMessageSuccessState = "HandleInboxMessageSuccessState";
-  internal const string HandleInboxMessageDomainErrorState = "HandleInboxMessageDomainErrorState";
-  internal const string HandleInboxMessageExhaustedState = "HandleInboxMessageExhaustedState";
-  internal const string HandleInboxMessageErrorState = "HandleInboxMessageErrorState";
+  internal const string HandlingSuccess = $"{Scope}.{nameof(HandlingSuccess)}";
+  internal const string HandlingDomainError = $"{Scope}.{nameof(HandlingDomainError)}";
+  internal const string HandlingExhausted = $"{Scope}.{nameof(HandlingExhausted)}";
+  internal const string HandlingError = $"{Scope}.{nameof(HandlingError)}";
 }

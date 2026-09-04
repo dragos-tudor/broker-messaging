@@ -3,7 +3,7 @@ namespace Operations.Outbound.Outbox;
 
 static partial class OutboxStates
 {
-  internal const string ValidateOutboxMessageSuccessState = "ValidateOutboxMessageSuccessState";
-  internal const string ValidateOutboxMessageErrorState = "ValidateOutboxMessageErrorState";
-  internal const string ValidateOutboxMessageInvalidErrorState = "ValidateOutboxMessageInvalidErrorState";
+  internal const string ValidatingSuccess = $"{Scope}.{nameof(ValidatingSuccess)}";
+  internal const string ValidatingError = $"{Scope}.{nameof(ValidatingError)}";
+  internal const string ValidatingInvalidError = $"{Scope}.{nameof(ValidatingInvalidError)}";
 }

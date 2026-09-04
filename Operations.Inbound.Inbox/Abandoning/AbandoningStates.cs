@@ -3,6 +3,7 @@ namespace Operations.Inbound.Inbox;
 
 static partial class InboxStates
 {
-  internal const string AbandonInboxMessageSuccessState = "AbandonInboxMessageSuccessState";
-  internal const string AbandonInboxMessageErrorState = "AbandonInboxMessageErrorState";
+  const string Scope = nameof(InboxStates);
+  internal const string AbandoningSuccess = $"{Scope}.{nameof(AbandoningSuccess)}";
+  internal const string AbandoningError = $"{Scope}.{nameof(AbandoningError)}";
 }

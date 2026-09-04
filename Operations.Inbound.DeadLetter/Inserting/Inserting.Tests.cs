@@ -45,7 +45,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await InsertDeadLetterMessageAsync<FakeInsertingServices, InsertingTestData, string, string>(services, data);
 
-    state.ShouldBe(InsertDeadLetterMessageSuccessState);
+    state.ShouldBe(InsertingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     services.CallCount.ShouldBe(1);
@@ -72,7 +72,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await InsertDeadLetterMessageAsync<FakeInsertingServices, InsertingTestData, string, string>(services, data);
 
-    state.ShouldBe(IdempotentDeadLetterMessageState);
+    state.ShouldBe(Idempotent);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     services.CallCount.ShouldBe(1);
@@ -86,7 +86,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await InsertDeadLetterMessageAsync<FakeInsertingServices, InsertingTestData, string, string>(services, data);
 
-    state.ShouldBe(InsertDeadLetterMessageErrorState);
+    state.ShouldBe(InsertingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Dead letter message is required.");
@@ -139,7 +139,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await InsertDeadLetterMessageAsync<FakeInsertingServices, InsertingTestData, string, string>(services, data);
 
-    state.ShouldBe(InsertDeadLetterMessageErrorState);
+    state.ShouldBe(InsertingError);
     exception.ShouldBeSameAs(expectedException);
   }
 
@@ -168,4 +168,3 @@ public partial class DeadLetterTests
     services.ReceivedCt.ShouldBe(ct);
   }
 }
-

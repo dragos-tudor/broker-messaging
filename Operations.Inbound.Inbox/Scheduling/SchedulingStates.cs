@@ -3,7 +3,7 @@ namespace Operations.Inbound.Inbox;
 
 static partial class InboxStates
 {
-  internal const string ScheduleInboxMessageExhaustedState = "ScheduleInboxMessageExhaustedState";
-  internal const string ScheduleInboxMessageRetryState = "ScheduleInboxMessageRetryState";
-  internal const string ScheduleInboxMessageErrorState = "ScheduleInboxMessageErrorState";
+  internal const string SchedulingExhausted = $"{Scope}.{nameof(SchedulingExhausted)}";
+  internal const string SchedulingNotExhausted = $"{Scope}.{nameof(SchedulingNotExhausted)}";
+  internal const string SchedulingError = $"{Scope}.{nameof(SchedulingError)}";
 }

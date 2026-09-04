@@ -3,7 +3,7 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 static partial class DeadLetterEnvelopeStates
 {
-  internal const string ProducingDeadLetterEnvelopeState = "ProducingDeadLetterEnvelopeState";
-  internal const string ProduceDeadLetterEnvelopeErrorState = "ProduceDeadLetterEnvelopeErrorState";
-  internal const string ProduceDeadLetterEnvelopeExhaustedState = "ProduceDeadLetterEnvelopeExhaustedState";
+  internal const string Producing = $"{Scope}.{nameof(Producing)}";
+  internal const string ProducingError = $"{Scope}.{nameof(ProducingError)}";
+  internal const string ProducingExhausted = $"{Scope}.{nameof(ProducingExhausted)}";
 }

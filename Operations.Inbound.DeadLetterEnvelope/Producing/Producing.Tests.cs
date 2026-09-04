@@ -31,7 +31,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await ProduceDeadLetterEnvelope<IProducingServices<string, string, string, string, string>, ProducingTestData, string, string, string, string, string>(service, data);
 
-    state.ShouldBe(ProducingDeadLetterEnvelopeState);
+    state.ShouldBe(Producing);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     service.Received(1).ProduceDeadLetterEnvelope(envelope, Arg.Any<Func<CancellationToken, ValueTask>>());
@@ -130,7 +130,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await ProduceDeadLetterEnvelope<IProducingServices<string, string, string, string, string>, ProducingTestData, string, string, string, string, string>(service, data);
 
-    state.ShouldBe(ProduceDeadLetterEnvelopeErrorState);
+    state.ShouldBe(ProducingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Dead letter envelope is required.");
@@ -150,7 +150,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await ProduceDeadLetterEnvelope<IProducingServices<string, string, string, string, string>, ProducingTestData, string, string, string, string, string>(service, data);
 
-    state.ShouldBe(ProduceDeadLetterEnvelopeErrorState);
+    state.ShouldBe(ProducingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Dead letter message is required.");
@@ -182,9 +182,8 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await ProduceDeadLetterEnvelope<IProducingServices<string, string, string, string, string>, ProducingTestData, string, string, string, string, string>(service, data);
 
-    state.ShouldBe(ProduceDeadLetterEnvelopeErrorState);
+    state.ShouldBe(ProducingError);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("Kafka producer failure");
   }
 }
-

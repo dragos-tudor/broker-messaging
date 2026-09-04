@@ -26,11 +26,11 @@ partial class OutboxFuncs
         ct
       );
 
-      return (data, TransactOutboxMessageSuccessState, null);
+      return (data, TransactingSuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception) {
-      return (data, TransactOutboxMessageErrorState, exception);
+      return (data, TransactingError, exception);
     }
   }
 }

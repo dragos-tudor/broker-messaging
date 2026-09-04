@@ -16,16 +16,16 @@ partial class EnvelopeFuncs
       var payload = services.FromEnvelopeValue(envelope.Value);
       if (payload is null) {
         data.PipelineError = $"Envelope {envelope.Key} value mapped to null payload";
-        return new ((data, MapEnvelopeValueErrorState, CreateValidationException(data.PipelineError)));
+        return new ((data, MappingValueError, CreateValidationException(data.PipelineError)));
       }
 
       var inboxMessage = services.FromEnvelope(envelope, payload, services.GetUtcDateTime());
       data.InboxMessage = SetInboxMessageInitialStatus(inboxMessage);
-      return new ((data, MapEnvelopeSuccessState, null));
+      return new ((data, MappingSuccess, null));
     }
     catch (Exception exception) {
       data.PipelineError = exception.Message;
-      return new ((data, MapEnvelopeErrorState, exception));
+      return new ((data, MappingError, exception));
     }
   }
 }

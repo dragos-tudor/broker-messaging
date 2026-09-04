@@ -19,17 +19,17 @@ partial class InboxFuncs
       if (domainError is not null)
       {
         data.PipelineError = domainError;
-        return (data, HandleInboxMessageDomainErrorState, CreateDomainException(domainError));
+        return (data, HandlingDomainError, CreateDomainException(domainError));
       }
 
       data.Model = model;
-      return (data, HandleInboxMessageSuccessState, null);
+      return (data, HandlingSuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception)
     {
       data.PipelineError = exception.Message;
-      return (data, HandleInboxMessageErrorState, exception);
+      return (data, HandlingError, exception);
     }
   }
 }

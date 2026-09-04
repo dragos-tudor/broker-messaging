@@ -33,7 +33,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await TransactInboxMessageAsync<ITransactingServices<string, string, IDisposable>, TransactingTestData, string, string, IDisposable>(services, data);
 
-    state.ShouldBe(TransactInboxMessageSuccessState);
+    state.ShouldBe(TransactingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     session.Received(1).Dispose();
@@ -52,7 +52,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await TransactInboxMessageAsync<ITransactingServices<string, string, IDisposable>, TransactingTestData, string, string, IDisposable>(services, data);
 
-    state.ShouldBe(TransactInboxMessageErrorState);
+    state.ShouldBe(TransactingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Inbox message is required.");
@@ -77,7 +77,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await TransactInboxMessageAsync<ITransactingServices<string, string, IDisposable>, TransactingTestData, string, string, IDisposable>(services, data);
 
-    state.ShouldBe(TransactInboxMessageErrorState);
+    state.ShouldBe(TransactingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Inbox model is required.");
@@ -138,7 +138,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await TransactInboxMessageAsync<ITransactingServices<string, string, IDisposable>, TransactingTestData, string, string, IDisposable>(services, data);
 
-    state.ShouldBe(TransactInboxMessageErrorState);
+    state.ShouldBe(TransactingError);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("Transaction aborted");
     session.Received(1).Dispose();
@@ -171,4 +171,3 @@ public partial class InboxTests
     await services.Received(1).TransactSessionAsync(session, Arg.Any<Func<IDisposable, Task>>(), Arg.Any<Func<IDisposable, Task>>(), ct);
   }
 }
-

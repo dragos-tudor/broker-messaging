@@ -32,7 +32,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await AbandonDeadLetterMessageAsync<IAbandoningServices<string, string>, AbandoningTestData, string, string>(services, data, default);
 
-    state.ShouldBe(AbandonDeadLetterMessageSuccessState);
+    state.ShouldBe(AbandoningSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     capturedUpdate.ShouldNotBeNull();
@@ -65,7 +65,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await AbandonDeadLetterMessageAsync<IAbandoningServices<string, string>, AbandoningTestData, string, string>(services, data, default);
 
-    state.ShouldBe(AbandonDeadLetterMessageSuccessState);
+    state.ShouldBe(AbandoningSuccess);
     exception.ShouldBeNull();
     capturedUpdate.ShouldNotBeNull();
     var updated = capturedUpdate(message);
@@ -81,7 +81,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await AbandonDeadLetterMessageAsync<IAbandoningServices<string, string>, AbandoningTestData, string, string>(services, data, default);
 
-    state.ShouldBe(AbandonDeadLetterMessageErrorState);
+    state.ShouldBe(AbandoningError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Dead letter message is required.");
@@ -133,7 +133,7 @@ public partial class DeadLetterTests
 
     var (resultData, state, exception) = await AbandonDeadLetterMessageAsync<IAbandoningServices<string, string>, AbandoningTestData, string, string>(services, data, default);
 
-    state.ShouldBe(AbandonDeadLetterMessageErrorState);
+    state.ShouldBe(AbandoningError);
     exception.ShouldBeSameAs(expectedException);
   }
 

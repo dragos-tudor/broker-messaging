@@ -19,14 +19,14 @@ partial class EnvelopeFuncs
       var deadLetterEnvelope = services.FromEnvelope(envelope, queue, pipelineError, services.GetUtcDateTime());
 
       if (deadLetterEnvelope is null)
-        return new ((data, ConvertEnvelopeInvalidState, CreateValidationException($"Envelope {envelope.Key} converted to null dead letter envelope.")));
+        return new ((data, ConvertingInvalid, CreateValidationException($"Envelope {envelope.Key} converted to null dead letter envelope.")));
 
       data.DeadLetterEnvelope = deadLetterEnvelope;
-      return new ((data, ConvertEnvelopeSuccessState, null));
+      return new ((data, ConvertingSuccess, null));
     }
     catch (Exception exception)
     {
-      return new ((data, ConvertEnvelopeErrorState, exception));
+      return new ((data, ConvertingError, exception));
     }
   }
 }

@@ -20,12 +20,12 @@ partial class DeadLetterFuncs
               .SetDeadLetterMessageLastError(error),
           ct);
 
-      return (data, AbandonDeadLetterMessageSuccessState, null);
+      return (data, AbandoningSuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception)
     {
-      return (data, AbandonDeadLetterMessageErrorState, exception);
+      return (data, AbandoningError, exception);
     }
   }
 }

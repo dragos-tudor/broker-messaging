@@ -28,7 +28,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await AbandonInboxMessageAsync<IAbandoningServices<string, string>, AbandoningTestData, string, string>(services, data);
 
-    state.ShouldBe(AbandonInboxMessageSuccessState);
+    state.ShouldBe(AbandoningSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     await services.Received(1).UpdateInboxMessageAsync(message, Arg.Any<Func<InboxMessage<string, string>, InboxMessage<string, string>>>(), Arg.Any<CancellationToken>());
@@ -57,7 +57,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await AbandonInboxMessageAsync<IAbandoningServices<string, string>, AbandoningTestData, string, string>(services, data);
 
-    state.ShouldBe(AbandonInboxMessageSuccessState);
+    state.ShouldBe(AbandoningSuccess);
     exception.ShouldBeNull();
     capturedUpdate.ShouldNotBeNull();
     var updated = capturedUpdate(message);
@@ -73,7 +73,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await AbandonInboxMessageAsync<IAbandoningServices<string, string>, AbandoningTestData, string, string>(services, data);
 
-    state.ShouldBe(AbandonInboxMessageErrorState);
+    state.ShouldBe(AbandoningError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
   }
@@ -120,7 +120,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await AbandonInboxMessageAsync<IAbandoningServices<string, string>, AbandoningTestData, string, string>(services, data);
 
-    state.ShouldBe(AbandonInboxMessageErrorState);
+    state.ShouldBe(AbandoningError);
     exception.ShouldBeSameAs(expectedException);
   }
 
@@ -144,4 +144,3 @@ public partial class InboxTests
     await services.Received(1).UpdateInboxMessageAsync(message, Arg.Any<Func<InboxMessage<string, string>, InboxMessage<string, string>>>(), ct);
   }
 }
-

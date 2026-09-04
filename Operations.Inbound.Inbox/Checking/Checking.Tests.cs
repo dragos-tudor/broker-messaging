@@ -36,7 +36,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await CheckRetryInboxMessageAsync<ICheckingRetryServices, CheckingTestData, string, string>(services, data);
 
-    state.ShouldBe(CheckRetryInboxMessageNotExhaustedState);
+    state.ShouldBe(CheckingRetryNotExhausted);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.RetryPlan.ShouldBeSameAs(retryPlan);
@@ -69,7 +69,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await CheckRetryInboxMessageAsync<ICheckingRetryServices, CheckingTestData, string, string>(services, data);
 
-    state.ShouldBe(CheckRetryInboxMessageExhaustedState);
+    state.ShouldBe(CheckingRetryExhausted);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.RetryPlan.ShouldBeSameAs(retryPlan);
@@ -96,7 +96,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await CheckRetryInboxMessageAsync<ICheckingRetryServices, CheckingTestData, string, string>(services, data);
 
-    state.ShouldBe(CheckRetryInboxMessageNotExhaustedState);
+    state.ShouldBe(CheckingRetryNotExhausted);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.RetryPlan.ShouldBeNull();
@@ -123,7 +123,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await CheckRetryInboxMessageAsync<ICheckingRetryServices, CheckingTestData, string, string>(services, data);
 
-    state.ShouldBe(CheckRetryInboxMessageExhaustedState);
+    state.ShouldBe(CheckingRetryExhausted);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.RetryPlan.ShouldBeNull();
@@ -137,7 +137,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await CheckRetryInboxMessageAsync<ICheckingRetryServices, CheckingTestData, string, string>(services, data);
 
-    state.ShouldBe(CheckRetryInboxMessageErrorState);
+    state.ShouldBe(CheckingRetryError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Inbox message is required.");
@@ -189,7 +189,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await CheckRetryInboxMessageAsync<ICheckingRetryServices, CheckingTestData, string, string>(services, data);
 
-    state.ShouldBe(CheckRetryInboxMessageErrorState);
+    state.ShouldBe(CheckingRetryError);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("Storage failure");
   }
@@ -220,4 +220,3 @@ public partial class InboxTests
     await services.Received(1).GetRetryPlanByIdAsync(retryId, ct);
   }
 }
-

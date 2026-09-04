@@ -20,11 +20,11 @@ partial class OutboxFuncs
         SetOutboxMessageStatus(message, OutboxMessageStatus.Published),
         ct);
 
-      return (data, CloseOutboxMessageSuccessState, null);
+      return (data, ClosingSuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception) {
-      return (data, CloseOutboxMessageErrorState, exception);
+      return (data, ClosingError, exception);
     }
   }
 }

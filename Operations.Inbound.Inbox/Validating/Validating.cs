@@ -16,15 +16,15 @@ partial class InboxFuncs
       if (InboxMessageFuncs.ValidateInboxMessage(message) is IEnumerable<string> valErrors && valErrors.Any()) {
         data.InboxMessage = null;
         data.PipelineError = JoinValidationErrors(valErrors);
-        return new ((data, ValidateInboxMessageInvalidErrorState, InboxMessageFuncs.CreateValidationException(data.PipelineError)));
+        return new ((data, ValidatingInvalidError, InboxMessageFuncs.CreateValidationException(data.PipelineError)));
       }
 
-      return new ((data, ValidateInboxMessageSuccessState, null));
+      return new ((data, ValidatingSuccess, null));
     }
     catch (Exception exception) {
       data.InboxMessage = null;
       data.PipelineError = exception.Message;
-      return new ((data, ValidateInboxMessageErrorState, exception));
+      return new ((data, ValidatingError, exception));
     }
   }
 }

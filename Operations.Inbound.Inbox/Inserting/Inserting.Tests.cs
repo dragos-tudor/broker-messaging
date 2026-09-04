@@ -25,7 +25,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await InsertInboxMessageAsync<IInsertingServices<string, string>, InsertingTestData, string, string>(services, data);
 
-    state.ShouldBe(InsertInboxMessageSuccessState);
+    state.ShouldBe(InsertingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.InboxMessage.ShouldBeSameAs(message);
@@ -49,7 +49,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await InsertInboxMessageAsync<IInsertingServices<string, string>, InsertingTestData, string, string>(services, data);
 
-    state.ShouldBe(IdempotentInboxMessageState);
+    state.ShouldBe(Idempotent);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.InboxMessage.ShouldBeNull();
@@ -63,7 +63,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await InsertInboxMessageAsync<IInsertingServices<string, string>, InsertingTestData, string, string>(services, data);
 
-    state.ShouldBe(InsertInboxMessageErrorState);
+    state.ShouldBe(InsertingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Inbox message is required.");
@@ -109,7 +109,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await InsertInboxMessageAsync<IInsertingServices<string, string>, InsertingTestData, string, string>(services, data);
 
-    state.ShouldBe(InsertInboxMessageErrorState);
+    state.ShouldBe(InsertingError);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("DB insert error");
     resultData.InboxMessage.ShouldBeEquivalentTo(new { Status = InboxMessageStatus.Initial });
@@ -137,4 +137,3 @@ public partial class InboxTests
     await services.Received(1).InsertInboxMessageAsync(message, ct);
   }
 }
-

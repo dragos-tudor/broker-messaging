@@ -3,6 +3,6 @@ namespace Operations.Inbound.Envelope;
 
 static partial class EnvelopeStates
 {
-  internal const string ConfirmEnvelopeSuccessState = "ConfirmEnvelopeSuccessState";
-  internal const string ConfirmEnvelopeErrorState = "ConfirmEnvelopeErrorState";
+  internal const string ConfirmingSuccess = $"{Scope}.{nameof(ConfirmingSuccess)}";
+  internal const string ConfirmingError = $"{Scope}.{nameof(ConfirmingError)}";
 }

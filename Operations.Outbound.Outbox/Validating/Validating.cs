@@ -16,14 +16,14 @@ partial class OutboxFuncs
 
       if (OutboxMessageFuncs.ValidateOutboxMessage(message) is IEnumerable<string> errors && errors.Any()) {
         data.OutboxMessage = null;
-        return new ((data, ValidateOutboxMessageInvalidErrorState, CreateValidationException(errors)));
+        return new ((data, ValidatingInvalidError, CreateValidationException(errors)));
       }
 
-      return new ((data, ValidateOutboxMessageSuccessState, null));
+      return new ((data, ValidatingSuccess, null));
     }
     catch (Exception exception) {
       data.OutboxMessage = null;
-      return new ((data, ValidateOutboxMessageErrorState, exception));
+      return new ((data, ValidatingError, exception));
     }
   }
 }

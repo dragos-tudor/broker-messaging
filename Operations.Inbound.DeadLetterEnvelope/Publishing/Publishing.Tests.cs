@@ -18,7 +18,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await PublishDeadLetterEnvelopeAsync<IPublishingServices<string, string, string, string, string>, PublishingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(PublishDeadLetterEnvelopeSuccessState);
+    state.ShouldBe(PublishingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     await services.Received(1).PublishDeadLetterEnvelopeAsync(envelope, Arg.Any<CancellationToken>());
@@ -32,7 +32,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await PublishDeadLetterEnvelopeAsync<IPublishingServices<string, string, string, string, string>, PublishingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(PublishDeadLetterEnvelopeErrorState);
+    state.ShouldBe(PublishingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Dead letter envelope is required.");
@@ -70,7 +70,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await PublishDeadLetterEnvelopeAsync<IPublishingServices<string, string, string, string, string>, PublishingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(PublishDeadLetterEnvelopeErrorState);
+    state.ShouldBe(PublishingError);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("Publish failure");
   }
@@ -90,4 +90,3 @@ public partial class DeadLetterEnvelopeTests
     await services.Received(1).PublishDeadLetterEnvelopeAsync(envelope, ct);
   }
 }
-

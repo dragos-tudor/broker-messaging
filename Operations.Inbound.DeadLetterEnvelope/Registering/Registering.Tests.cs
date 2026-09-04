@@ -38,7 +38,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await RegisterRetryDeadLetterEnvelopeAsync<IRegisteringRetryServices, RegisteringTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(RegisterRetryDeadLetterEnvelopeSuccessState);
+    state.ShouldBe(RegisteringRetrySuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     await services.Received(1).ScheduleRetryPlanAsync(existingRetry, Arg.Any<Func<RetryPlan, RetryPlan>>(), Arg.Any<CancellationToken>());
@@ -67,7 +67,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await RegisterRetryDeadLetterEnvelopeAsync<IRegisteringRetryServices, RegisteringTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(RegisterRetryDeadLetterEnvelopeSuccessState);
+    state.ShouldBe(RegisteringRetrySuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     await services.Received(1).ScheduleRetryPlanAsync(
@@ -101,7 +101,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await RegisterRetryDeadLetterEnvelopeAsync<IRegisteringRetryServices, RegisteringTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(RegisterRetryDeadLetterEnvelopeSuccessState);
+    state.ShouldBe(RegisteringRetrySuccess);
     exception.ShouldBeNull();
     capturedUpdate.ShouldNotBeNull();
     var dummyRetry = new RetryPlan { RetryId = "dummy" };
@@ -117,7 +117,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await RegisterRetryDeadLetterEnvelopeAsync<IRegisteringRetryServices, RegisteringTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(RegisterRetryDeadLetterEnvelopeErrorState);
+    state.ShouldBe(RegisteringRetryError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Dead letter envelope is required.");
@@ -163,7 +163,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await RegisterRetryDeadLetterEnvelopeAsync<IRegisteringRetryServices, RegisteringTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(RegisterRetryDeadLetterEnvelopeErrorState);
+    state.ShouldBe(RegisteringRetryError);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("Schedule DB failure");
   }

@@ -18,11 +18,11 @@ partial class InboxFuncs
       var deadLetterMessage = FromInboxMessage(inboxMessage, error, services.GetUtcDateTime());
       data.DeadLetterMessage = deadLetterMessage;
 
-      return new((data, ConvertInboxMessageSuccessState, null));
+      return new((data, ConvertingSuccess, null));
     }
     catch (Exception exception)
     {
-      return new((data, ConvertInboxMessageErrorState, exception));
+      return new((data, ConvertingError, exception));
     }
   }
 }

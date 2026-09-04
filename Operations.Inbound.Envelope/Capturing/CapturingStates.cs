@@ -3,7 +3,8 @@ namespace Operations.Inbound.Envelope;
 
 static partial class EnvelopeStates
 {
-  internal const string CaptureEnvelopeSuccessState = "CapturedEnvelopeSuccessState";
-  internal const string NotCapturedEnvelopeState = "NotCapturedEnvelopeState";
-  internal const string CaptureEnvelopeErrorState = "CaptureEnvelopeErrorState";
+  const string Scope = nameof(EnvelopeStates);
+  internal const string CapturingSuccess = $"{Scope}.{nameof(CapturingSuccess)}";
+  internal const string CapturingNotCaptured = $"{Scope}.{nameof(CapturingNotCaptured)}";
+  internal const string CapturingError = $"{Scope}.{nameof(CapturingError)}";
 }

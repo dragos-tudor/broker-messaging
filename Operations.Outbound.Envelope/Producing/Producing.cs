@@ -18,12 +18,12 @@ partial class EnvelopeFuncs
       service.ProduceEnvelope(envelope,
           (ct) => ProduceEnvelopeCallbackAsync(outboxMessage, service, ct));
 
-      return new((data, ProducingEnvelopeState, null));
+      return new((data, Producing, null));
     }
     catch (Exception exception)
     {
       data.PipelineError = exception.Message;
-      return new((data, ProduceEnvelopeErrorState, exception));
+      return new((data, ProducingError, exception));
     }
   }
 

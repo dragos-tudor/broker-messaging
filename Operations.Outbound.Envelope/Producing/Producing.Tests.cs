@@ -30,7 +30,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ProduceEnvelope<IProducingServices<string, string, string, string, string>, ProducingTestData, string, string, string, string, string>(service, data);
 
-    state.ShouldBe(ProducingEnvelopeState);
+    state.ShouldBe(Producing);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     service.Received(1).ProduceEnvelope(envelope, Arg.Any<Func<CancellationToken, ValueTask>>());
@@ -126,7 +126,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ProduceEnvelope<IProducingServices<string, string, string, string, string>, ProducingTestData, string, string, string, string, string>(service, data);
 
-    state.ShouldBe(ProduceEnvelopeErrorState);
+    state.ShouldBe(ProducingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Envelope is required.");
@@ -146,7 +146,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ProduceEnvelope<IProducingServices<string, string, string, string, string>, ProducingTestData, string, string, string, string, string>(service, data);
 
-    state.ShouldBe(ProduceEnvelopeErrorState);
+    state.ShouldBe(ProducingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Outbox message is required.");
@@ -177,9 +177,8 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ProduceEnvelope<IProducingServices<string, string, string, string, string>, ProducingTestData, string, string, string, string, string>(service, data);
 
-    state.ShouldBe(ProduceEnvelopeErrorState);
+    state.ShouldBe(ProducingError);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("Kafka producer error");
   }
 }
-

@@ -14,12 +14,12 @@ partial class EnvelopeFuncs
       var envelope = RequireEnvelope(data.Envelope);
       await services.ConfirmEnvelope(envelope, ct);
 
-      return (data, ConfirmEnvelopeSuccessState, null);
+      return (data, ConfirmingSuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception) {
       data.PipelineError = exception.Message;
-      return new (data, ConfirmEnvelopeErrorState, exception);
+      return new (data, ConfirmingError, exception);
     }
   }
 }

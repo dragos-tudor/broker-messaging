@@ -28,12 +28,12 @@ partial class InboxFuncs
         ct);
 
       return status == InboxMessageStatus.Processing?
-        (data, ScheduleInboxMessageRetryState, null):
-        (data, ScheduleInboxMessageExhaustedState, null);
+        (data, SchedulingNotExhausted, null):
+        (data, SchedulingExhausted, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception) {
-      return (data, ScheduleInboxMessageErrorState, exception);
+      return (data, SchedulingError, exception);
     }
   }
 }

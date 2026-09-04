@@ -18,16 +18,16 @@ partial class InboxFuncs
       if (messageInserted is false)
       {
         data.InboxMessage = default;
-        return (data, IdempotentInboxMessageState, null);
+        return (data, Idempotent, null);
       }
 
-      return (data, InsertInboxMessageSuccessState, null);
+      return (data, InsertingSuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception) {
       data.PipelineError = exception.Message;
       SetInboxMessageInitialStatus(data.InboxMessage);
-      return (data, InsertInboxMessageErrorState, exception);
+      return (data, InsertingError, exception);
     }
   }
 }

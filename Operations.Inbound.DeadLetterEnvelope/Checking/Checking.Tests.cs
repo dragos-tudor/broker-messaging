@@ -26,7 +26,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await CheckRetryDeadLetterEnvelopeAsync<ICheckingRetryServices, CheckingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(CheckRetryDeadLetterEnvelopeNotExhaustedState);
+    state.ShouldBe(CheckingRetryNotExhausted);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.RetryPlan.ShouldBeNull();
@@ -49,7 +49,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await CheckRetryDeadLetterEnvelopeAsync<ICheckingRetryServices, CheckingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(CheckRetryDeadLetterEnvelopeExhaustedState);
+    state.ShouldBe(CheckingRetryExhausted);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.RetryPlan.ShouldBeNull();
@@ -78,7 +78,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await CheckRetryDeadLetterEnvelopeAsync<ICheckingRetryServices, CheckingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(CheckRetryDeadLetterEnvelopeNotExhaustedState);
+    state.ShouldBe(CheckingRetryNotExhausted);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.RetryPlan.ShouldBeSameAs(retryPlan);
@@ -107,7 +107,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await CheckRetryDeadLetterEnvelopeAsync<ICheckingRetryServices, CheckingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(CheckRetryDeadLetterEnvelopeExhaustedState);
+    state.ShouldBe(CheckingRetryExhausted);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.RetryPlan.ShouldBeSameAs(retryPlan);
@@ -121,7 +121,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await CheckRetryDeadLetterEnvelopeAsync<ICheckingRetryServices, CheckingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(CheckRetryDeadLetterEnvelopeErrorState);
+    state.ShouldBe(CheckingRetryError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Dead letter envelope is required.");
@@ -165,7 +165,7 @@ public partial class DeadLetterEnvelopeTests
 
     var (resultData, state, exception) = await CheckRetryDeadLetterEnvelopeAsync<ICheckingRetryServices, CheckingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(CheckRetryDeadLetterEnvelopeErrorState);
+    state.ShouldBe(CheckingRetryError);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("Storage error");
   }
@@ -192,4 +192,3 @@ public partial class DeadLetterEnvelopeTests
     await services.Received(1).GetRetryPlanByIdAsync(retryId, ct);
   }
 }
-

@@ -14,15 +14,15 @@ partial class EnvelopeFuncs
     {
       var envelope = await services.ReadEnvelope(ct);
       if (envelope is null)
-        return new(data, NotCapturedEnvelopeState, null);
+        return new(data, CapturingNotCaptured, null);
 
       data.Envelope = envelope;
-      return new(data, CaptureEnvelopeSuccessState, null);
+      return new(data, CapturingSuccess, null);
     }
     catch (Exception exception)
     {
       data.PipelineError = exception.Message;
-      return new(data, CaptureEnvelopeErrorState, exception);
+      return new(data, CapturingError, exception);
     }
   }
 }

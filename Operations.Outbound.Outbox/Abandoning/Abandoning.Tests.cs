@@ -31,7 +31,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await AbandonOutboxMessageAsync<IAbandoningServices<string, string>, AbandoningTestData, string, string>(services, data);
 
-    state.ShouldBe(AbandonOutboxMessageSuccessState);
+    state.ShouldBe(AbandoningSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     capturedUpdate.ShouldNotBeNull();
@@ -63,7 +63,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await AbandonOutboxMessageAsync<IAbandoningServices<string, string>, AbandoningTestData, string, string>(services, data);
 
-    state.ShouldBe(AbandonOutboxMessageSuccessState);
+    state.ShouldBe(AbandoningSuccess);
     exception.ShouldBeNull();
     capturedUpdate.ShouldNotBeNull();
     var updated = capturedUpdate(message);
@@ -79,7 +79,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await AbandonOutboxMessageAsync<IAbandoningServices<string, string>, AbandoningTestData, string, string>(services, data);
 
-    state.ShouldBe(AbandonOutboxMessageErrorState);
+    state.ShouldBe(AbandoningError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Outbox message is required.");
@@ -129,7 +129,7 @@ public partial class OutboxTests
 
     var (resultData, state, exception) = await AbandonOutboxMessageAsync<IAbandoningServices<string, string>, AbandoningTestData, string, string>(services, data);
 
-    state.ShouldBe(AbandonOutboxMessageErrorState);
+    state.ShouldBe(AbandoningError);
     exception.ShouldBeSameAs(expectedException);
   }
 

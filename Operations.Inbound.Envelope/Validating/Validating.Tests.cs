@@ -23,7 +23,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ValidateEnvelope<IValidatingServices<string, string, string, string>, ValidatingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(ValidateEnvelopeSuccessState);
+    state.ShouldBe(ValidatingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.Envelope.ShouldBeSameAs(envelope);
@@ -45,7 +45,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ValidateEnvelope<IValidatingServices<string, string, string, string>, ValidatingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(ValidateEnvelopeInvalidConfirmableErrorState);
+    state.ShouldBe(ValidatingInvalidConfirmableError);
     exception.ShouldNotBeNull();
     exception.Message.ShouldContain("Envelope key is null.");
     resultData.ShouldBeSameAs(data);
@@ -59,11 +59,10 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ValidateEnvelope<IValidatingServices<string, string, string, string>, ValidatingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(ValidateEnvelopeErrorState);
+    state.ShouldBe(ValidatingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Envelope is required.");
     resultData.PipelineError.ShouldBe("Envelope is required.");
   }
 }
-

@@ -29,13 +29,13 @@ partial class DeadLetterFuncs
         ct);
 
       return status == DeadLetterMessageStatus.Processing
-          ? (data, ScheduleDeadLetterMessageRetryState, null)
-          : (data, ScheduleDeadLetterMessageExhaustedState, null);
+          ? (data, SchedulingNotExhausted, null)
+          : (data, SchedulingExhausted, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception)
     {
-      return (data, ScheduleDeadLetterMessageErrorState, exception);
+      return (data, SchedulingError, exception);
     }
   }
 }

@@ -18,7 +18,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await PublishEnvelopeAsync<IPublishingServices<string, string, string, string, string>, PublishingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(PublishEnvelopeSuccessState);
+    state.ShouldBe(PublishingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     await services.Received(1).PublishEnvelopeAsync(envelope, Arg.Any<CancellationToken>());
@@ -32,7 +32,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await PublishEnvelopeAsync<IPublishingServices<string, string, string, string, string>, PublishingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(PublishEnvelopeErrorState);
+    state.ShouldBe(PublishingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Envelope is required.");
@@ -70,7 +70,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await PublishEnvelopeAsync<IPublishingServices<string, string, string, string, string>, PublishingTestData, string, string, string, string, string>(services, data);
 
-    state.ShouldBe(PublishEnvelopeErrorState);
+    state.ShouldBe(PublishingError);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("Publish failure");
   }
@@ -90,4 +90,3 @@ public partial class EnvelopeTests
     await services.Received(1).PublishEnvelopeAsync(envelope, ct);
   }
 }
-

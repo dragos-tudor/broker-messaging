@@ -25,13 +25,13 @@ partial class InboxFuncs
         ct
       );
 
-      return (data, TransactInboxMessageSuccessState, null);
+      return (data, TransactingSuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception)
     {
       data.PipelineError = exception.Message;
-      return (data, TransactInboxMessageErrorState, exception);
+      return (data, TransactingError, exception);
     }
   }
 }

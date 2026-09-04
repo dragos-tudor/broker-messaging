@@ -18,12 +18,12 @@ partial class DeadLetterEnvelopeFuncs
       service.ProduceDeadLetterEnvelope(deadLetterEnvelope,
           (ct) => ProduceDeadLetterEnvelopeCallbackAsync(deadLetterMessage, service, ct));
 
-      return new((data, ProducingDeadLetterEnvelopeState, null));
+      return new((data, Producing, null));
     }
     catch (Exception exception)
     {
       data.PipelineError = exception.Message;
-      return new((data, ProduceDeadLetterEnvelopeErrorState, exception));
+      return new((data, ProducingError, exception));
     }
   }
 

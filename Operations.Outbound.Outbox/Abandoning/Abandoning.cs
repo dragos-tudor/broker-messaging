@@ -21,12 +21,12 @@ partial class OutboxFuncs
         SetOutboxMessageLastError(error),
         ct);
 
-      return (data, AbandonOutboxMessageSuccessState, null);
+      return (data, AbandoningSuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception)
     {
-      return (data, AbandonOutboxMessageErrorState, exception);
+      return (data, AbandoningError, exception);
     }
   }
 }

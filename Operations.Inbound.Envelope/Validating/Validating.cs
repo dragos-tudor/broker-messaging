@@ -17,16 +17,16 @@ partial class EnvelopeFuncs
 
       if (valErrors.Any())
         return IsValidEnvelopeConfirmation(envelope)?
-          new ((data, ValidateEnvelopeInvalidConfirmableErrorState, CreateValidationException(valErrors))):
-          new ((data, ValidateEnvelopeInvalidErrorState, CreateValidationException(valErrors)));
+          new ((data, ValidatingInvalidConfirmableError, CreateValidationException(valErrors))):
+          new ((data, ValidatingInvalidError, CreateValidationException(valErrors)));
 
       data.Envelope = envelope;
-      return new ((data, ValidateEnvelopeSuccessState, null));
+      return new ((data, ValidatingSuccess, null));
     }
     catch (Exception exception)
     {
       data.PipelineError = exception.Message;
-      return new ((data, ValidateEnvelopeErrorState, exception));
+      return new ((data, ValidatingError, exception));
     }
   }
 }

@@ -27,7 +27,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await ConvertInboxMessage<IConvertingServices, ConvertingTestData, string, string>(services, data);
 
-    state.ShouldBe(ConvertInboxMessageSuccessState);
+    state.ShouldBe(ConvertingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.DeadLetterMessage.ShouldNotBeNull();
@@ -55,7 +55,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await ConvertInboxMessage<IConvertingServices, ConvertingTestData, string, string>(services, data);
 
-    state.ShouldBe(ConvertInboxMessageSuccessState);
+    state.ShouldBe(ConvertingSuccess);
     exception.ShouldBeNull();
     resultData.DeadLetterMessage.ShouldNotBeNull();
     resultData.DeadLetterMessage.FailureReason.ShouldBe("Unknown converting inbox message error.");
@@ -69,7 +69,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await ConvertInboxMessage<IConvertingServices, ConvertingTestData, string, string>(services, data);
 
-    state.ShouldBe(ConvertInboxMessageErrorState);
+    state.ShouldBe(ConvertingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
   }
@@ -92,7 +92,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await ConvertInboxMessage<IConvertingServices, ConvertingTestData, string, string>(services, data);
 
-    state.ShouldBe(ConvertInboxMessageErrorState);
+    state.ShouldBe(ConvertingError);
     exception.ShouldBeSameAs(expectedException);
   }
 
@@ -131,4 +131,3 @@ public partial class InboxTests
     dlMessage.FailureReason.ShouldBe("Reason");
   }
 }
-

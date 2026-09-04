@@ -17,7 +17,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ConfirmEnvelope<IConfirmingServices<string, string, string, string>, ConfirmingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(ConfirmEnvelopeSuccessState);
+    state.ShouldBe(ConfirmingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.PipelineError.ShouldBeNull();
@@ -32,7 +32,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ConfirmEnvelope<IConfirmingServices<string, string, string, string>, ConfirmingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(ConfirmEnvelopeErrorState);
+    state.ShouldBe(ConfirmingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     exception.Message.ShouldBe("Envelope is required.");
@@ -52,7 +52,7 @@ public partial class EnvelopeTests
 
     var (resultData, state, exception) = await ConfirmEnvelope<IConfirmingServices<string, string, string, string>, ConfirmingTestData, string, string, string, string>(services, data);
 
-    state.ShouldBe(ConfirmEnvelopeErrorState);
+    state.ShouldBe(ConfirmingError);
     exception.ShouldBeSameAs(expectedException);
     resultData.ShouldBeSameAs(data);
     resultData.PipelineError.ShouldBe("Confirmation failed");
@@ -88,4 +88,3 @@ public partial class EnvelopeTests
     await services.Received(1).ConfirmEnvelope(envelope, ct);
   }
 }
-

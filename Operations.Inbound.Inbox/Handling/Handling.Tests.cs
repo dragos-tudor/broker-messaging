@@ -28,7 +28,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await HandleInboxMessageAsync<IHandlingServices<string, string>, HandlingTestData, string, string>(services, data);
 
-    state.ShouldBe(HandleInboxMessageSuccessState);
+    state.ShouldBe(HandlingSuccess);
     exception.ShouldBeNull();
     resultData.ShouldBeSameAs(data);
     resultData.Model.ShouldBeSameAs(expectedModel);
@@ -52,7 +52,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await HandleInboxMessageAsync<IHandlingServices<string, string>, HandlingTestData, string, string>(services, data);
 
-    state.ShouldBe(HandleInboxMessageDomainErrorState);
+    state.ShouldBe(HandlingDomainError);
     exception.ShouldNotBeNull();
     exception.Message.ShouldBe("Item out of stock");
     resultData.PipelineError.ShouldBe("Item out of stock");
@@ -66,7 +66,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await HandleInboxMessageAsync<IHandlingServices<string, string>, HandlingTestData, string, string>(services, data);
 
-    state.ShouldBe(HandleInboxMessageErrorState);
+    state.ShouldBe(HandlingError);
     exception.ShouldNotBeNull();
     exception.ShouldBeOfType<InvalidOperationException>();
     resultData.PipelineError.ShouldBe("Inbox message is required.");
@@ -114,7 +114,7 @@ public partial class InboxTests
 
     var (resultData, state, exception) = await HandleInboxMessageAsync<IHandlingServices<string, string>, HandlingTestData, string, string>(services, data);
 
-    state.ShouldBe(HandleInboxMessageErrorState);
+    state.ShouldBe(HandlingError);
     exception.ShouldBeSameAs(expectedException);
     resultData.PipelineError.ShouldBe("Handler error");
   }
@@ -143,4 +143,3 @@ public partial class InboxTests
     await services.Received(1).HandleInboxMessageAsync(message, ct);
   }
 }
-

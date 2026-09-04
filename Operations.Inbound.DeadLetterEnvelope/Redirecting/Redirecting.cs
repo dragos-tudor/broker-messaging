@@ -15,12 +15,12 @@ partial class DeadLetterEnvelopeFuncs
       var deadLetterEnvelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
 
       await services.PublishDeadLetterEnvelopeAsync(deadLetterEnvelope, ct);
-      return (data, RedirectDeadLetterEnvelopeSuccessState, null);
+      return (data, RedirectingSuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception)
     {
-      return (data, RedirectDeadLetterEnvelopeErrorState, exception);
+      return (data, RedirectingError, exception);
     }
   }
 }

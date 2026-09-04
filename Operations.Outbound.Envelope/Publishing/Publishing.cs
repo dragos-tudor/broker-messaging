@@ -16,13 +16,13 @@ partial class EnvelopeFuncs
 
       await services.PublishEnvelopeAsync(envelope, ct);
 
-      return (data, PublishEnvelopeSuccessState, null);
+      return (data, PublishingSuccess, null);
     }
     catch (OperationCanceledException) { return default; }
     catch (Exception exception)
     {
       data.PipelineError = exception.Message;
-      return (data, PublishEnvelopeErrorState, exception);
+      return (data, PublishingError, exception);
     }
   }
 }
