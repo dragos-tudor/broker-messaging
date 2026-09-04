@@ -1,4 +1,4 @@
-using static Operations.Inbound.Envelope.EnvelopeStates;
+using Operations.Inbound.Envelope;
 
 namespace Pipelines.Inbound;
 
@@ -6,25 +6,25 @@ partial class InboundFuncs
 {
   internal static string? GetEnvelopePipelineAction(string state) => state switch
   {
-    NotCapturedEnvelopeState => EnvelopeActions.Capturing,
-    CaptureEnvelopeErrorState => EnvelopeActions.Capturing,
-    CaptureEnvelopeSuccessState => EnvelopeActions.Validating,
+    EnvelopeStates.CapturingNotCaptured => EnvelopeActions.Capturing,
+    EnvelopeStates.CapturingError => EnvelopeActions.Capturing,
+    EnvelopeStates.CapturingSuccess => EnvelopeActions.Validating,
 
-    ValidateEnvelopeSuccessState => EnvelopeActions.Mapping,
-    ValidateEnvelopeErrorState => EnvelopeActions.Unrecoverable,
-    ValidateEnvelopeInvalidErrorState => EnvelopeActions.Unrecoverable,
-    ValidateEnvelopeInvalidConfirmableErrorState => EnvelopeActions.Confirming,
+    EnvelopeStates.ValidatingSuccess => EnvelopeActions.Mapping,
+    EnvelopeStates.ValidatingError => TerminalActions.Unrecoverable,
+    EnvelopeStates.ValidatingInvalidError => TerminalActions.Unrecoverable,
+    EnvelopeStates.ValidatingInvalidConfirmableError => EnvelopeActions.Confirming,
 
-    MapEnvelopeSuccessState => EnvelopeActions.Mapped,
-    MapEnvelopeErrorState => EnvelopeActions.Unrecoverable,
-    MapEnvelopeValueErrorState => EnvelopeActions.Converting,
+    EnvelopeStates.MappingSuccess => EnvelopeActions.Mapped,
+    EnvelopeStates.MappingError => TerminalActions.Unrecoverable,
+    EnvelopeStates.MappingValueError => EnvelopeActions.Converting,
 
-    ConvertEnvelopeSuccessState => EnvelopeActions.Converted,
-    ConvertEnvelopeErrorState => EnvelopeActions.Unrecoverable,
-    ConvertEnvelopeInvalidState => EnvelopeActions.Confirming,
+    EnvelopeStates.ConvertingSuccess => EnvelopeActions.Converted,
+    EnvelopeStates.ConvertingError => TerminalActions.Unrecoverable,
+    EnvelopeStates.ConvertingInvalid => EnvelopeActions.Confirming,
 
-    ConfirmEnvelopeSuccessState => EnvelopeActions.Confirmed,
-    ConfirmEnvelopeErrorState => EnvelopeActions.Confirming,
+    EnvelopeStates.ConfirmingSuccess => EnvelopeActions.Confirmed,
+    EnvelopeStates.ConfirmingError => EnvelopeActions.Confirming,
 
     _ => default
   };

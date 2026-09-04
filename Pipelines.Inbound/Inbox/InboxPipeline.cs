@@ -1,4 +1,5 @@
-using static Operations.Inbound.Inbox.InboxStates;
+
+using Operations.Inbound.Inbox;
 
 namespace Pipelines.Inbound;
 
@@ -6,40 +7,40 @@ partial class InboundFuncs
 {
   internal static string? GetInboxPipelineAction(string state) => state switch
   {
-    ValidateInboxMessageSuccessState => InboxActions.Inserting,
-    ValidateInboxMessageErrorState => InboxActions.Unrecoverable,
-    ValidateInboxMessageInvalidErrorState => InboxActions.Unrecoverable,
+    InboxStates.ValidatingSuccess => InboxActions.Inserting,
+    InboxStates.ValidatingError => TerminalActions.Unrecoverable,
+    InboxStates.ValidatingInvalidError => TerminalActions.Unrecoverable,
 
-    InsertInboxMessageSuccessState => InboxActions.Inserted,
-    InsertInboxMessageErrorState => InboxActions.CheckingRetry,
-    IdempotentInboxMessageState => InboxActions.Idempotent,
+    InboxStates.InsertingSuccess => InboxActions.Inserted,
+    InboxStates.InsertingError => InboxActions.CheckingRetry,
+    InboxStates.Idempotent => InboxActions.Idempotent,
 
-    CheckRetryInboxMessageExhaustedState => InboxActions.RetryExhausted,
-    CheckRetryInboxMessageNotExhaustedState => InboxActions.RegisteringRetry,
-    CheckRetryInboxMessageErrorState => InboxActions.CheckingRetry,
+    InboxStates.CheckingRetryExhausted => InboxActions.RetryExhausted,
+    InboxStates.CheckingRetryNotExhausted => InboxActions.RegisteringRetry,
+    InboxStates.CheckingRetryError => InboxActions.CheckingRetry,
 
-    RegisterRetryInboxMessageSuccessState => InboxActions.Exit,
-    RegisterRetryInboxMessageErrorState => InboxActions.RegisteringRetry,
+    InboxStates.RegisteringRetrySuccess => TerminalActions.Exit,
+    InboxStates.RegisteringRetryError => InboxActions.RegisteringRetry,
 
-    HandleInboxMessageSuccessState => InboxActions.Transacting,
-    HandleInboxMessageDomainErrorState => InboxActions.Abandoning,
-    HandleInboxMessageErrorState => InboxActions.Handling,
+    InboxStates.HandlingSuccess => InboxActions.Transacting,
+    InboxStates.HandlingDomainError => InboxActions.Abandoning,
+    InboxStates.HandlingError => InboxActions.Handling,
 
-    TransactInboxMessageSuccessState => InboxActions.Transacted,
-    TransactInboxMessageErrorState => InboxActions.Transacting,
+    InboxStates.TransactingSuccess => InboxActions.Transacted,
+    InboxStates.TransactingError => InboxActions.Transacting,
 
-    AbandonInboxMessageSuccessState => InboxActions.Converting,
-    AbandonInboxMessageErrorState => InboxActions.Abandoning,
+    InboxStates.AbandoningSuccess => InboxActions.Converting,
+    InboxStates.AbandoningError => InboxActions.Abandoning,
 
-    ScheduleInboxMessageExhaustedState => InboxActions.Abandoning,
-    ScheduleInboxMessageRetryState => InboxActions.Scheduled,
-    ScheduleInboxMessageErrorState => InboxActions.Scheduling,
+    InboxStates.SchedulingExhausted => InboxActions.Abandoning,
+    InboxStates.SchedulingNotExhausted => InboxActions.Scheduled,
+    InboxStates.SchedulingError => InboxActions.Scheduling,
 
-    ConvertInboxMessageSuccessState => InboxActions.Converted,
-    ConvertInboxMessageErrorState => InboxActions.Unrecoverable,
+    InboxStates.ConvertingSuccess => InboxActions.Converted,
+    InboxStates.ConvertingError => TerminalActions.Unrecoverable,
 
-    CloseInboxMessageSuccessState => InboxActions.Closed,
-    CloseInboxMessageErrorState => InboxActions.Closing,
+    InboxStates.ClosingSuccess => InboxActions.Closed,
+    InboxStates.ClosingError => InboxActions.Closing,
 
     _ => default
   };

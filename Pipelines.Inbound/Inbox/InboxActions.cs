@@ -21,6 +21,4 @@ static class InboxActions
   internal const string Converted = $"{Scope}.{nameof(Converted)}";
   internal const string Closing = $"{Scope}.{nameof(Closing)}";
   internal const string Closed = $"{Scope}.{nameof(Closed)}";
-  internal const string Unrecoverable = $"{Scope}.{nameof(Unrecoverable)}";
-  internal const string Exit = $"{Scope}.{nameof(Exit)}";
 }

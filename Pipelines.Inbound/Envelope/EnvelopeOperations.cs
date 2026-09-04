@@ -4,7 +4,7 @@ namespace Pipelines.Inbound;
 partial class InboundFuncs
 {
   internal static Func<TServices, TData, CancellationToken, ValueTask<(TData, string, Exception?)>>?
-    GetEnvelopeOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(string action)
+    GetEnvelopePipelineOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(string action)
       where TServices: IEnvelopeServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
       where TData: IEnvelopeData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
       action switch

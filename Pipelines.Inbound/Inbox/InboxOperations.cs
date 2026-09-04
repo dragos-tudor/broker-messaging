@@ -4,7 +4,7 @@ namespace Pipelines.Inbound;
 partial class InboundFuncs
 {
   internal static Func<TServices, TData, CancellationToken, ValueTask<(TData, string, Exception?)>>?
-    GetInboxOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>(string action)
+    GetInboxPipelineOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>(string action)
       where TServices : IInboxServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
       where TData : IInboxData<TKey, TValue, TMetadata, TConfirmation, TPayload>
       where TSession : IDisposable =>

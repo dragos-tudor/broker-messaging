@@ -1,4 +1,4 @@
-using static Operations.Inbound.DeadLetter.DeadLetterStates;
+using Operations.Inbound.DeadLetter;
 
 namespace Pipelines.Inbound;
 
@@ -6,23 +6,23 @@ partial class InboundFuncs
 {
   internal static string? GetDeadLetterPipelineAction(string state) => state switch
   {
-    InsertDeadLetterMessageSuccessState => DeadLetterActions.Mapping,
-    InsertDeadLetterMessageErrorState => DeadLetterActions.Inserting,
-    IdempotentDeadLetterMessageState => DeadLetterActions.Mapping,
+    DeadLetterStates.InsertingSuccess => DeadLetterActions.Mapping,
+    DeadLetterStates.InsertingError => DeadLetterActions.Inserting,
+    DeadLetterStates.Idempotent => DeadLetterActions.Mapping,
 
-    MapDeadLetterMessageSuccessState => DeadLetterActions.Mapped,
-    MapDeadLetterMessageErrorState => DeadLetterActions.Unrecoverable,
-    MapDeadLetterMessagePayloadErrorState => DeadLetterActions.Unrecoverable,
+    DeadLetterStates.MappingSuccess => DeadLetterActions.Mapped,
+    DeadLetterStates.MappingError => TerminalActions.Unrecoverable,
+    DeadLetterStates.MappingPayloadError => TerminalActions.Unrecoverable,
 
-    ScheduleDeadLetterMessageExhaustedState => DeadLetterActions.Abandoning,
-    ScheduleDeadLetterMessageRetryState => DeadLetterActions.Scheduled,
-    ScheduleDeadLetterMessageErrorState => DeadLetterActions.Scheduling,
+    DeadLetterStates.SchedulingExhausted => DeadLetterActions.Abandoning,
+    DeadLetterStates.SchedulingNotExhausted => DeadLetterActions.Scheduled,
+    DeadLetterStates.SchedulingError => DeadLetterActions.Scheduling,
 
-    AbandonDeadLetterMessageSuccessState => DeadLetterActions.Abandoned,
-    AbandonDeadLetterMessageErrorState => DeadLetterActions.Abandoning,
+    DeadLetterStates.AbandoningSuccess => DeadLetterActions.Abandoned,
+    DeadLetterStates.AbandoningError => DeadLetterActions.Abandoning,
 
-    CloseDeadLetterMessageSuccessState => DeadLetterActions.Closed,
-    CloseDeadLetterMessageErrorState => DeadLetterActions.Closing,
+    DeadLetterStates.ClosingSuccess => DeadLetterActions.Closed,
+    DeadLetterStates.ClosingError => DeadLetterActions.Closing,
 
     _ => default
   };

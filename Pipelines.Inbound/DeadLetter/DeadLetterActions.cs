@@ -13,5 +13,4 @@ internal static class DeadLetterActions
   internal const string Abandoned = $"{Scope}.{nameof(Abandoned)}";
   internal const string Closing = $"{Scope}.{nameof(Closing)}";
   internal const string Closed = $"{Scope}.{nameof(Closed)}";
-  internal const string Unrecoverable = $"{Scope}.{nameof(Unrecoverable)}";
 }

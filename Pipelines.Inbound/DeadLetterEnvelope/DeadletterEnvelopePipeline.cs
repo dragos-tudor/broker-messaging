@@ -1,4 +1,4 @@
-using static Operations.Inbound.DeadLetterEnvelope.DeadLetterEnvelopeStates;
+using Operations.Inbound.DeadLetterEnvelope;
 
 namespace Pipelines.Inbound;
 
@@ -6,26 +6,26 @@ partial class InboundFuncs
 {
   internal static string? GetEphemeralDeadLetterEnvelopePipelineAction(string state) => state switch
   {
-    RedirectDeadLetterEnvelopeSuccessState => EphemeralDeadLetterEnvelopeActions.Redirected,
-    RedirectDeadLetterEnvelopeErrorState => EphemeralDeadLetterEnvelopeActions.CheckingRetry,
+    DeadLetterEnvelopeStates.RedirectingSuccess => EphemeralDeadLetterEnvelopeActions.Redirected,
+    DeadLetterEnvelopeStates.RedirectingError => EphemeralDeadLetterEnvelopeActions.CheckingRetry,
 
-    CheckRetryDeadLetterEnvelopeExhaustedState => EphemeralDeadLetterEnvelopeActions.RetryExhausted,
-    CheckRetryDeadLetterEnvelopeNotExhaustedState => EphemeralDeadLetterEnvelopeActions.RegisteringRetry,
-    CheckRetryDeadLetterEnvelopeErrorState => EphemeralDeadLetterEnvelopeActions.CheckingRetry,
+    DeadLetterEnvelopeStates.CheckingRetryExhausted => EphemeralDeadLetterEnvelopeActions.RetryExhausted,
+    DeadLetterEnvelopeStates.CheckingRetryNotExhausted => EphemeralDeadLetterEnvelopeActions.RegisteringRetry,
+    DeadLetterEnvelopeStates.CheckingRetryError => EphemeralDeadLetterEnvelopeActions.CheckingRetry,
 
-    RegisterRetryDeadLetterEnvelopeSuccessState => EphemeralDeadLetterEnvelopeActions.Exit,
-    RegisterRetryDeadLetterEnvelopeErrorState => EphemeralDeadLetterEnvelopeActions.RegisteringRetry,
+    DeadLetterEnvelopeStates.RegisteringRetrySuccess => TerminalActions.Exit,
+    DeadLetterEnvelopeStates.RegisteringRetryError => EphemeralDeadLetterEnvelopeActions.RegisteringRetry,
 
     _ => default
   };
 
   internal static string? GetDeadLetterEnvelopePipelineAction(string state) => state switch
   {
-    PublishDeadLetterEnvelopeSuccessState => DeadLetterEnvelopeActions.Published,
-    PublishDeadLetterEnvelopeErrorState => DeadLetterEnvelopeActions.Publishing,
+    DeadLetterEnvelopeStates.PublishingSuccess => DeadLetterEnvelopeActions.Published,
+    DeadLetterEnvelopeStates.PublishingError => DeadLetterEnvelopeActions.Publishing,
 
-    ProducingDeadLetterEnvelopeState => DeadLetterEnvelopeActions.Exit,
-    ProduceDeadLetterEnvelopeErrorState => DeadLetterEnvelopeActions.Producing,
+    DeadLetterEnvelopeStates.Producing => TerminalActions.Exit,
+    DeadLetterEnvelopeStates.ProducingError => DeadLetterEnvelopeActions.Producing,
 
     _ => default
   };

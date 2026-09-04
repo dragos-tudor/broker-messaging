@@ -9,7 +9,6 @@ static class EphemeralDeadLetterEnvelopeActions
   internal const string CheckingRetry = $"{Scope}.{nameof(CheckingRetry)}";
   internal const string RetryExhausted = $"{Scope}.{nameof(RetryExhausted)}";
   internal const string RegisteringRetry = $"{Scope}.{nameof(RegisteringRetry)}";
-  internal const string Exit = $"{Scope}.{nameof(Exit)}";
 }
 
 static class DeadLetterEnvelopeActions
@@ -18,5 +17,4 @@ static class DeadLetterEnvelopeActions
   internal const string Publishing = $"{Scope}.{nameof(Publishing)}";
   internal const string Published = $"{Scope}.{nameof(Published)}";
   internal const string Producing = $"{Scope}.{nameof(Producing)}";
-  internal const string Exit = $"{Scope}.{nameof(Exit)}";
 }

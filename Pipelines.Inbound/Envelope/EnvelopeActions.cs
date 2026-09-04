@@ -12,5 +12,4 @@ static class EnvelopeActions
   internal const string Converted = $"{Scope}.{nameof(Converted)}";
   internal const string Confirming = $"{Scope}.{nameof(Confirming)}";
   internal const string Confirmed = $"{Scope}.{nameof(Confirmed)}";
-  internal const string Unrecoverable = $"{Scope}.{nameof(Unrecoverable)}";
 }

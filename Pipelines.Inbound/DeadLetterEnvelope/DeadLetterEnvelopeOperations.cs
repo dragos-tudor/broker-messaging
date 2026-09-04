@@ -4,7 +4,7 @@ namespace Pipelines.Inbound;
 partial class InboundFuncs
 {
   internal static Func<TServices, TData, CancellationToken, ValueTask<(TData, string, Exception?)>>?
-    GetEphemeralDeadLetterEnvelopeOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(string action)
+    GetEphemeralDeadLetterEnvelopePipelineOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(string action)
       where TServices : IDeadLetterEnvelopeServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
       where TData : IDeadLetterEnvelopeData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
       action switch
@@ -17,7 +17,7 @@ partial class InboundFuncs
       };
 
   internal static Func<TServices, TData, CancellationToken, ValueTask<(TData, string, Exception?)>>?
-    GetDeadLetterEnvelopeOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(string action)
+    GetDeadLetterEnvelopepipelineOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(string action)
       where TServices : IDeadLetterEnvelopeServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
       where TData : IDeadLetterEnvelopeData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
       action switch
