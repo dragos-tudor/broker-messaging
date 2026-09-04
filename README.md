@@ -1,13 +1,13 @@
 ## Broker agnostic messaging client library.
 
-A high-throughput, **transactional inbox/outbox** messaging library as broker-backed systems built on .NET 10. Designed around a strict four-layer directed acyclic graph (DAG), uniform operation shapes, and an orchestrator pattern that keeps state machines pure and readable.
+A high-throughput, **transactional inbox/outbox** messaging library as broker-backed systems. Designed around a strict four-layer directed acyclic graph (DAG), uniform operation shapes, and an orchestrator pattern that keeps state machines pure and readable.
 
-(*ongoing design/architecture docs on [docs](./.docs)*).
+(*ongoing architecture, design, decisions, code-conventions docs on for AI [docs](./.docs)*).
 
 ---
 
-## AI Models Used
-- Design/Architecture sessions: Sonnet 5 (Thinking), GPT-5.6 Luna (Thinking) (web + live conversations).
+## AI Credits
+- Architecture/Design sessions: Sonnet 5 (Thinking), GPT-5.6 Luna (Thinking) (web + live conversations).
 - Implementation plan and code generation: Sonnet 5 (Medium) (Github Copilot).
 - Implementation plan and tests generation: Gemini 3.7 Flash (Medium) (Google Antigravity VSCode extension).
 
@@ -17,20 +17,28 @@ A high-throughput, **transactional inbox/outbox** messaging library as broker-ba
 
 At any given moment, moving a message through the library means answering one of two genuinely different questions — and the architecture keeps them permanently separate:
 
-1. **"Given the current state of this workflow, what runs next?"** — answered by a **Pipeline**, which is a pure, inert lookup table mapping operation state strings to scoped action strings (`state → action`).
-2. **"Given what just happened across pipeline boundaries or in this data, how do we orchestrate it?"** — answered by the **Router**, which acts as the orchestrator.
+1. **"Given the last operation state of this workflow, what runs
+   next?"** — answered by a **Pipeline**, which is a pure, inert lookup
+   table mapping operation state strings to scoped action strings
+   (`state → action`).
+2. **"Given what just happened across pipeline boundaries, how do we
+   orchestrate it?"** — answered by the **Router**, which acts as the
+   orchestrator: dispatching the operation an action's scope names,
+   resolving the handful of genuinely conditional branches (via a small
+   precomputed config, not by inspecting data live), and stitching
+   pipeline hand-offs together through one central cross-pipeline map.
 
 ```
-   ┌──────────────┐   1. evaluates state   ┌───────────────┐
-   │    Router    │ ─────────────────────▶ │   Pipeline    │
-   │(orchestrator)│                        │ (pure lookup) │
-   │              │ ◀──2. returns action───│ (state→action)│
-   └──────┬───────┘                        └───────────────┘
+   ┌──────────────┐   1. last operation state    ┌───────────────┐
+   │    Router    │ ────────────────────────────▶│   Pipeline    │
+   │(orchestrator)│                              │ (pure lookup) │
+   │              │ ◀──2. returns action─────────│ (state→action)│
+   └──────┬───────┘                              └───────────────┘
           │
           │ 3. if action crosses pipelines:
-          │    calls MapInboundAction(action, config)
+          │    calls MapInboundPipeline(action, config)
           │
-          │ 4. dispatches operation delegate, gets fresh state
+          │ 4. dispatches operation delegate, gets next state
           ▼
    ┌──────────────┐
    │  Operation   │   a small, self-contained async function
@@ -70,7 +78,7 @@ Two strict disciplines every operation follows:
 Each pipeline is a single, zero-allocation switch statement. Actions are modeled not as boxed enums, but as **unique, compile-time interpolated constant strings** scoped by domain (e.g. `Inbox.Inserting`, `Envelope.Confirming`):
 
 ```csharp
-internal static string InboxPipeline(string state) => state switch
+internal static string? GetInboxPipelineAction(string state) => state switch
 {
   ValidateInboxMessageSuccessState => InboxActions.Inserting,
   ValidateInboxMessageErrorState => InboxActions.Unrecoverable,
@@ -78,20 +86,20 @@ internal static string InboxPipeline(string state) => state switch
   // Inserting — durability achieved on success; ANY failure routes to retry check
   InsertInboxMessageSuccessState => InboxActions.Inserted,
   // ...
-  _ => InboxActions.Unknown
+  _ => default
 };
 ```
 
 ## Cross-pipeline orchestration: the mapping function
 
-When an operation produces an action that crosses into another pipeline, it flows through a central, pure mapping function (`MapInboundAction`).
+When an operation produces an action that crosses into another pipeline, it flows through a central, pure mapping function (`MapInboundPipeline`).
 
 Organized along the natural lifecycle flow:
 
 ```csharp
 partial class InboundFuncs
 {
-  internal static string? MapInboundAction(string action, InboundPipelineConfig config = default) =>
+  internal static string? MapInboundPipeline(string? action, InboundPipelineConfig config = default) =>
     action switch
     {
       // 1. Envelope Pipeline actions
@@ -112,9 +120,9 @@ Offset confirmation (`ConfirmEnvelope`) does not happen at the tail end of all b
 $$\text{Inserting} \xrightarrow{\text{Inserted}} \text{Confirming} \xrightarrow{\text{Confirmed}} \text{Handling} \xrightarrow{\text{Handled}} \text{Transacting}$$
 
 1. **`Inbox.Inserting` succeeds** $\to$ emits `InboxActions.Inserted`.
-2. **`MapInboundAction`** maps `Inserted` to `EnvelopeActions.Confirming`.
+2. **`MapInboundPipeline`** maps `Inserted` to `EnvelopeActions.Confirming`.
 3. **`ConfirmEnvelope` runs** $\to$ broker offset is durably committed $\to$ emits `EnvelopeActions.Confirmed`.
-4. **`MapInboundAction`** maps `Confirmed` to `InboxActions.Handling`.
+4. **`MapInboundPipeline`** maps `Confirmed` to `InboxActions.Handling`.
 5. **The Router Guard**: The Router checks `data.InboxMessage?.Status == InboxMessageStatus.Processing`:
    - For `Inserted`: message is in `Processing` $\to$ dispatches `Handling`.
    - For `Idempotent` (duplicate cleared), `RetryExhausted` (insert failed), or `Redirected` (malformed payload): the condition is false $\to$ the Router terminates cleanly without dispatching `Handling`.
@@ -142,7 +150,7 @@ Layer 4 — Routing        Routing.Inbound / Routing.Outbound
                            cross-pipeline hand-offs)
                                         │
 Layer 3 — Pipelines      Pipelines.Inbound / Pipelines.Outbound
-                          (pure lookup tables, MapInboundAction,
+                          (pure lookup tables, MapInboundPipeline,
                            and pipeline configuration)
                                         │
 Layer 2 — Operations     split by DIRECTION × INPUT ENTITY:
@@ -190,10 +198,10 @@ The `RetryPlan` record is **not a message store** — the payload is always re-r
 
 ## Testing Strategy: Two-Tier Verification
 
-The pipeline and mapping architecture is tested across two complementary tiers using composite interfaces (`IInboundServices`, `IInboundData`):
+The pipeline and routing architecture is tested across two complementary tiers using composite interfaces (`IInboundServices`, `IInboundData`):
 
-1. **Tier 1: Fast Graph Traversal Tests (Zero Mocks, <10ms)**: Validates pure string sequences (`Pipeline(state) → MapInboundAction(action)`) across every permutation of branches and error paths.
-2. **Tier 2: Async Scenario Runner Tests (NSubstitute Mocks)**: Executes the actual async operation delegates through `RunInboundPipelineAsync` to verify end-to-end data mutations, offset confirmation order, idempotency clearing, and status guards across all 5 canonical lifecycle scenarios:
+1. **Fast Graph Traversal Tests (Zero Mocks, <10ms)**: Validates pure string sequences (`Pipeline(state) → MapInboundPipeline(action)`) across every permutation of branches and error paths.
+2. **Async Scenario Runner Tests (NSubstitute Mocks)**: Executes the actual async operation delegates through `RunInboundPipelineAsync` to verify end-to-end data mutations, offset confirmation order, idempotency clearing, and status guards across all 5 canonical lifecycle scenarios:
    - **Happy Path**: `Envelope.Mapped` $\to$ `Inbox.Inserted` $\to$ `Envelope.Confirmed` $\to$ `Inbox.Handled` $\to$ `Inbox.Transacted`.
    - **Idempotent Duplicate**: Duplicate insert returns false $\to$ `Inbox.Idempotent` $\to$ `Envelope.Confirmed` $\to$ Router guard stops cleanly without `Handling`.
    - **Insert Failure Exhaustion**: Insert error $\to$ `CheckingRetry` exhausts $\to$ `Envelope.Confirmed` $\to$ Router guard stops cleanly.
