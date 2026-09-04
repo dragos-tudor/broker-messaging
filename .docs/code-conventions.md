@@ -42,7 +42,7 @@
 - inject dependencies explicitly through function parameters, service structures/interfaces, or delegates.
 - use:
   - Result pattern for expected/domain failures.
-  - reserve exceptions for unexpected runtime failures.
+  - reserve exceptions for technical runtime failures.
 
 ### Testing Conventions
 - use:
