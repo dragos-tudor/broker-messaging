@@ -17,5 +17,5 @@ echo change mod for bash scripts
 chmod u+x ./*.sh
 
 echo create the runner and start the configuration experience
-RUNNER_ALLOW_RUNASROOT=true ./config.sh --url https://github.com/dragos-tudor/backend-kafka --token ${TOKEN}
+RUNNER_ALLOW_RUNASROOT=true ./config.sh --url https://github.com/dragos-tudor/broker-messaging --token ${TOKEN}
 
