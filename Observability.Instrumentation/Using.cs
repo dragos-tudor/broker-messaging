@@ -6,8 +6,8 @@ global using System.Diagnostics.Metrics;
 global using Microsoft.Extensions.Logging;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("ObservabilityInbound")]
-[assembly: InternalsVisibleTo("ObservabilityOutbound")]
+[assembly: InternalsVisibleTo("Router.Inbound")]
+[assembly: InternalsVisibleTo("Router.Outbound")]
 
 namespace ObservabilityInstrumentation;
 
