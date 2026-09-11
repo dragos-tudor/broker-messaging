@@ -24,6 +24,7 @@ podman run \
   -e KAFKA_PROCESS_ROLES="broker,controller" \
   -e KAFKA_CONTROLLER_QUORUM_VOTERS="${KAFKA_VOTERS}" \
   -e KAFKA_CONTROLLER_LISTENER_NAMES="CONTROLLER" \
+  -e KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0 \
   -e CLUSTER_ID="${KAFKA_CLUSTER_ID}" \
   --network "${DEV_NETWORK}" --hosts-file=none --dns="${DEV_NETWORK_DNS}" -d --name "${KAFKA_SERVER}" \
   docker.io/apache/kafka:4.3.1
