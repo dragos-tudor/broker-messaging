@@ -9,6 +9,8 @@ global using Confluent.Kafka.Admin;
 global using static Kafka.Clients.ClientsFuncs;
 using System.Runtime.CompilerServices;
 
+[assembly:InternalsVisibleTo("Kafka.Services")]
+
 namespace Kafka.Clients;
 
 public static partial class ClientsFuncs;

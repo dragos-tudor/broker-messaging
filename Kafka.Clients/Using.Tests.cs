@@ -19,7 +19,8 @@ public partial class ClientsTests
     SaslMechanism = SaslMechanism.ScramSha512,
     GroupId = "kafka-tests-group",
     ClientId = "kafka-tests",
-    EnableAutoCommit = false,
+    EnableAutoCommit = true,
+    EnableAutoOffsetStore = false,
     AutoOffsetReset = AutoOffsetReset.Earliest,
     DefaultNumPartitions = 12,
     DefaultReplicationFactor = 3,
@@ -27,7 +28,7 @@ public partial class ClientsTests
     OperationTimeout = TimeSpan.FromSeconds(5),
   };
   static CancellationToken cancellationToken = default!;
-  static string publishTopicName = GetKafkaTopicName("kafka-tests-publish");
+  static string topicName = GetKafkaTopicName("kafka-tests-publish");
 
 
   [AssemblyInitialize]
@@ -38,16 +39,16 @@ public partial class ClientsTests
     cancellationToken = cancellationTokenSource.Token;
 
     using var adminClient = CreateKafkaAdminClient(options);
-    if (!ExistsTopic(adminClient, publishTopicName, options))
-      CreateTopicAsync(adminClient, publishTopicName, options, cancellationToken).GetAwaiter().GetResult();
+    if (!ExistsTopic(adminClient, topicName, options))
+      CreateTopicAsync(adminClient, topicName, options, cancellationToken).GetAwaiter().GetResult();
   }
 
   [AssemblyCleanup]
   public static void CleanupKafka()
   {
     using var adminClient = CreateKafkaAdminClient(options);
-    if (ExistsTopic(adminClient, publishTopicName, options))
-      DeleteTopicAsync(adminClient, publishTopicName, options, cancellationToken).GetAwaiter().GetResult();
+    if (ExistsTopic(adminClient, topicName, options))
+      DeleteTopicAsync(adminClient, topicName, options, cancellationToken).GetAwaiter().GetResult();
   }
 
   static string GetKafkaTopicName(string topicName) => $"{topicName}-{Guid.NewGuid():N}";

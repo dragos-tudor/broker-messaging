@@ -1,13 +1,12 @@
 <Solution>
   <!-- Messaging.Core: System -->
-  <Project Path="Reliability.Resiliency/Reliability.Resiliency.csproj" />
   <Project Path="Observability.Instrumentation/Observability.Instrumentation.csproj" />
 
-  <!-- Messaging.Core: Transport & Persistence projects [Foundation Layer] -->
+  <!-- Messaging.Core: Foundation projects [Foundation Layer] -->
   <Project Path="Persistence.InboxMessage/Persistence.InboxMessage.csproj" />
   <Project Path="Persistence.OutboxMessage/Persistence.OutboxMessage.csproj" />
   <Project Path="Persistence.DeadLetterMessage/Persistence.DeadLetterMessage.csproj" />
-  <Project Path="Persistence.RetryPlan/Persistence.RetryPlan.csproj" />
+  <Project Path="Reliability.Resiliency/Reliability.Resiliency.csproj" />
   <Project Path="Transport.Envelope/Transport.Envelope.csproj" />
   <Project Path="Transport.DeadLetterEnvelope/Transport.DeadLetterEnvelope.csproj" />
 
@@ -26,12 +25,15 @@
   <!-- Messaging.Core: Routing projects [Routing Layer] -->
   <Project Path="Routing.Inbound/Routing.Inbound.csproj" />
   <Project Path="Routing.Outbound/Routing.Outbound.csproj" />
+  <Project Path="Foundation.Extensions/Foundation.Extensions.csproj" />
 
   <!-- Messaging.Kafka projects -->
   <Project Path="Kafka.Clients/Kafka.Clients.csproj" />
+  <Project Path="Kafka.Envelopes/Kafka.Envelopes.csproj" />
   <Project Path="Kafka.Messages/Kafka.Messages.csproj" />
+  <Project Path="Kafka.Services/Kafka.Services.csproj" />
 
   <!-- Messaging packages: Metadata projects -->
   <Project Path="Messaging.Core/Messaging.Core.csproj" />
-  <!-- <Project Path="Messaging.Kafka/Messaging.Kafka.csproj" /> -->
+  <Project Path="Messaging.Kafka/Messaging.Kafka.csproj" />
 </Solution>

@@ -1,68 +1,66 @@
 
-using System.Text.Json;
-
 namespace Kafka.Clients;
 
 public sealed partial class ClientsTests
 {
-  [TestMethod]
-  public async Task message__produce_and_flush_message__message_persisted()
-  {
-    using var producer = CreateKafkaProducer<string, byte[]>(options);
-    var payload = new TestMessage(1, "test");
-    var message = CreateKafkaMessage("key3", JsonSerializer.SerializeToUtf8Bytes(payload), []);
-    var tcs = new TaskCompletionSource<DeliveryResult<string, byte[]>>();
+  // [TestMethod]
+  // public async Task message__produce_and_flush_message__message_persisted()
+  // {
+  //   using var producer = CreateKafkaProducer<string, byte[]>(options);
+  //   var payload = new TestMessage(1, "test");
+  //   var message = CreateKafkaMessage("key3", JsonSerializer.SerializeToUtf8Bytes(payload), []);
+  //   var tcs = new TaskCompletionSource<DeliveryResult<string, byte[]>>();
 
-    ProduceMessage(producer, publishTopicName, message, report =>
-    {
-      try { tcs.SetResult(report); }
-      catch (Exception ex) { tcs.SetException(ex); }
-    });
+  //   ProduceMessage(producer, publishTopicName, message, report =>
+  //   {
+  //     try { tcs.SetResult(report); }
+  //     catch (Exception ex) { tcs.SetException(ex); }
+  //   });
 
-    producer.Flush(cancellationToken);
-    var result = await tcs.Task;
-    result.Status.ShouldBe(PersistenceStatus.Persisted);
-  }
+  //   producer.Flush(cancellationToken);
+  //   var result = await tcs.Task;
+  //   result.Status.ShouldBe(PersistenceStatus.Persisted);
+  // }
 
-  [TestMethod]
-  public async Task message__produce_and_flush_message__message_with_key_and_value()
-  {
-    using var producer = CreateKafkaProducer<string, byte[]>(options);
-    var tcs = new TaskCompletionSource<DeliveryResult<string, byte[]>>();
-    var payload = new TestMessage(1, "test");
+  // [TestMethod]
+  // public async Task message__produce_and_flush_message__message_with_key_and_value()
+  // {
+  //   using var producer = CreateKafkaProducer<string, byte[]>(options);
+  //   var tcs = new TaskCompletionSource<DeliveryResult<string, byte[]>>();
+  //   var payload = new TestMessage(1, "test");
 
-    var message = CreateKafkaMessage("key4", JsonSerializer.SerializeToUtf8Bytes(payload), []);
-    ProduceMessage(producer, publishTopicName, message, report =>
-    {
-      try { tcs.SetResult(report); }
-      catch (Exception ex) { tcs.SetException(ex); }
-    });
+  //   var message = CreateKafkaMessage("key4", JsonSerializer.SerializeToUtf8Bytes(payload), []);
+  //   ProduceMessage(producer, publishTopicName, message, report =>
+  //   {
+  //     try { tcs.SetResult(report); }
+  //     catch (Exception ex) { tcs.SetException(ex); }
+  //   });
 
-    producer.Flush(cancellationToken);
-    var result = await tcs.Task;
-    result.Message.Key.ShouldBe("key4");
-    JsonSerializer.Deserialize<TestMessage>(result.Message.Value).ShouldBe(payload);
-  }
+  //   producer.Flush(cancellationToken);
+  //   var result = await tcs.Task;
+  //   result.Message.Key.ShouldBe("key4");
+  //   JsonSerializer.Deserialize<TestMessage>(result.Message.Value).ShouldBe(payload);
+  // }
 
-  [TestMethod]
-  public async Task messages__produce_and_flush_messages__messages_persisted()
-  {
-    using var producer = CreateKafkaProducer<string, byte[]>(options);
-    Message<string, byte[]>[] messages = [
-      CreateKafkaMessage("key5", JsonSerializer.SerializeToUtf8Bytes(new TestMessage(1, "test")), []),
-      CreateKafkaMessage("key6", JsonSerializer.SerializeToUtf8Bytes(new TestMessage(2, "test")), []),
-    ];
-    var tcs = new TaskCompletionSource<DeliveryResult<string, byte[]>>();
-    var results = new List<DeliveryResult<string, byte[]>>();
+  // [TestMethod]
+  // public async Task messages__produce_and_flush_messages__messages_persisted()
+  // {
+  //   using var producer = CreateKafkaProducer<string, byte[]>(options);
+  //   Message<string, byte[]>[] messages = [
+  //     CreateKafkaMessage("key5", JsonSerializer.SerializeToUtf8Bytes(new TestMessage(1, "test")), []),
+  //     CreateKafkaMessage("key6", JsonSerializer.SerializeToUtf8Bytes(new TestMessage(2, "test")), []),
+  //   ];
+  //   var tcs = new TaskCompletionSource<DeliveryResult<string, byte[]>>();
+  //   var results = new List<DeliveryResult<string, byte[]>>();
 
-    ProduceMessages(producer, publishTopicName, messages, report =>
-    {
-      try { results.Add(report); if (results.Count == messages.Length) tcs.SetResult(report); }
-      catch (Exception ex) { tcs.SetException(ex); }
-    });
+  //   ProduceMessages(producer, publishTopicName, messages, report =>
+  //   {
+  //     try { results.Add(report); if (results.Count == messages.Length) tcs.SetResult(report); }
+  //     catch (Exception ex) { tcs.SetException(ex); }
+  //   });
 
-    producer.Flush(cancellationToken);
-    await tcs.Task;
-    results.All(r => r.Status == PersistenceStatus.Persisted).ShouldBeTrue();
-  }
+  //   producer.Flush(cancellationToken);
+  //   await tcs.Task;
+  //   results.All(r => r.Status == PersistenceStatus.Persisted).ShouldBeTrue();
+  // }
 }

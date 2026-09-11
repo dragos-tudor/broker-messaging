@@ -8,8 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Kafka.Clients/Kafka.Clients.csproj" />
-    <ProjectReference Include="../Kafka.Messages/Kafka.Messages.csproj" />
+    <ProjectReference Include="../Kafka.Services/Kafka.Services.csproj" />
 
   	<None Include="../README.md" Pack="true" PackagePath="\"/>
     <None Include="../LICENSE" Pack="true" PackagePath="\"/>
@@ -20,8 +19,12 @@
       <!-- Include both DLL and PDB in the package output -->
       <BuildOutputInPackage Include="$(OutputPath)Kafka.Clients.dll" />
       <BuildOutputInPackage Include="$(OutputPath)Kafka.Clients.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Kafka.Envelopes.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Kafka.Envelopes.pdb" />
       <BuildOutputInPackage Include="$(OutputPath)Kafka.Messages.dll" />
       <BuildOutputInPackage Include="$(OutputPath)Kafka.Messages.pdb" />
+      <BuildOutputInPackage Include="$(OutputPath)Kafka.Services.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Kafka.Services.pdb" />
     </ItemGroup>
   </Target>
 

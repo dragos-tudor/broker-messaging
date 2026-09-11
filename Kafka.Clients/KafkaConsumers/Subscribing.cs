@@ -7,4 +7,7 @@ partial class ClientsFuncs
 
   public static void SubscribeConsumerToTopics<TKey, TValue>(IConsumer<TKey, TValue> consumer, IEnumerable<string> topicNames)
     => consumer.Subscribe(topicNames);
+
+  public static void UnsubscribeConsumer<TKey, TValue>(IConsumer<TKey, TValue> consumer)
+    => consumer.Unsubscribe();
 }

@@ -17,7 +17,7 @@ partial class ClientsFuncs
     int? maxPollRecords = default,
     TimeSpan? sessionTimeout = default,
     IsolationLevel? isolationLevel = default,
-    Action<ConsumerConfig>? configBuilder = default)
+    Action<ConsumerConfig>? configOptions = default)
   {
     var config = new ConsumerConfig
     {
@@ -32,32 +32,32 @@ partial class ClientsFuncs
       EnableAutoOffsetStore = enableAutoOffsetStore,
       ClientId = clientId,
       MaxPollRecords = maxPollRecords,
-      SessionTimeoutMs = sessionTimeout?.Milliseconds,
+      SessionTimeoutMs = (int?)sessionTimeout?.TotalMilliseconds,
       IsolationLevel = isolationLevel,
-      SocketTimeoutMs = (int)(connectTimeout ?? TimeSpan.FromSeconds(15)).TotalMilliseconds,
+      SocketTimeoutMs = (int?)connectTimeout?.TotalMilliseconds,
     };
 
-    configBuilder?.Invoke(config);
+    configOptions?.Invoke(config);
     return config;
   }
 
   public static ConsumerConfig CreateKafkaConsumerConfig(
     KafkaOptions options,
-    Action<ConsumerConfig>? configBuilder = default) =>
-    CreateKafkaConsumerConfig(
-      options.EndPoints,
-      options.GroupId,
-      options.User,
-      options.Password,
-      options.SecurityProtocol,
-      options.SaslMechanism,
-      options.AutoOffsetReset,
-      options.EnableAutoCommit,
-      options.EnableAutoOffsetStore,
-      options.ClientId,
-      options.ConnectTimeout,
-      options.MaxPollRecords,
-      options.SessionTimeout,
-      options.IsolationLevel,
-      configBuilder);
+    Action<ConsumerConfig>? configOptions = default) =>
+      CreateKafkaConsumerConfig(
+        options.EndPoints,
+        options.GroupId,
+        options.User,
+        options.Password,
+        options.SecurityProtocol,
+        options.SaslMechanism,
+        options.AutoOffsetReset,
+        options.EnableAutoCommit,
+        options.EnableAutoOffsetStore,
+        options.ClientId,
+        options.ConnectTimeout,
+        options.MaxPollRecords,
+        options.SessionTimeout,
+        options.IsolationLevel,
+        configOptions);
 }

@@ -7,4 +7,9 @@ partial class ClientsFuncs
     IConsumer<TKey, TValue> consumer,
     TopicPartitionOffset offset) =>
       consumer.StoreOffset(offset);
+
+  internal static void StoreConsumerOffset<TKey, TValue>(
+    IConsumer<TKey, TValue> consumer,
+    ConsumeResult<TKey, TValue> consumeResult) =>
+      consumer.StoreOffset(consumeResult);
 }

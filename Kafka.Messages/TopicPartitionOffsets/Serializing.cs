@@ -9,4 +9,9 @@ partial class MessagesFuncs
       topicPartitionOffset.Partition.Value.ToString(CultureInfo.InvariantCulture),
       topicPartitionOffset.Offset.Value.ToString(CultureInfo.InvariantCulture),
       topicPartitionOffset.LeaderEpoch?.ToString(CultureInfo.InvariantCulture) ?? string.Empty);
+
+  internal static string? TrySerializeTopicPartitionOffset(TopicPartitionOffset? topicPartitionOffset) =>
+    topicPartitionOffset is not null?
+      SerializeTopicPartitionOffset(topicPartitionOffset):
+      default;
 }

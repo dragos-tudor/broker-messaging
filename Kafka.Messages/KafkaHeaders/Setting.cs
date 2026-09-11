@@ -18,7 +18,7 @@ partial class MessagesFuncs
   internal static Headers SetKafkaHeaderMessageId(this Headers headers, Guid messageId) =>
     SetKafkaHeaderString(headers, MessageIdHeaderName, messageId.ToString());
 
-  internal static Headers SetKafkaHeaderCorrelationId(this Headers headers, Guid? correlationId) =>
+  internal static Headers SetKafkaHeaderCorrelationId(Headers headers, Guid? correlationId) =>
     correlationId is null ? headers : SetKafkaHeaderString(headers, CorrelationIdHeaderName, correlationId.ToString());
 
   public static Headers SetKafkaHeaderTraceParent(Headers headers, string? traceParent) =>

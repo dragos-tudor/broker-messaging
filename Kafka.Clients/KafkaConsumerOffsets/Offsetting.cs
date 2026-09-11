@@ -5,6 +5,12 @@ partial class ClientsFuncs
 {
   internal static bool OffsetConsumer<TKey, TValue>(
     IConsumer<TKey, TValue> consumer,
+    ConsumeResult<TKey, TValue> consumeResult,
+    KafkaOptions kafkaOptions) =>
+      OffsetConsumer(consumer, consumeResult.TopicPartitionOffset, kafkaOptions);
+
+  internal static bool OffsetConsumer<TKey, TValue>(
+    IConsumer<TKey, TValue> consumer,
     TopicPartitionOffset offset,
     KafkaOptions kafkaOptions)
   {

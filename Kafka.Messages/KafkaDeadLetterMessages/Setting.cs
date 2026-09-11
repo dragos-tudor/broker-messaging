@@ -3,7 +3,7 @@ namespace Kafka.Messages;
 
 partial class MessagesFuncs
 {
-  static Headers SetKafkaDeadLetterMessageHeaders(
+  internal static Headers SetKafkaDeadLetterMessageHeaders(
     Headers headers,
     TopicPartitionOffset? topicPartitionOffset,
     string failureReason)

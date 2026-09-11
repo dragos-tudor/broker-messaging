@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../Directory.Testing.props" />
+
+  <PropertyGroup>
+    <Description>Kafka services project.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Kafka.Clients/Kafka.Clients.csproj" />
+    <ProjectReference Include="../Kafka.Envelopes/Kafka.Envelopes.csproj" />
+    <ProjectReference Include="../Kafka.Messages/Kafka.Messages.csproj" />
+  </ItemGroup>
+
+</Project>

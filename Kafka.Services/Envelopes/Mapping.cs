@@ -1,25 +1,24 @@
 
-namespace Kafka.Messages;
+namespace Kafka.Services;
 
-partial class MessagesFuncs
+partial class ServicesFuncs
 {
-  public static InboxMessage<TKey, TPayload> FromEnvelope<TKey, TValue, TPayload>(
+  public static InboxMessage<TKey, TPayload> ToInboxMessage<TKey, TValue, TPayload>(
     Envelope<TKey, TValue> envelope,
     TPayload payload)
   =>
     CreateInboxMessage(
       GetKafkaHeaderMessageId(envelope.Metadata) ?? Guid.NewGuid(),
+      TryGetTransportMessageId(envelope.Confirmation),
       envelope.Key,
       payload,
       envelope.CreatedAt,
+      GetKafkaHeaderSchemaType(envelope.Metadata) ?? typeof(TPayload).Name,
       GetKafkaHeaderCorrelationId(envelope.Metadata),
-      envelope.Type ?? GetKafkaHeaderSchemaType(envelope.Metadata) ?? typeof(TPayload).Name,
       GetKafkaHeaderSchemaVersion(envelope.Metadata),
-      envelope.Confirmation is not null ?
-        SerializeTopicPartitionOffset(envelope.Confirmation) :
-        null);
+      TrySerializeTopicPartitionOffset(envelope.Confirmation));
 
-  public static Envelope<TKey, TValue> ToEnvelope<TKey, TValue, TPayload>(
+  public static Envelope<TKey, TValue> FromOutboxMessage<TKey, TValue, TPayload>(
     OutboxMessage<TKey, TPayload> message,
     TValue value,
     string queueName)
@@ -36,7 +35,7 @@ partial class MessagesFuncs
           message.CorrelationId
         ),
         message.CreatedAt),
-      queueName,
-      default
+      message.Type,
+      queueName
     );
 }
