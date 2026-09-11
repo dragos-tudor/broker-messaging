@@ -3,26 +3,37 @@ namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  internal static async ValueTask<(TData, string, Exception?)> CaptureEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
+  static async ValueTask<(TData, string, Exception?)> CaptureEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
     TServices services,
     TData data,
     CancellationToken ct = default)
   where TServices : ICapturingServices<TKey, TValue, TMetadata, TConfirmation>
   where TData : ICapturingData<TKey, TValue, TMetadata, TConfirmation>
   {
-    try
-    {
-      var envelope = await services.ReadEnvelope(ct);
-      if (envelope is null)
-        return new(data, CapturingNotCaptured, null);
+    var envelope = await services.ReadEnvelope(ct);
 
-      data.Envelope = envelope;
-      return new(data, CapturingSuccess, null);
-    }
-    catch (Exception exception)
-    {
-      data.PipelineError = exception.Message;
-      return new(data, CapturingError, exception);
-    }
+    return SetEnvelope(data, envelope) is not null?
+      new(data, CapturingSuccess, null):
+      new(data, CapturingNotCaptured, null);
   }
+
+  static (TData, string, Exception?) CaptureEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation>(
+    TData data,
+    Exception exception)
+  where TData : ICapturingData<TKey, TValue, TMetadata, TConfirmation>
+    => (data, CapturingError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> CaptureEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
+    TServices services,
+    TData data,
+    CancellationToken ct = default)
+  where TServices : ICapturingServices<TKey, TValue, TMetadata, TConfirmation>
+  where TData : ICapturingData<TKey, TValue, TMetadata, TConfirmation> =>
+    TryCatch(
+      services,
+      data,
+      CaptureEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation>,
+      CaptureEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation>,
+      ct
+    );
 }

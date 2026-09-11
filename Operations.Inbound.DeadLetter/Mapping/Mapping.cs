@@ -3,35 +3,36 @@ namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  internal static ValueTask<(TData, string, Exception?)> MapDeadLetterMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      TServices service,
-      TData data,
-      CancellationToken ct = default)
-      where TServices : IMappingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
-      where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
+  internal static (TData, string, Exception?) MapDeadLetterMessageSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TServices services,
+    TData data)
+  where TServices : IMappingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
+  where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
   {
-    try
-    {
-      var deadLetterMessage = RequireDeadLetterMessage(data.DeadLetterMessage);
-      var payload = deadLetterMessage.Payload;
+    var message = RequireDeadLetterMessage(data.DeadLetterMessage);
 
-      var value = service.FromDeadLetterMessagePayload(payload);
-      if (value is null)
-      {
-        data.PipelineError = $"Dead letter message {deadLetterMessage.MessageId} mapped to null value";
-        return new((data, MappingPayloadError, CreateValidationException(data.PipelineError)));
-      }
+    var envelope = services.FromDeadLetterMessage(message, message.OriginatedAt);
+    SetDeadLetterEnvelope(data, envelope);
 
-      var queue = service.GetDeadLetterQueueName(deadLetterMessage);
-      var deadLetterEnvelope = service.FromDeadLetterMessage(deadLetterMessage, queue, value, deadLetterMessage.OriginatedAt);
-      data.DeadLetterEnvelope = deadLetterEnvelope;
-
-      return new((data, MappingSuccess, null));
-    }
-    catch (Exception exception)
-    {
-      data.PipelineError = exception.Message;
-      return new((data, MappingError, exception));
-    }
+    return (data, MappingSuccess, null);
   }
+
+  internal static (TData, string, Exception?) MapDeadLetterMessageError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+    (data, MappingError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> MapDeadLetterMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TServices services,
+    TData data,
+    CancellationToken ct = default)
+  where TServices : IMappingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
+  where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+    TryCatch(
+      services,
+      data,
+      MapDeadLetterMessageSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
+      MapDeadLetterMessageError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>
+    );
 }

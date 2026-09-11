@@ -4,13 +4,13 @@ global using System.Threading;
 global using System.Threading.Tasks;
 global using Persistence.DeadLetterMessage;
 global using Transport.DeadLetterEnvelope;
+global using static Foundation.Extensions.ExtensionsFuncs;
 global using static Persistence.DeadLetterMessage.DeadLetterMessageFuncs;
 global using static Operations.Inbound.DeadLetter.DeadLetterFuncs;
 global using static Operations.Inbound.DeadLetter.DeadLetterStates;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Pipelines.Inbound")]
-[assembly: InternalsVisibleTo("Routing.Inbound")]
 
 namespace Operations.Inbound.DeadLetter;
 

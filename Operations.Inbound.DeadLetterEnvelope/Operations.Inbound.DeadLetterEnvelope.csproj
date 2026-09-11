@@ -3,13 +3,13 @@
   <Import Project="../Directory.Testing.props" />
 
   <PropertyGroup>
-    <Description>Dead letter operations project.</Description>
+    <Description>Dead letter envelope operations project.</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="../Persistence.DeadLetterMessage/Persistence.DeadLetterMessage.csproj" />
-    <ProjectReference Include="../Persistence.RetryPlan/Persistence.RetryPlan.csproj" />
     <ProjectReference Include="../Transport.DeadLetterEnvelope/Transport.DeadLetterEnvelope.csproj" />
+    <ProjectReference Include="../Foundation.Extensions/Foundation.Extensions.csproj" />
   </ItemGroup>
 
 </Project>

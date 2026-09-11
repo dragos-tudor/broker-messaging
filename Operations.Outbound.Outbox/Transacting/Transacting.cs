@@ -1,10 +1,9 @@
-using static Operations.Outbound.Outbox.OutboxStates;
 
 namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  internal static async ValueTask<(TData, string, Exception?)> TransactOutboxMessageAsync<TServices, TData, TKey, TPayload, TSession>(
+  static async ValueTask<(TData, string, Exception?)> TransactOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload, TSession>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -12,25 +11,43 @@ partial class OutboxFuncs
   where TData : ITransactingData<TKey, TPayload>
   where TSession : IDisposable
   {
-    try {
-      var message = RequireOutboxMessage(data.OutboxMessage);
-      var model = RequireOutboxModel(data.Model);
+    var message = RequireOutboxMessage(data.OutboxMessage);
+    var model = RequireDomainModel(data.DomainModel);
+    var @params = (model, message);
 
-      using var session = services.GetSession();
-      await services.TransactSessionAsync(
-        session,
-        (session) => services.PersistOutboxModelAsync(session, model),
-        (session) => services.InsertOutboxMessageAsync(session,
-          SetOutboxMessageStatus(message, OutboxMessageStatus.Processing),
-          ct),
-        ct
-      );
+    using var session = services.GetSession();
+    await services.TransactSessionAsync(
+      services,
+      session,
+      @params,
+        static (services, session, @params, ct) =>
+          services.PersistDomainModelAsync(session, @params.model, ct),
+        static (services, session, @params, ct) =>
+          services.InsertOutboxMessageAsync(session, @params.message, ct),
+      ct
+    );
 
-      return (data, TransactingSuccess, null);
-    }
-    catch (OperationCanceledException) { return default; }
-    catch (Exception exception) {
-      return (data, TransactingError, exception);
-    }
+    return (data, TransactingSuccess, null);
   }
+
+  static (TData, string, Exception?) TransactOutboxMessageError<TData, TKey, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : ITransactingData<TKey, TPayload>  =>
+    (data, TransactingError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> TransactOutboxMessageAsync<TServices, TData, TKey, TPayload, TSession>(
+    TServices services,
+    TData data,
+    CancellationToken ct = default)
+  where TServices : ITransactingServices<TKey, TPayload, TSession>
+  where TData : ITransactingData<TKey, TPayload>
+  where TSession : IDisposable =>
+    TryCatch(
+      services,
+      data,
+      TransactOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload, TSession>,
+      TransactOutboxMessageError<TData, TKey, TPayload>,
+      ct);
+
 }

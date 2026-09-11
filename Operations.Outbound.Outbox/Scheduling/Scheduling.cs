@@ -1,40 +1,47 @@
-using static Operations.Outbound.Outbox.OutboxStates;
 
 namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  internal static async ValueTask<(TData, string, Exception?)> ScheduleOutboxMessageAsync<TServices, TData, TKey, TValue, TPayload>(
+  static async ValueTask<(TData, string, Exception?)> ScheduleOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
   where TServices : ISchedulingServices<TKey, TPayload>
   where TData : ISchedulingData<TKey, TPayload>
   {
-    try {
-      var message = RequireOutboxMessage(data.OutboxMessage);
-      var error = data.PipelineError ?? "Unknown scheduling outbox message error.";
-      var currentRetryCount = message.RetryCount ?? 0;
-      var outboxOptions = services.GetOutboxMessageOptions();
+    var message = RequireOutboxMessage(data.OutboxMessage);
+    var options = services.GetOutboxMessageOptions();
 
-      var nextRetryCount = currentRetryCount + 1;
-      var nextAttemptAt = CalculateNextAttemptAt(nextRetryCount, services.GetUtcDateTime(), outboxOptions);
-      var status = GetOutboxMessageStatus(nextRetryCount, outboxOptions.MaxRetryAttempts);
+    var nextRetryCount = CalculateNextRetryCount(message.RetryCount);
+    var nextAttemptAt = CalculateNextAttemptAt(nextRetryCount, services.GetUtcDateTime(), options);
+    var nextStatus = CalculateOutboxMessageNextStatus(nextRetryCount, options);
+    var lastError = message.LastError;
+    var @params = new SchedulingUpdate(nextRetryCount, nextAttemptAt, nextStatus, lastError);
 
-      await services.UpdateOutboxMessageAsync(message, message =>
-        SetOutboxMessageStatus(message, status).
-        SetOutboxMessageLastError(error).
-        SetOutboxMessageNextAttemptAt(nextAttemptAt).
-        SetOutboxMessageRetryCount(nextRetryCount),
-        ct);
+    await services.UpdateOutboxMessageAsync(message, @params, ct);
 
-      return status == OutboxMessageStatus.Processing?
-        (data, SchedulingRetry, null):
-        (data, SchedulingExhausted, null);
-    }
-    catch (OperationCanceledException) { return default; }
-    catch (Exception exception) {
-      return (data, SchedulingError, exception);
-    }
+    return nextStatus == OutboxMessageStatus.Processing?
+      (data, SchedulingNotExhausted, null):
+      (data, SchedulingExhausted, null);
   }
+
+  static (TData, string, Exception?) ScheduleOutboxMessageError<TData, TKey, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : ISchedulingData<TKey, TPayload> =>
+    (data, SchedulingError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> ScheduleOutboxMessageAsync<TServices, TData, TKey, TPayload>(
+    TServices services,
+    TData data,
+    CancellationToken ct = default)
+  where TServices : ISchedulingServices<TKey, TPayload>
+  where TData : ISchedulingData<TKey, TPayload> =>
+    TryCatch(
+      services,
+      data,
+      ScheduleOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload>,
+      ScheduleOutboxMessageError<TData, TKey, TPayload>,
+      ct);
 }

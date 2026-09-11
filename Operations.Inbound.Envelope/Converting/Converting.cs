@@ -3,30 +3,37 @@ namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  internal static ValueTask<(TData, string, Exception?)> ConvertEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
-      TServices services,
-      TData data,
-      CancellationToken ct = default)
-      where TServices : IConvertingServices<TKey, TValue, TMetadata, TConfirmation>
-      where TData : IConvertingData<TKey, TValue, TMetadata, TConfirmation>
+  static (TData, string, Exception?) ConvertEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TServices services,
+    TData data)
+  where TServices : IConvertingServices<TKey, TValue, TMetadata, TConfirmation>
+  where TData : IConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
   {
-    try
-    {
-      var envelope = RequireEnvelope(data.Envelope);
-      var pipelineError = data.PipelineError ?? "Unknown converting envelope error";
+    var envelope = RequireEnvelope(data.Envelope);
+    var failureReason = RequireFailureReason(data);
 
-      var queue = services.GetDeadLetterQueueName(envelope);
-      var deadLetterEnvelope = services.FromEnvelope(envelope, queue, pipelineError, services.GetUtcDateTime());
+    var deadLetter = services.FromEnvelope(envelope, failureReason, services.GetUtcDateTime());
+    SetDeadLetterEnvelope(data, deadLetter);
 
-      if (deadLetterEnvelope is null)
-        return new ((data, ConvertingInvalid, CreateValidationException($"Envelope {envelope.Key} converted to null dead letter envelope.")));
-
-      data.DeadLetterEnvelope = deadLetterEnvelope;
-      return new ((data, ConvertingSuccess, null));
-    }
-    catch (Exception exception)
-    {
-      return new ((data, ConvertingError, exception));
-    }
+    return (data, ConvertingSuccess, null);
   }
+
+  static (TData, string, Exception?) ConvertEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : IConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+    (data, ConvertingError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> ConvertEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TServices services,
+    TData data,
+    CancellationToken ct = default)
+  where TServices : IConvertingServices<TKey, TValue, TMetadata, TConfirmation>
+  where TData : IConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+    TryCatch(
+      services,
+      data,
+      ConvertEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
+      ConvertEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>
+    );
 }

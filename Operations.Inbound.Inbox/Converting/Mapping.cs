@@ -4,20 +4,20 @@ namespace Operations.Inbound.Inbox;
 partial class InboxFuncs
 {
   internal static DeadLetterMessage<TKey, TPayload> FromInboxMessage<TKey, TPayload>(
-    InboxMessage<TKey, TPayload> inboxMessage,
-    string failureReason,
+    IInboxMessage<TKey, TPayload> message,
     DateTime createdAt) =>
     new (){
-      MessageId = inboxMessage.MessageId,
-      MessageKey = inboxMessage.MessageKey,
-      Payload = inboxMessage.Payload,
+      MessageId = message.MessageId,
+      MessageKey = message.MessageKey,
+      TransportMessageId = message.TransportMessageId,
+      Payload = message.Payload,
       Status = DeadLetterMessageStatus.Processing,
-      OriginatedAt = inboxMessage.CreatedAt,
+      OriginatedAt = message.CreatedAt,
       CreatedAt = createdAt,
-      Type = inboxMessage.Type,
-      Version = inboxMessage.Version,
-      Metadata = inboxMessage.Metadata,
-      CorrelationId = inboxMessage.CorrelationId,
-      FailureReason = TruncateDeadLetterMessageFailureReason(failureReason)
+      Type = message.Type,
+      Version = message.Version,
+      Metadata = message.Metadata,
+      CorrelationId = message.CorrelationId,
+      FailureReason = TruncateDeadLetterMessageFailureReason(message.FailureReason ?? "Unknow failure reason")
     };
 }

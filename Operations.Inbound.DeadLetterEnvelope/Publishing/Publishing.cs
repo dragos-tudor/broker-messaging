@@ -3,26 +3,36 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  internal static async ValueTask<(TData, string, Exception?)> PublishDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  static async ValueTask<(TData, string, Exception?)> PublishDeadLetterEnvelopeSuccessAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
   where TServices : IPublishingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
   where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
   {
-    try
-    {
-      var deadLetterEnvelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
+    var envelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
 
-      await services.PublishDeadLetterEnvelopeAsync(deadLetterEnvelope, ct);
-
-      return (data, PublishingSuccess, null);
-    }
-    catch (OperationCanceledException) { return default; }
-    catch (Exception exception)
-    {
-      data.PipelineError = exception.Message;
-      return (data, PublishingError, exception);
-    }
+    await services.PublishDeadLetterEnvelopeAsync(envelope, ct);
+    return (data, PublishingSuccess, null);
   }
+
+  static (TData, string, Exception?) PublishDeadLetterEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+      (data, PublishingError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> PublishDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TServices services,
+    TData data,
+    CancellationToken ct = default)
+  where TServices : IPublishingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
+  where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+    TryCatch(
+      services,
+      data,
+      PublishDeadLetterEnvelopeSuccessAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
+      PublishDeadLetterEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
+      ct
+    );
 }

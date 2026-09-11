@@ -3,33 +3,40 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  internal static async ValueTask<(TData, string, Exception?)> HandleInboxMessageAsync<TServices, TData, TKey, TPayload>(
+  internal static async ValueTask<(TData, string, Exception?)> HandleInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
   where TServices : IHandlingServices<TKey, TPayload>
   where TData : IHandlingData<TKey, TPayload>
   {
-    try
-    {
-      var message = RequireInboxMessage(data.InboxMessage);
-      var options = services.GetInboxMessageOptions();
+    var message = RequireInboxMessage(data.InboxMessage);
 
-      var (model, domainError) = await services.HandleInboxMessageAsync(message, ct);
-      if (domainError is not null)
-      {
-        data.PipelineError = domainError;
-        return (data, HandlingDomainError, CreateDomainException(domainError));
-      }
+    var (model, error) = await services.HandleInboxMessageAsync(message, ct);
+    if (error is not null)
+      return (data, HandlingDomainError, CreateDomainException(error));
 
-      data.Model = model;
-      return (data, HandlingSuccess, null);
-    }
-    catch (OperationCanceledException) { return default; }
-    catch (Exception exception)
-    {
-      data.PipelineError = exception.Message;
-      return (data, HandlingError, exception);
-    }
+    SetDomainModel(data, model!);
+    return (data, HandlingSuccess, null);
   }
+
+  static (TData, string, Exception?) HandleInboxMessageError<TData, TKey, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : IHandlingData<TKey, TPayload> =>
+    (data, HandlingError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> HandleInboxMessageAsync<TServices, TData, TKey, TPayload>(
+    TServices services,
+    TData data,
+    CancellationToken ct = default)
+  where TServices : IHandlingServices<TKey, TPayload>
+  where TData : IHandlingData<TKey, TPayload> =>
+    TryCatch(
+      services,
+      data,
+      HandleInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>,
+      HandleInboxMessageError<TData, TKey, TPayload>,
+      ct
+    );
 }

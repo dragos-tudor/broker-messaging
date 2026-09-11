@@ -6,6 +6,7 @@ global using System.Threading;
 global using System.Threading.Tasks;
 global using Persistence.OutboxMessage;
 global using Transport.Envelope;
+global using static Foundation.Extensions.ExtensionsFuncs;
 global using static Persistence.OutboxMessage.OutboxMessageFuncs;
 global using static Operations.Outbound.Outbox.OutboxFuncs;
 global using static Operations.Outbound.Outbox.OutboxStates;

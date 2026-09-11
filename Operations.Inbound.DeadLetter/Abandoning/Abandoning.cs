@@ -3,29 +3,41 @@ namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  internal static async ValueTask<(TData, string, Exception?)> AbandonDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
+  static async ValueTask<(TData, string, Exception?)> AbandonDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct)
   where TServices : IAbandoningServices<TKey, TPayload>
   where TData : IAbandoningData<TKey, TPayload>
   {
-    try
-    {
-      var message = RequireDeadLetterMessage(data.DeadLetterMessage);
-      var error = data.PipelineError ?? "Unknown abandoning dead letter message error";
+    var message = RequireDeadLetterMessage(data.DeadLetterMessage);
+    var lastError = message.LastError;
+    var status = DeadLetterMessageStatus.Abandoned;
+    var @params = new AbandoningUpdate(status, lastError, null);
 
-      await services.UpdateDeadLetterMessageAsync(message, message =>
-          SetDeadLetterMessageStatus(message, DeadLetterMessageStatus.Abandoned)
-              .SetDeadLetterMessageLastError(error),
-          ct);
+    await services.UpdateDeadLetterMessageAsync(message, @params, ct);
 
-      return (data, AbandoningSuccess, null);
-    }
-    catch (OperationCanceledException) { return default; }
-    catch (Exception exception)
-    {
-      return (data, AbandoningError, exception);
-    }
+    return (data, AbandoningSuccess, null);
   }
+
+  static (TData, string, Exception?) AbandonDeadLetterMessageError<TData, TKey, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : IAbandoningData<TKey, TPayload> =>
+    (data, AbandoningError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> AbandonDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
+    TServices services,
+    TData data,
+    CancellationToken ct)
+  where TServices : IAbandoningServices<TKey, TPayload>
+  where TData : IAbandoningData<TKey, TPayload> =>
+    TryCatch(
+      services,
+      data,
+      AbandonDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>,
+      AbandonDeadLetterMessageError<TData, TKey, TPayload>,
+      ct
+    );
+
 }

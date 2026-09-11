@@ -3,45 +3,44 @@ namespace Operations.Outbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  internal static ValueTask<(TData, string, Exception?)> ProduceEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    TServices service,
-    TData data,
-    CancellationToken ct = default)
+  static (TData, string, Exception?) ProduceEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TServices services,
+    TData data)
   where TServices : IProducingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
   where TData : IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
   {
-    try
-    {
-      var envelope = RequireEnvelope(data.Envelope);
-      var outboxMessage = RequireOutboxMessage(data.OutboxMessage);
+    var envelope = RequireEnvelope(data.Envelope);
+    var message = RequireOutboxMessage(data.OutboxMessage);
+    var result = CreateProduceResult(message.MessageId);
 
-      service.ProduceEnvelope(envelope,
-          (ct) => ProduceEnvelopeCallbackAsync(outboxMessage, service, ct));
+    var isEnqueued = services.ProduceEnvelope(envelope,
+      (isAcknowledged, exception) => {
+        SetProduceResultIsAcknowledged(result, isAcknowledged);
+        SetProduceResultException(result, exception);
+        services.DispatchProduceResult(result);
+      });
 
-      return new((data, Producing, null));
-    }
-    catch (Exception exception)
-    {
-      data.PipelineError = exception.Message;
-      return new((data, ProducingError, exception));
-    }
+    return isEnqueued
+      ? (data, ProducingEnqueue, null)
+      : (data, ProducingNotEnqueue, null);
   }
 
-  // Published status same like publishing envelope.
-  static async ValueTask ProduceEnvelopeCallbackAsync<TKey, TPayload>(
-    OutboxMessage<TKey, TPayload> outboxMessage,
-    IProducingCallbackServices<TKey, TPayload> service,
+  static (TData, string, Exception?) ProduceEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+    (data, ProducingError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> ProduceEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TServices services,
+    TData data,
     CancellationToken ct = default)
-  {
-    try
-    {
-      await service.UpdateOutboxMessageAsync(outboxMessage, message =>
-        SetOutboxMessageStatus(message, OutboxMessageStatus.Published),
-        ct);
-    }
-    catch (Exception exception)
-    {
-      service.InstrumentException(exception);
-    }
-  }
+  where TServices : IProducingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
+  where TData : IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+    TryCatch(
+      services,
+      data,
+      ProduceEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
+      ProduceEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>
+    );
 }

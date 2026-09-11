@@ -1,33 +1,40 @@
-using static Operations.Outbound.Outbox.OutboxStates;
 
 namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  internal static ValueTask<(TData, string, Exception?)> MapOutboxMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  static ValueTask<(TData, string, Exception?)> MapOutboxMessageSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
   where TServices : IMappingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
   where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
   {
-    try {
-      var outboxMessage = RequireOutboxMessage(data.OutboxMessage);
+    var outboxMessage = RequireOutboxMessage(data.OutboxMessage);
 
-      var value = services.FromOutboxMessagePayload(outboxMessage.Payload);
-      if (value is null) {
-        data.PipelineError = $"Outbox message {outboxMessage.MessageId} mapped to null value";
-        return new ((data, MappingPayloadError, CreateValidationException(data.PipelineError)));
-      }
+    var envelope = services.FromOutboxMessage(outboxMessage, outboxMessage.CreatedAt);
+    SetEnvelope(data, envelope);
 
-      var envelope = services.FromOutboxMessage(outboxMessage, value, outboxMessage.CreatedAt);
-      data.Envelope = envelope;
-
-      return new ((data, MappingSuccess, null));
-    }
-    catch (Exception exception) {
-      data.PipelineError = exception.Message;
-      return new ((data, MappingError, exception));
-    }
+    return new ((data, MappingSuccess, null));
   }
+
+  static (TData, string, Exception?) MapOutboxMessageError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+    (data, MappingError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> MapOutboxMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TServices services,
+    TData data,
+    CancellationToken ct = default)
+  where TServices : IMappingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
+  where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+    TryCatch(
+      services,
+      data,
+      MapOutboxMessageSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
+      MapOutboxMessageError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
+      ct
+    );
 }

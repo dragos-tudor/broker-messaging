@@ -3,27 +3,40 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  internal static async ValueTask<(TData, string, Exception?)> AbandonInboxMessageAsync<TServices, TData, TKey, TPayload>(
+  static async ValueTask<(TData, string, Exception?)> AbandonInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
   where TServices : IAbandoningServices<TKey, TPayload>
   where TData : IAbandoningData<TKey, TPayload>
   {
-    try {
-      var message = RequireInboxMessage(data.InboxMessage);
-      var error = data.PipelineError ?? "Unknown abandoning inbox message error.";
+    var message = RequireInboxMessage(data.InboxMessage);
+    var failureReason = message.FailureReason;
+    var lastError = message.LastError;
+    var @params = new AbandoningUpdate(InboxMessageStatus.Abandoned, lastError, failureReason);
 
-      await services.UpdateInboxMessageAsync(message, message =>
-        SetInboxMessageStatus(message, InboxMessageStatus.Abandoning).
-        SetInboxMessageLastError(error),
-        ct);
+    await services.UpdateInboxMessageAsync(message, @params, ct);
 
-      return (data, AbandoningSuccess, null);
-    }
-    catch (OperationCanceledException) { return default; }
-    catch (Exception exception) {
-      return (data, AbandoningError, exception);
-    }
+    return (data, AbandoningSuccess, null);
   }
+
+  static (TData, string, Exception?) AbandonInboxMessageError<TData, TKey, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : IAbandoningData<TKey, TPayload> =>
+    (data, AbandoningError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> AbandonInboxMessageAsync<TServices, TData, TKey, TPayload>(
+    TServices services,
+    TData data,
+    CancellationToken ct = default)
+  where TServices : IAbandoningServices<TKey, TPayload>
+  where TData : IAbandoningData<TKey, TPayload> =>
+    TryCatch(
+      services,
+      data,
+      AbandonInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>,
+      AbandonInboxMessageError<TData, TKey, TPayload>,
+      ct
+    );
 }

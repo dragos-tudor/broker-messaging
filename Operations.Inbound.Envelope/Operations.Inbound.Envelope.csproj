@@ -10,6 +10,7 @@
     <ProjectReference Include="../Persistence.InboxMessage/Persistence.InboxMessage.csproj" />
     <ProjectReference Include="../Transport.Envelope/Transport.Envelope.csproj" />
     <ProjectReference Include="../Transport.DeadLetterEnvelope/Transport.DeadLetterEnvelope.csproj" />
+    <ProjectReference Include="../Foundation.Extensions/Foundation.Extensions.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,26 +3,38 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  internal static async ValueTask<(TData, string, Exception?)> CloseInboxMessageAsync<TServices, TData, TKey, TPayload>(
+  internal static async ValueTask<(TData, string, Exception?)> CloseInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
   where TServices : IClosingServices<TKey, TPayload>
   where TData : IClosingData<TKey, TPayload>
   {
-    try {
-      var message = RequireInboxMessage(data.InboxMessage);
-      var error = data.PipelineError ?? "Unknown closing inbox message error.";
+    var message = RequireInboxMessage(data.InboxMessage);
+    var @params = new ClosingUpdate(InboxMessageStatus.Closed);
 
-      await services.UpdateInboxMessageAsync(message, message =>
-        SetInboxMessageStatus(message, InboxMessageStatus.Closed),
-        ct);
+    await services.UpdateInboxMessageAsync(message, @params, ct);
 
-      return (data, ClosingSuccess, null);
-    }
-    catch (OperationCanceledException) { return default; }
-    catch (Exception exception) {
-      return (data, ClosingError, exception);
-    }
+    return (data, ClosingSuccess, null);
   }
+
+  static (TData, string, Exception?) CloseInboxMessageError<TData, TKey, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : IClosingData<TKey, TPayload> =>
+    (data, ClosingError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> CloseInboxMessageAsync<TServices, TData, TKey, TPayload>(
+    TServices services,
+    TData data,
+    CancellationToken ct = default)
+  where TServices : IClosingServices<TKey, TPayload>
+  where TData : IClosingData<TKey, TPayload> =>
+    TryCatch(
+      services,
+      data,
+      CloseInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>,
+      CloseInboxMessageError<TData, TKey, TPayload>,
+      ct
+    );
 }

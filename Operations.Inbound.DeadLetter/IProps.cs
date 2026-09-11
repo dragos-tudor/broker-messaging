@@ -8,7 +8,5 @@ public interface IDeadLetterEnvelopeProp<TKey, TValue, TMetadata, TConfirmation>
 
 public interface IDeadLetterMessageProp<TKey, TPayload>
 {
-  DeadLetterMessage<TKey, TPayload>? DeadLetterMessage { get; set; }
+  IDeadLetterMessage<TKey, TPayload>? DeadLetterMessage { get; set; }
 }
-
-public interface IPipelineErrorProp { string? PipelineError { get; set; } }

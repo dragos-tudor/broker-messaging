@@ -1,32 +1,42 @@
-using static Operations.Outbound.Outbox.OutboxStates;
 
 namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  internal static async ValueTask<(TData, string, Exception?)> AbandonOutboxMessageAsync<TServices, TData, TKey, TPayload>(
+  static async ValueTask<(TData, string, Exception?)> AbandonOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
   where TServices : IAbandoningServices<TKey, TPayload>
   where TData : IAbandoningData<TKey, TPayload>
   {
-    try
-    {
-      var message = RequireOutboxMessage(data.OutboxMessage);
-      var error = data.PipelineError ?? "Unknown abandoning outbox message error";
+    var message = RequireOutboxMessage(data.OutboxMessage);
+    var lastError = message.LastError;
+    var status = OutboxMessageStatus.Abandoned;
+    var @params = new AbandoningUpdate(status, lastError, null);
 
-      await services.UpdateOutboxMessageAsync(message, message =>
-        SetOutboxMessageStatus(message, OutboxMessageStatus.Abandoned).
-        SetOutboxMessageLastError(error),
-        ct);
+    await services.UpdateOutboxMessageAsync(message, @params, ct);
 
-      return (data, AbandoningSuccess, null);
-    }
-    catch (OperationCanceledException) { return default; }
-    catch (Exception exception)
-    {
-      return (data, AbandoningError, exception);
-    }
+    return (data, AbandoningSuccess, null);
   }
+
+  static (TData, string, Exception?) AbandonOutboxMessageError<TServices, TData, TKey, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : IAbandoningData<TKey, TPayload> =>
+    (data, AbandoningError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> AbandonOutboxMessageAsync<TServices, TData, TKey, TPayload>(
+    TServices services,
+    TData data,
+    CancellationToken ct = default)
+  where TServices : IAbandoningServices<TKey, TPayload>
+  where TData : IAbandoningData<TKey, TPayload> =>
+    TryCatch(
+      services,
+      data,
+      AbandonOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload>,
+      AbandonOutboxMessageError<TServices, TData, TKey, TPayload>,
+      ct
+    );
 }

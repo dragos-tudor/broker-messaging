@@ -10,6 +10,7 @@ global using static Persistence.InboxMessage.InboxMessageFuncs;
 global using static Operations.Inbound.Envelope.EnvelopeFuncs;
 global using static Operations.Inbound.Envelope.EnvelopeStates;
 global using static Transport.Envelope.EnvelopeFuncs;
+global using static Foundation.Extensions.ExtensionsFuncs;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Pipelines.Inbound")]

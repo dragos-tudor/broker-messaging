@@ -3,26 +3,36 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  internal static ValueTask<(TData, string, Exception?)> ConvertInboxMessage<TServices, TData, TKey, TPayload>(
-      TServices services,
-      TData data,
-      CancellationToken ct = default)
-      where TServices : IConvertingServices
-      where TData : IConvertingData<TKey, TPayload>
+  internal static (TData, string, Exception?) ConvertInboxMessageSuccess<TServices, TData, TKey, TPayload>(
+    TServices services,
+    TData data)
+  where TServices : IConvertingServices
+  where TData : IConvertingData<TKey, TPayload>
   {
-    try
-    {
-      var inboxMessage = RequireInboxMessage(data.InboxMessage);
-      var error = inboxMessage.LastError ?? "Unknown converting inbox message error.";
+    var message = RequireInboxMessage(data.InboxMessage);
 
-      var deadLetterMessage = FromInboxMessage(inboxMessage, error, services.GetUtcDateTime());
-      data.DeadLetterMessage = deadLetterMessage;
+    var deadLetter = FromInboxMessage(message, services.GetUtcDateTime());
+    SetDeadLetterMessage(data, deadLetter);
 
-      return new((data, ConvertingSuccess, null));
-    }
-    catch (Exception exception)
-    {
-      return new((data, ConvertingError, exception));
-    }
+    return (data, ConvertingSuccess, null);
   }
+
+  static (TData, string, Exception?) ConvertInboxMessageError<TData, TKey, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : IConvertingData<TKey, TPayload> =>
+    (data, ConvertingError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> ConvertInboxMessage<TServices, TData, TKey, TPayload>(
+    TServices services,
+    TData data,
+    CancellationToken ct = default)
+  where TServices : IConvertingServices
+  where TData : IConvertingData<TKey, TPayload> =>
+    TryCatch(
+      services,
+      data,
+      ConvertInboxMessageSuccess<TServices, TData, TKey, TPayload>,
+      ConvertInboxMessageError<TData, TKey, TPayload>
+    );
 }

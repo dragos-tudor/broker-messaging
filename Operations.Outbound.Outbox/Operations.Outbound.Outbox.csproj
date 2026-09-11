@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="../Persistence.OutboxMessage/Persistence.OutboxMessage.csproj" />
     <ProjectReference Include="../Transport.Envelope/Transport.Envelope.csproj" />
+    <ProjectReference Include="../Foundation.Extensions/Foundation.Extensions.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,44 +3,44 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  internal static ValueTask<(TData, string, Exception?)> ProduceDeadLetterEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    TServices service,
-    TData data,
-    CancellationToken ct = default)
+  internal static (TData, string, Exception?) ProduceDeadLetterEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TServices services,
+    TData data)
   where TServices : IProducingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
   where TData : IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
   {
-    try
-    {
-      var deadLetterEnvelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
-      var deadLetterMessage = RequireDeadLetterMessage(data.DeadLetterMessage);
+    var envelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
+    var message = RequireDeadLetterMessage(data.DeadLetterMessage);
+    var result = CreateProduceResult(message.MessageId);
 
-      service.ProduceDeadLetterEnvelope(deadLetterEnvelope,
-          (ct) => ProduceDeadLetterEnvelopeCallbackAsync(deadLetterMessage, service, ct));
+    var isEnqueued = services.ProduceDeadLetterEnvelope(envelope,
+      (isAcknowledged, exception) => {
+        SetProduceResultIsAcknowledged(result, isAcknowledged);
+        SetProduceResultException(result, exception);
+        services.DispatchProduceResult(result);
+      });
 
-      return new((data, Producing, null));
-    }
-    catch (Exception exception)
-    {
-      data.PipelineError = exception.Message;
-      return new((data, ProducingError, exception));
-    }
+    return isEnqueued?
+      (data, ProducingEnqueue, null):
+      (data, ProducingNotEnqueue, null);
   }
 
-  static async ValueTask ProduceDeadLetterEnvelopeCallbackAsync<TKey, TPayload>(
-    DeadLetterMessage<TKey, TPayload> deadLetterMessage,
-    IProducingCallbackServices<TKey, TPayload> service,
+  static (TData, string, Exception?) ProduceDeadLetterEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+    (data, ProducingError, exception);
+
+  internal static ValueTask<(TData, string, Exception?)> ProduceDeadLetterEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TServices services,
+    TData data,
     CancellationToken ct = default)
-  {
-    try
-    {
-      await service.UpdateDeadLetterMessageAsync(deadLetterMessage, message =>
-        SetDeadLetterMessageStatus(message, DeadLetterMessageStatus.Published),
-        ct);
-    }
-    catch (Exception exception)
-    {
-      service.InstrumentException(exception);
-    }
-  }
+  where TServices : IProducingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
+  where TData : IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+    TryCatch(
+      services,
+      data,
+      ProduceDeadLetterEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
+      ProduceDeadLetterEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>
+    );
 }

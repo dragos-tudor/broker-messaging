@@ -1,33 +1,42 @@
+using Funcs = Persistence.InboxMessage.InboxMessageFuncs;
 
 namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  internal static async ValueTask<(TData, string, Exception?)> InsertInboxMessageAsync<TServices, TData, TKey, TPayload>(
+  static async ValueTask<(TData, string, Exception?)> InsertInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
   where TServices : IInsertingServices<TKey, TPayload>
   where TData : IInsertingData<TKey, TPayload>
   {
-    try {
-      var message = RequireInboxMessage(data.InboxMessage);
-      SetInboxMessageProcessingStatus(message);
-
-      var messageInserted = await services.InsertInboxMessageAsync(message, ct);
-      if (messageInserted is false)
-      {
-        data.InboxMessage = default;
-        return (data, Idempotent, null);
-      }
-
-      return (data, InsertingSuccess, null);
-    }
-    catch (OperationCanceledException) { return default; }
-    catch (Exception exception) {
-      data.PipelineError = exception.Message;
-      SetInboxMessageInitialStatus(data.InboxMessage);
-      return (data, InsertingError, exception);
-    }
+    var message = RequireInboxMessage(data.InboxMessage);
+    return await services.InsertInboxMessageAsync(message, ct)?
+      (data, InsertingSuccess, null):
+      (data, InsertingIdempotent, null);
   }
+
+  static (TData, string, Exception?) InsertInboxMessageError<TServices, TData, TKey, TPayload>(
+    TData data,
+    Exception exception)
+  where TData : IInsertingData<TKey, TPayload>
+  {
+    Funcs.SetInboxMessageLastError(data.InboxMessage!, exception.Message);
+    return (data, InsertingError, exception);
+  }
+
+  internal static ValueTask<(TData, string, Exception?)> InsertInboxMessageAsync<TServices, TData, TKey, TPayload>(
+    TServices services,
+    TData data,
+    CancellationToken ct = default)
+  where TServices : IInsertingServices<TKey, TPayload>
+  where TData : IInsertingData<TKey, TPayload> =>
+    TryCatch(
+      services,
+      data,
+      InsertInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>,
+      InsertInboxMessageError<TServices, TData, TKey, TPayload>,
+      ct
+    );
 }
