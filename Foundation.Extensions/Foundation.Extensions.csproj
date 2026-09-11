@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Foundation extensions project.</Description>
+  </PropertyGroup>
+
+</Project>
