@@ -2,9 +2,9 @@
 namespace Transport.DeadLetterEnvelope;
 
 public interface IDeadLetterEnvelopeProducerService<TKey, TValue, TMetadata, TConfirmation> {
-  void ProduceDeadLetterEnvelope(
+  bool ProduceDeadLetterEnvelope(
     IDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation> envelope,
-    Func<CancellationToken, ValueTask> callback);
+    Action<bool, Exception?> dispatcher);
 }
 
 public interface IDeadLetterEnvelopePublisherService<TKey, TValue, TMetadata, TConfirmation> {

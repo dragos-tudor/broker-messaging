@@ -8,9 +8,9 @@ public interface IEnvelopeConfirmationService<TKey, TValue, TMetadata, TConfirma
 }
 
 public interface IEnvelopeProducerService<TKey, TValue, TMetadata, TConfirmation> {
-  void ProduceEnvelope(
+  bool ProduceEnvelope(
     IEnvelope<TKey, TValue, TMetadata, TConfirmation> envelope,
-    Func<CancellationToken, ValueTask> callback);
+    Action<bool, Exception?> dispatcher);
 }
 
 public interface IEnvelopePublisherService<TKey, TValue, TMetadata, TConfirmation> {
@@ -21,12 +21,6 @@ public interface IEnvelopePublisherService<TKey, TValue, TMetadata, TConfirmatio
 
 public interface IEnvelopeReaderService<TKey, TValue, TMetadata, TConfirmation> {
   ValueTask<IEnvelope<TKey, TValue, TMetadata, TConfirmation>> ReadEnvelope(CancellationToken ct = default);
-}
-
-public interface IEnvelopeQueueReaderService<TKey, TValue, TMetadata, TConfirmation> {
-  string GetDeadLetterQueueName(
-    IEnvelope<TKey, TValue, TMetadata, TConfirmation> envelope
-  );
 }
 
 public interface IEnvelopeValueMapperService<TValue, TPayload> {
