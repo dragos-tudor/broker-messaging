@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="../Directory.Testing.props" />
+
   <PropertyGroup>
-    <Description>Outbound pipelines project.</Description>
+    <Description>Pipelines outbound project.</Description>
   </PropertyGroup>
 
   <ItemGroup>
