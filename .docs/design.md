@@ -14,7 +14,8 @@
   - dead letter envelope wrapper.
 - pipelines show exactly the natural flow of information [excepting retry plan].
 - envelopes stay at the pipeline edges:
-  - for inbound pipeline at the boundary with the broker consumer.
+  - for inbound pipeline at the start boundary with the broker consumer for envelopes.
+  - for inbound pipeline at the end boundary with the broker producer for dead letter envelopes.
   - for outbound pipeline at the boundary with the broker producer.
 
 ### Transport `Envelope`:
@@ -29,8 +30,8 @@
 - `Type` field contains envelope value type extracted from Metadata meaning the domain message type.
   - used by developers implemented handlers to distinguish how to deserialize inbox message `Payload`.
 - the mappings between:
-  - envelope `Value` → inbox message `Payload` should be implemented by developers.
-  - outbox message `Payload` → envelope `Value` should also be implemented by developers.
+  - envelope `TValue` → inbox message `TPayload` should be implemented by developers.
+  - outbox message `TPayload` → envelope `TValue` should be implemented by developers.
 - envelopes are transient transport structures and are never persisted directly by the core pipeline.
 
 ### Transport `DeadLetterEnvelope`
@@ -48,7 +49,6 @@
 ## Persistence
 - persistent structures are classes.
 - inbound pipelines process inbox messages and dead letter messages.
-- inbound pipelines use retry plans.
 - outbound pipelines process outbox messages.
 
 ### Persistence `InboxMessage`
@@ -57,9 +57,7 @@
   - `TKey` the inbox message type mapped from envelope `TKey`.
   - `TPayload` the inbox message payload type [usually `byte[]` or JSON `string`].
 - `Metadata` field should keep the JSON serialized envelope `Metadata`.
-- inbox message statuses are: Initial, Processing, Handled, Abandoning, Closed.
-  - before persistence inbox message status = Initial [in-memory status].
-  - after persistence inbox message status = Processing.
+- inbox message statuses are: Processing [default], Handled, DeadLettering, Abandoned, Closed.
 - inbox message fields have constraints used for validation before persistence.
 - fields constraints are enforced in parallel by:
  - dedicated validation functions.
@@ -83,17 +81,6 @@
  - dedicated validation functions.
  - data annotations.
 
-### Persistence `RetryPlan`
-- retry plan is a durable recovery mechanism.
-- retry plan mechanism is used for 2 structures:
-  - non-persisted inbox messages.
-  - dead letter envelope [non-persisted by design].
-- retry plans mechanis is used ONLY and AFTER for operations failures:
-  - first check the current retry plan for current structure.
-  - when not exhausted pipeline route to register new retry plan.
-- retry plans mechanism avoid poison messages limiting failed operation retries per entity.
-- retry plan is not a message.
-
 ## Operations
 - transport operations process transient transport structures and return explicit operation states.
 - persistence operations process durable structures and return explicit operation states.
@@ -111,89 +98,96 @@
 - execution types:
   - `side-effects` operations [async].
   - `pure`, `side-effects-free` operations [sync].
-- use try/catch blocks consistently [even for `sync` operations];
+- use try/catch blocks wrappers consistently [even for `sync` operations];
 - all operations have the same signature:
   - input data + services + cancellation token as parameters.
   - (output data, state, exception?) as return type.
+- operations.* projects are organized by message type and direction.
+- the repository is the source of truth for exact operation outcome states.
 
-### Inbound operations
-- **envelope**:
-  - capture and validate the broker message into broker-agnostic envelope.
-  - map envelope to an inbox message.
-  - confirm the envelope to broker [using `Confirmation`].
-  - convert invalid envelopes to dead-letter envelopes.
-  - invalid envelopes are:
-    - unrecoverable.
-    - confirmable [`Confirmation` exists].
+### Operations.Inbound.Envelope
 
-- **inbox**:
-  - validate, insert, handle, transact, schedule retries, abandon, close inbox messages.
-  - insertion could be idempotent [ensuring deduplication for at-least-once consuming strategy].
-  - inbox messages retries statuses:
-    - non-exhausted -> `Processing`.
-    - exhausted -> `Abandoning`.
-  - inbox messages statuses:
-    - `Processing`: for inserting and non-exhausted scheduling.
-    - `Abandoning`: for handling domain error and exhausted scheduling.
-    - `Closed`: for transacting success.
-  - convert invalid inbox messages to dead-letter messages.
-  - check, register retry plans [non-persisted inbox message].
+* **Capturing** — obtains the next broker envelope.
+* **Verifying** — performs lightweight envelope verification before mapping.
+* **Mapping** — maps the inbound envelope into an `InboxMessage`.
+* **Converting** — converts an inbound envelope failure into a `DeadLetterEnvelope`.
+* **Confirming** — confirms the original broker envelope, including final confirmation when processing ends without entering Handling.
 
-- **dead letter**:
-  - insert, schedule retries, abandon, close dead letter messages.
-  - insertion could be idempotent [for `Abandoning` inbox messages].
-  - dead letter messages statuses:
-    - `Processing`: inserting and non-exhausted scheduling.
-    - `Published`: publishing/producing dead letter envelope success.
-    - `Abandoned`: exhausted scheduling.
+### Operations.Inbound.Inbox
 
-- **dead letter envelope**:
-  - redirect ephemeral dead-letter envelopes.
-  - publish persisted dead-letter envelopes.
-  - produce persisted dead-letter envelopes.
-  - produce callback success mark the related dead-letter message `Published`.
-  - produce callback failures are instrumented.
-  - check, register retry plans [dead letter envelopes = non-persistent structure].
+* **Validating** — validates `InboxMessage` data.
+* **Inserting** — persists the `InboxMessage`.
+* **Handling** — invokes developer-provided business handling.
+* **Transacting** — persists handling-side transactional changes.
+* **Scheduling** — persists retry scheduling information for later handling.
+* **DeadLettering** — hands the `InboxMessage` to dead-letter processing.
+* **Converting** — converts the `InboxMessage` into a `DeadLetterMessage`.
+* **Closing** — completes the original `InboxMessage` lifecycle.
+* **Abandoning** — marks the `InboxMessage` as abandoned when processing cannot continue.
 
-### Outbound operations
-- **outbox**:
-  - validate, transact, map, schedule, abandon, close .
-  - outbox messages statuses:
-    - `Processing`: transacting and non-exhausted scheduling.
-    - `Published`: publishing/producing [outbox] envelope success.
-    - `Abandoned`: exhausted scheduling.
+### Operations.Inbound.DeadLetter
 
-- **envelope**:
-  - publish, produce outbound envelopes.
-  - produce callback failures are instrumented.
+* **Mapping** — maps a persisted `DeadLetterMessage` into a `DeadLetterEnvelope`.
+* **Inserting** — persists a `DeadLetterMessage`.
+* **Scheduling** — persists retry scheduling information for later publishing.
+* **Closing** — completes the `DeadLetterMessage` lifecycle after successful publication.
+* **Abandoning** — marks the `DeadLetterMessage` as abandoned when publishing cannot continue.
 
-## Inbound Pipeline
-- inbound pipeline is composed from all 4 pipeline segments.
-- inbound happy path: capturing -> validating -> mapping -> inserting -> confirming -> handling -> transacting -> closing.
+### Operations.Inbound.DeadLetterEnvelope
+
+* **Redirecting** — publishes a `DeadLetterEnvelope` created from an inbound pre-persistence failure.
+* **Publishing** — publishes a `DeadLetterEnvelope` synchronously.
+* **Producing** — submits a `DeadLetterEnvelope` asynchronously and registers broker-result handling.
+* **Dispatching** — processes the asynchronous broker produce result.
+
+### Operations.Outbound.Outbox
+
+* **Validating** — validates `OutboxMessage` data.
+* **Transacting** — persists the `OutboxMessage` within the developer transaction.
+* **Mapping** — maps a persisted `OutboxMessage` into an outbound `Envelope`.
+* **Scheduling** — persists retry scheduling information for later publishing.
+* **Closing** — completes the `OutboxMessage` lifecycle after successful publication.
+* **Abandoning** — marks the `OutboxMessage` as abandoned when publishing cannot continue.
+
+### Operations.Outbound.Envelope
+
+* **Publishing** — publishes the outbound `Envelope` synchronously.
+* **Producing** — submits the outbound `Envelope` asynchronously and registers broker-result handling.
+* **Dispatching** — processes the asynchronous broker produce result.
+
+## Pipelines
+- operations produce outcomes; pipelines define semantic continuation from those outcomes.
 - operation actions = connection mechanism: connect last operation -> next operation.
 - one pipeline action could be:
   - prescriptive ["do this"].
-  - descriptive ["this happened"].
   - descriptive ["terminal"].
+- one pipeline = mapper between last operation state and next action.
 - each pipeline segment implement:
-  - define pipeline actions group.
-  - define specialized services and data interfaces.
-  - action -> operation = action mapper [`GetInboxPipelineOperation`].
-  - operation -> action = pipeline mapper [`GetInboxPipelineAction`].
-- all pipelines use shared `InboundPipelineData` operations service param.
-- all pipelines use shared `InboundPipelineServices` operations service param.
+  - pipeline actions group [eg. `CapturingActions`].
+  - specialized services and data interfaces [eg. `ICapturingServices`, `ICapturingData`].
+  - action -> operation = action mapper [eg. `GetCapturingOperation`].
+  - operation -> action = pipeline mapper [eg. `MapCapturingAction`].
+
+### Inbound Pipeline
+- inbound pipeline is composed from 6 pipeline segments:
+  - capturing.
+  - redirecting.
+  - handling.
+  - deadlettering.
+  - publishing.
+  - dispatching.
+- inbound happy path: capturing -> verifying -> mapping -> validating -> inserting -> confirming -> handling -> transacting.
 - inbound pipeline:
-  - define pipeline services interface composing all pipeline segments services interfaces.
-  - define pipeline data interface composing all pipeline segments data interfaces.
-  - action -> operation = combining segment action mappers [`GetInboundPipelineOperation`].
-  - action -> action = cross-pipelines mapper [`MapInboundPipeline`].
-  - operation -> action = combining segment pipeline mappers [`GetInboundPipelineAction`].
+  - define pipeline services interface composing all pipeline segments services interfaces [eg. `InboundPipelineServices`].
+  - define pipeline data interface composing all pipeline segments data interfaces [eg. `InboundPipelineData`].
 - `TerminalActions` signal pipelines terminal action.
+
+### Resiliency `RetryPlan`
+- retry plan is an in-memory recovery mechanism.
+- retry plan mechanism is used for non-persisted structures [scheduling for persisted structures].
+- retry plan mechanism is transparent for operations and is used at router level.
 
 ## Design Vocabulary
 - transport & persistence:
   - converting: transform structures from the same type group [eg. envelope -> dead letter envelope].
   - mapping: transform structures from different type groups [eg. envelope -> inbox message].
-- verbs:
- - operation names use -ing forms: Mapping, Inserting, Handling
- - completed actions/states use completed forms: Mapped, Scheduled, Confirmed, Closed.
