@@ -4,7 +4,7 @@ namespace Persistence.InboxMessage;
 public interface IInboxMessageHandlerService<TKey, TPayload>
 {
   Task<(object?, string?)> HandleInboxMessageAsync(
-    InboxMessage<TKey, TPayload> message,
+    IInboxMessage<TKey, TPayload> message,
     CancellationToken ct = default
   );
 }
@@ -12,7 +12,7 @@ public interface IInboxMessageHandlerService<TKey, TPayload>
 public interface IInboxMessageInsertService<TKey, TPayload>
 {
   Task<bool> InsertInboxMessageAsync(
-    InboxMessage<TKey, TPayload> message,
+    IInboxMessage<TKey, TPayload> message,
     CancellationToken ct = default
   );
 }
@@ -23,18 +23,22 @@ public interface IInboxMessageOptionsReaderService {
 
 public interface IInboxMessageUpdateService<TKey, TPayload>
 {
-  Task UpdateInboxMessageAsync<TMessage>(
+  Task UpdateInboxMessageAsync<TMessage, TParam>(
     TMessage message,
-    Func<TMessage, TMessage> update,
-    CancellationToken ct = default) where TMessage : InboxMessage<TKey, TPayload>;
+    TParam parameters,
+    CancellationToken ct = default)
+  where TMessage : IInboxMessage<TKey, TPayload>
+  where TParam : struct;
 }
 
 public interface IInboxMessageUpdateSessionService<TKey, TPayload, TSession>
   where TSession: IDisposable
 {
-  Task UpdateInboxMessageAsync<TMessage>(
+  Task UpdateInboxMessageAsync<TMessage, TParam>(
     TSession session,
     TMessage message,
-    Func<TMessage, TMessage> update,
-    CancellationToken ct = default) where TMessage : InboxMessage<TKey, TPayload>;
+    TParam parameters,
+    CancellationToken ct = default)
+    where TMessage : IInboxMessage<TKey, TPayload>
+    where TParam : struct;
 }

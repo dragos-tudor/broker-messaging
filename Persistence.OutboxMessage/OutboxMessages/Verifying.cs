@@ -3,7 +3,7 @@ namespace Persistence.OutboxMessage;
 
 partial class OutboxMessageFuncs
 {
-  internal static bool IsValidOutboxMessage<TKey, TPayload>(OutboxMessage<TKey, TPayload> message) =>
+  internal static bool IsValidOutboxMessage<TKey, TPayload>(IOutboxMessage<TKey, TPayload> message) =>
     IsValidOutboxMessageId(message.MessageId) &&
     IsValidOutboxMessageKey(message.MessageKey) &&
     IsValidOutboxMessagePayload(message.Payload) &&

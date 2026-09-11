@@ -4,9 +4,8 @@ namespace Persistence.OutboxMessage;
 
 partial class OutboxMessageFuncs
 {
-  internal static IEnumerable<string> ValidateOutboxMessage<TKey, TPayload>(OutboxMessage<TKey, TPayload> message)
+  internal static IEnumerable<string> GetValidationOutboxMessageErrors<TKey, TPayload>(IOutboxMessage<TKey, TPayload> message)
   {
-    if (IsValidOutboxMessage(message)) yield break;
     if (!IsValidOutboxMessageId(message.MessageId)) yield return "MessageId is empty.";
     if (!IsValidOutboxMessageKey(message.MessageKey)) yield return "MessageKey is null.";
     if (!IsValidOutboxMessagePayload(message.Payload)) yield return $"Payload exceeds max length of {PayloadMaxLength}.";
@@ -14,4 +13,9 @@ partial class OutboxMessageFuncs
     if (!IsValidOutboxMessageMetadata(message.Metadata)) yield return $"Metadata exceeds max length of {MetadataMaxLength} (was {message.Metadata?.Length}).";
     if (!IsValidOutboxMessageLastError(message.LastError)) yield return $"LastError exceeds max length of {LastErrorMaxLength} (was {message.LastError?.Length}).";
   }
+
+  internal static string? ValidateOutboxMessage<TKey, TPayload>(IOutboxMessage<TKey, TPayload> message) =>
+    IsValidOutboxMessage(message)?
+      default:
+      JoinValidationErrors(GetValidationOutboxMessageErrors(message));
 }

@@ -4,7 +4,7 @@ namespace Persistence.DeadLetterMessage;
 public interface IDeadLetterMessageInsertService<TKey, TPayload>
 {
   Task<bool> InsertDeadLetterMessageAsync(
-    DeadLetterMessage<TKey, TPayload> message,
+    IDeadLetterMessage<TKey, TPayload> message,
     CancellationToken ct = default);
 }
 
@@ -16,14 +16,12 @@ public interface IDeadLetterMessagePayloadMapperService<TKey, TValue, TMetadata,
   TValue FromDeadLetterMessagePayload(TPayload value);
 }
 
-public interface IDeadLetterMessageQueueReaderService<TKey, TPayload> {
-  string GetDeadLetterQueueName(DeadLetterMessage<TKey, TPayload> message);
-}
-
 public interface IDeadLetterMessageUpdateService<TKey, TPayload>
 {
-  Task UpdateDeadLetterMessageAsync<TMessage>(
+  Task UpdateDeadLetterMessageAsync<TMessage, TParams>(
     TMessage message,
-    Func<TMessage, TMessage> update,
-    CancellationToken ct = default) where TMessage : DeadLetterMessage<TKey, TPayload>;
+    TParams parameters,
+    CancellationToken ct = default)
+  where TMessage : IDeadLetterMessage<TKey, TPayload>
+  where TParams : struct;
 }

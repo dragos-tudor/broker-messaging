@@ -8,8 +8,8 @@ public static partial class OutboxMessageFuncs
     TKey messageKey,
     TPayload payload,
     DateTime createdAt,
+    string type,
     Guid? correlationId,
-    string? type,
     int? version,
     string? metadata) =>
     new()

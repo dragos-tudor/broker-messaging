@@ -5,12 +5,8 @@ public interface IOutboxMessageInsertSessionService<TKey, TPayload, TSession>
 {
   Task<bool> InsertOutboxMessageAsync(
     TSession session,
-    OutboxMessage<TKey, TPayload> message,
+    IOutboxMessage<TKey, TPayload> message,
     CancellationToken ct = default);
-}
-
-public interface IOutboxMessagePayloadMapperService<TPayload, TValue> {
-  TValue FromOutboxMessagePayload(TPayload payload);
 }
 
 public interface IOutboxMessageOptionsReaderService {
@@ -19,8 +15,10 @@ public interface IOutboxMessageOptionsReaderService {
 
 public interface IOutboxMessageUpdateService<TKey, TPayload>
 {
-  Task UpdateOutboxMessageAsync<TMessage>(
+  Task UpdateOutboxMessageAsync<TMessage, TParams>(
     TMessage message,
-    Func<TMessage, TMessage> update,
-    CancellationToken ct = default) where TMessage : OutboxMessage<TKey, TPayload>;
+    TParams parameters,
+    CancellationToken ct = default)
+  where TMessage : IOutboxMessage<TKey, TPayload>
+  where TParams : struct;
 }

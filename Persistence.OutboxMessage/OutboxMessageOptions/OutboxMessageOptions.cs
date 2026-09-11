@@ -3,8 +3,8 @@ namespace Persistence.OutboxMessage;
 
 public record OutboxMessageOptions
 {
-  public int MaxRetryAttempts { get; init; } = 5;
-  public TimeSpan RetryBaseDelay { get; init; } = TimeSpan.FromSeconds(1);
-  public double RetryBackoffFactor { get; init; } = 2d;
-  public TimeSpan MaxRetryDelay { get; init; } = TimeSpan.FromMinutes(1);
+  public int MaxRetryAttempts { get; init; }
+  public TimeSpan RetryBaseDelay { get; init; }
+  public double RetryBackoffFactor { get; init; }
+  public TimeSpan MaxRetryDelay { get; init; }
 }

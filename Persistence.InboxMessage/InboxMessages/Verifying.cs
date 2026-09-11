@@ -3,7 +3,7 @@ namespace Persistence.InboxMessage;
 
 partial class InboxMessageFuncs
 {
-  internal static bool IsValidInboxMessage<TKey, TPayload> (InboxMessage<TKey, TPayload> message) =>
+  internal static bool IsValidInboxMessage<TKey, TPayload> (IInboxMessage<TKey, TPayload> message) =>
     IsValidInboxMessageId(message.MessageId) &&
     IsValidInboxMessageKey(message.MessageKey) &&
     IsValidInboxMessagePayload(message.Payload) &&

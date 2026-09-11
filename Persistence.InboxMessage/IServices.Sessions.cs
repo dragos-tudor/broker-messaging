@@ -3,23 +3,29 @@ namespace Persistence.InboxMessage;
 
 public interface IInboxSessionServices<TSession>:
   IInboxSessionReaderService<TSession>,
-  IInboxSessionModelPersistService<TSession>,
+  IInboxSessionModelStoreService<TSession>,
   IInboxSessionTransactService<TSession>
   where TSession : IDisposable;
 
-public interface IInboxSessionModelPersistService<TSession> where TSession: IDisposable {
-  Task PersistInboxModelAsync<TModel>(TSession session, TModel model);
-}
-
-public interface IInboxSessionTransactService<TSession> where TSession: IDisposable {
-  Task TransactSessionAsync(
+public interface IInboxSessionModelStoreService<TSession> where TSession: IDisposable {
+  Task StoreDomainModelAsync<TModel>(
     TSession session,
-    Func<TSession, Task> func1,
-    Func<TSession, Task> func2,
-    CancellationToken ct = default
-  );
+    TModel model,
+    CancellationToken ct = default);
 }
 
 public interface IInboxSessionReaderService<TSession> where TSession : IDisposable {
   TSession GetSession();
+}
+
+public interface IInboxSessionTransactService<TSession> where TSession: IDisposable {
+  Task TransactSessionAsync<TServices, TParams>(
+    TServices services,
+    TSession session,
+    TParams parameters,
+    Func<TServices, TSession, TParams, CancellationToken, Task> func1,
+    Func<TServices, TSession, TParams, CancellationToken, Task> func2,
+    CancellationToken ct = default
+  ) where TServices : IInboxSessionServices<TSession>
+    where TParams : struct;
 }
