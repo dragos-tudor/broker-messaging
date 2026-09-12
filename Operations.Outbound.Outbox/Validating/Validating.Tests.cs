@@ -28,4 +28,18 @@ public partial class OutboxTests
     state.ShouldBe(ValidatingError);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
+
+  [TestMethod]
+  public async Task validate_outbox_message__message_is_invalid__returns_invalid_error()
+  {
+    var services = Substitute.For<IValidatingServices<string, string>>();
+    var message = new OutboxMessage<string, string> { MessageId = Guid.Empty, MessageKey = "key", Payload = "payload", Type = "type", CreatedAt = DateTime.UtcNow };
+    var inputData = new OutboxData { OutboxMessage = message };
+
+    var (data, state, exception) = await OutboxFuncs.ValidateOutboxMessage<IValidatingServices<string, string>, OutboxData, string, string>(services, inputData);
+
+    data.ShouldBeSameAs(inputData);
+    state.ShouldBe(ValidatingInvalidError);
+    exception.ShouldNotBeNull();
+  }
 }

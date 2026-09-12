@@ -30,4 +30,19 @@ public partial class DeadLetterTests
     state.ShouldBe(MappingError);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
+
+  [TestMethod]
+  public async Task map_dead_letter_message__mapper_throws__returns_error_with_exception()
+  {
+    var services = Substitute.For<IMappingServices<string, byte[], object, string, string>>();
+    var expectedException = new InvalidOperationException("mapping failed");
+    services.FromDeadLetterMessage(Arg.Any<IDeadLetterMessage<string, string>>(), Arg.Any<DateTime>()).Throws(expectedException);
+    var inputData = new DeadLetterData { DeadLetterMessage = Substitute.For<IDeadLetterMessage<string, string>>() };
+
+    var (data, state, exception) = await DeadLetterFuncs.MapDeadLetterMessage<IMappingServices<string, byte[], object, string, string>, DeadLetterData, string, byte[], object, string, string>(services, inputData);
+
+    data.ShouldBeSameAs(inputData);
+    state.ShouldBe(MappingError);
+    exception.ShouldBeSameAs(expectedException);
+  }
 }

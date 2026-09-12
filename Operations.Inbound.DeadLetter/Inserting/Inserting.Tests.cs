@@ -17,4 +17,19 @@ public partial class DeadLetterTests
     state.ShouldBe(expectedState);
     exception.ShouldBeNull();
   }
+
+  [TestMethod]
+  public async Task insert_dead_letter_message__persistence_throws__returns_error_with_exception()
+  {
+    var services = Substitute.For<IInsertingServices<string, string>>();
+    var expectedException = new InvalidOperationException("insert failed");
+    services.InsertDeadLetterMessageAsync(Arg.Any<IDeadLetterMessage<string, string>>(), Arg.Any<CancellationToken>()).ThrowsAsync(expectedException);
+    var inputData = new DeadLetterData { DeadLetterMessage = Substitute.For<IDeadLetterMessage<string, string>>() };
+
+    var (data, state, exception) = await DeadLetterFuncs.InsertDeadLetterMessageAsync<IInsertingServices<string, string>, DeadLetterData, string, string>(services, inputData);
+
+    data.ShouldBeSameAs(inputData);
+    state.ShouldBe(InsertingError);
+    exception.ShouldBeSameAs(expectedException);
+  }
 }

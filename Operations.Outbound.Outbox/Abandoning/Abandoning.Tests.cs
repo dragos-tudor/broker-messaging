@@ -15,4 +15,19 @@ public partial class OutboxTests
     state.ShouldBe(AbandoningSuccess);
     exception.ShouldBeNull();
   }
+
+  [TestMethod]
+  public async Task abandon_outbox_message__update_throws__returns_error_with_exception()
+  {
+    var services = Substitute.For<IAbandoningServices<string, string>>();
+    var expectedException = new InvalidOperationException("abandon failed");
+    services.UpdateOutboxMessageAsync(Arg.Any<IOutboxMessage<string, string>>(), Arg.Any<AbandoningUpdate>(), Arg.Any<CancellationToken>()).ThrowsAsync(expectedException);
+    var inputData = new OutboxData { OutboxMessage = Substitute.For<IOutboxMessage<string, string>>() };
+
+    var (data, state, exception) = await OutboxFuncs.AbandonOutboxMessageAsync<IAbandoningServices<string, string>, OutboxData, string, string>(services, inputData);
+
+    data.ShouldBeSameAs(inputData);
+    state.ShouldBe(AbandoningError);
+    exception.ShouldBeSameAs(expectedException);
+  }
 }

@@ -15,4 +15,19 @@ public partial class DeadLetterTests
     state.ShouldBe(AbandoningSuccess);
     exception.ShouldBeNull();
   }
+
+  [TestMethod]
+  public async Task abandon_dead_letter_message__update_throws__returns_error_with_exception()
+  {
+    var services = Substitute.For<IAbandoningServices<string, string>>();
+    var expectedException = new InvalidOperationException("abandon failed");
+    var inputData = new DeadLetterData { DeadLetterMessage = Substitute.For<IDeadLetterMessage<string, string>>() };
+    services.UpdateDeadLetterMessageAsync(Arg.Any<IDeadLetterMessage<string, string>>(), Arg.Any<AbandoningUpdate>(), Arg.Any<CancellationToken>()).ThrowsAsync(expectedException);
+
+    var (data, state, exception) = await DeadLetterFuncs.AbandonDeadLetterMessageAsync<IAbandoningServices<string, string>, DeadLetterData, string, string>(services, inputData, default);
+
+    data.ShouldBeSameAs(inputData);
+    state.ShouldBe(AbandoningError);
+    exception.ShouldBeSameAs(expectedException);
+  }
 }

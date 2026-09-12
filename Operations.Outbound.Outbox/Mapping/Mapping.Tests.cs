@@ -30,4 +30,19 @@ public partial class OutboxTests
     state.ShouldBe(MappingError);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
+
+  [TestMethod]
+  public async Task map_outbox_message__mapper_throws__returns_error_with_exception()
+  {
+    var services = Substitute.For<IMappingServices<string, byte[], object, string, string>>();
+    var expectedException = new InvalidOperationException("mapping failed");
+    services.FromOutboxMessage(Arg.Any<IOutboxMessage<string, string>>(), Arg.Any<DateTime>()).Throws(expectedException);
+    var inputData = new OutboxData { OutboxMessage = Substitute.For<IOutboxMessage<string, string>>() };
+
+    var (data, state, exception) = await OutboxFuncs.MapOutboxMessage<IMappingServices<string, byte[], object, string, string>, OutboxData, string, byte[], object, string, string>(services, inputData);
+
+    data.ShouldBeSameAs(inputData);
+    state.ShouldBe(MappingError);
+    exception.ShouldBeSameAs(expectedException);
+  }
 }

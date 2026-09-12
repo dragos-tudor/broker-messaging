@@ -35,4 +35,19 @@ public partial class EnvelopeTests
     state.ShouldBe(MappingError);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
+
+  [TestMethod]
+  public async Task map_envelope__mapper_throws__returns_error_with_exception()
+  {
+    var services = Substitute.For<IMappingServices<string, byte[], object, string, string>>();
+    var expectedException = new InvalidOperationException("mapping failed");
+    services.FromEnvelope(Arg.Any<IEnvelope<string, byte[], object, string>>(), Arg.Any<DateTime>()).Throws(expectedException);
+    var inputData = new EnvelopeData { Envelope = Substitute.For<IEnvelope<string, byte[], object, string>>() };
+
+    var (data, state, exception) = await EnvelopeFuncs.MapEnvelope<IMappingServices<string, byte[], object, string, string>, EnvelopeData, string, byte[], object, string, string>(services, inputData);
+
+    data.ShouldBeSameAs(inputData);
+    state.ShouldBe(MappingError);
+    exception.ShouldBeSameAs(expectedException);
+  }
 }

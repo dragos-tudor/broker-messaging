@@ -27,4 +27,18 @@ public partial class InboxTests
     state.ShouldBe(ValidatingError);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
+
+  [TestMethod]
+  public async Task validate_inbox_message__message_is_invalid__returns_invalid_error()
+  {
+    var services = Substitute.For<IValidatingServices>();
+    var message = InboxData.CreateMessage() with { MessageId = Guid.Empty };
+    var inputData = new InboxData { InboxMessage = message };
+
+    var (data, state, exception) = await InboxFuncs.ValidateInboxMessage<IValidatingServices, InboxData, string, string>(services, inputData);
+
+    data.ShouldBeSameAs(inputData);
+    state.ShouldBe(ValidatingInvalidError);
+    exception.ShouldNotBeNull();
+  }
 }
