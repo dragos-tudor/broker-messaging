@@ -7,8 +7,8 @@
 
 ## Transport
 - transport structures:
-  - envelope [interface].
-  - dead letter envelope [interface].
+  - envelope [`IEnvelope`].
+  - dead letter envelope [`IDeadLetterEnvelope`].
 - conceptually there are:
   - inbound envelopes.
   - inbound dead letter envelopes.
@@ -18,7 +18,7 @@
   - envelope wrapper.
   - dead letter envelope wrapper.
 
-### Transport `Envelope`:
+### Transport.Envelope:
 - envelopes are created by:
   - inbound pipeline wrapping and mapping broker specific messages.
   - outbound pipeline mapping outbox messages.
@@ -34,7 +34,7 @@
   - outbox message `TPayload` → envelope `TValue` should be implemented by developers.
 - envelopes are transient transport structures and are never persisted directly by the core pipeline.
 
-### Transport `DeadLetterEnvelope`
+### Transport.DeadLetterEnvelope
 - dead letter envelopes are created by the inbound pipeline:
   - converting invalid envelopes.
   - mapping invalid inbox messages.
@@ -48,11 +48,11 @@
 
 ## Persistence
 - persistence structures:
-  - inbox message [interface and class].
-  - dead letter message [interface and class].
-  - outbox message [interface and class].
+  - inbox message [`IInboxMessage`].
+  - dead letter message [`IDeadLetterMessage`].
+  - outbox message [`IOutboxMessage`].
 
-### Persistence `InboxMessage`
+### Persistence.InboxMessage
 - inbox messages are created by the inbound pipeline mapping envelopes.
 - inbox message class has 2 open generics `<TKey, TPayload>`.
   - `TKey` the inbox message type mapped from envelope `TKey`.
@@ -64,14 +64,14 @@
  - dedicated validation functions.
  - data annotations.
 
-### Persistence `DeadLetterMessage`
+### Persistence.DeadLetterMessage
 - dead letter messages are created by the inbound pipeline converting invalid inbox messages.
 - dead letter message class has 2 open generics `<TKey, TPayload>`:
   - `TKey` the dead letter message type mapped from inbox message `TKey`.
   - `TPayload` the dead letter message payload mapped from inbox message `TPayload`.
 - dead letter message statuses are: Processing, Published, Abandoned.
 
-### Persistence `OutboxMessage`
+### Persistence.OutboxMessage
 - outbox messages are created by the user to publish them to brokers.
 - outbox message class has 2 open generics `<TKey, TPayload>`:
   - `TKey` the outbox message type should be the same as the inbox message `TKey`.
@@ -190,19 +190,20 @@ Processes asynchronous broker produce results for outbound Envelope publishing.
 
 ### Pipeline Design Rules
 
-* A pipeline maps an operation outcome to its semantic continuation.
-* A continuation may be:
+- a pipeline maps an operation outcome to its semantic continuation.
+- a continuation may be:
   * another action in the same pipeline;
   * another pipeline;
   * `Exit`;
   * `Unrecoverable`.
-* `Exit` means the current router/pipeline invocation has no further continuation; it does not necessarily mean the overall message lifecycle is finished.
-* Persisted messages must not remain indefinitely active after unrecoverable processing failure; such flows continue to the appropriate abandoning operation.
-* Pre-persistence failures must not use persisted-message abandonment when no durable message exists.
-* Domain failures and technical failures remain distinct protocol outcomes.
-* Pipelines must not inspect message internals to infer control flow; continuation is determined from explicit operation outcomes.
-* Pipeline definitions should contain only semantic flow. Cross-cutting concerns such as retry and centralized error-field handling belong outside the pipeline.
-* Pipeline and operation identifiers are unique within their owning component; exact outcome-state names remain source-code implementation details.
+- `Exit` means the current router/pipeline invocation has no further continuation; it does not necessarily mean the overall message lifecycle is finished.
+- persisted messages must not remain indefinitely active after unrecoverable processing failure; such flows continue to the appropriate abandoning operation.
+- pre-persistence failures must not use persisted-message abandonment when no durable message exists.
+- domain failures and technical failures remain distinct protocol outcomes.
+- pipelines must not inspect message internals to infer control flow; continuation is determined from explicit operation outcomes.
+- pipeline definitions should contain only semantic flow. Cross-cutting concerns such as retry and centralized error-field handling belong outside the pipeline.
+- pipeline and operation identifiers are unique within their owning component; exact outcome-state names remain source-code implementation details.\
+- each pipeline must define its entry action by mapping its unique pipeline identifier to the first action. Subsequent mappings are driven by operation outcomes.
 
 ## Design Vocabulary
 - transport & persistence:
