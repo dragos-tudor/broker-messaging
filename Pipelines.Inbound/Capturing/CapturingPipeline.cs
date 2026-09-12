@@ -5,7 +5,7 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static string? CapturingPipeline(string state, InboundPipelineConfig config) => state switch
+  internal static string? GetCapturingAction(string state, InboundPipelineConfig config) => state switch
   {
     PipelineTypes.Capturing => CapturingActions.Capturing,
 

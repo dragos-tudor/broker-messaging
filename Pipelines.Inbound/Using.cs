@@ -9,6 +9,8 @@ global using static Operations.Inbound.Envelope.EnvelopeFuncs;
 global using static Operations.Inbound.DeadLetter.DeadLetterFuncs;
 global using static Operations.Inbound.DeadLetterEnvelope.DeadLetterEnvelopeFuncs;
 global using static Operations.Inbound.Inbox.InboxFuncs;
+global using static Pipelines.Inbound.InboundFuncs;
+
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Routing.Inbound")]

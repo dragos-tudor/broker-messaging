@@ -6,7 +6,7 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static string? DeadLetteringPipeline(string state, InboundPipelineConfig _) => state switch
+  internal static string? GetDeadLetteringAction(string state, InboundPipelineConfig _) => state switch
   {
     PipelineTypes.DeadLettering => DeadLetteringActions.Converting,
 

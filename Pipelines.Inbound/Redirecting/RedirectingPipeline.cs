@@ -5,7 +5,7 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static string? RedirectingPipeline(string state, InboundPipelineConfig _) => state switch
+  internal static string? GetRedirectingAction(string state, InboundPipelineConfig _) => state switch
   {
     PipelineTypes.Redirecting => RedirectingActions.Converting,
 
