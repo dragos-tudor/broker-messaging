@@ -60,4 +60,5 @@
   - `<Feature>` (e.g., `Handling`, `Scheduling`, `Publishing`) when necessary (based on examples).
 - use descriptive names for parameters and variables.
 - use human-readable test names with double underscores `subject__action__expected`.
-
+- use the SAME namespace in all files per each project.
+- tests files and testing fixtures files should use *.Tests.cs as suffix.

@@ -6,17 +6,17 @@
 - outbound: publish broker messages.
 
 ## Transport
-- conceptually there are inbound and outbound envelope types.
+- transport structures:
+  - envelope [interface].
+  - dead letter envelope [interface].
+- conceptually there are:
+  - inbound envelopes.
+  - inbound dead letter envelopes.
+  - outbound envelopes.
 - inbound and outbound envelopes share the same envelope abstraction.
-- envelopes and dead letter envelopes are interfaces.
-- each broker-specific transport library implements two wrappers over its native broker message structure:
+- each broker-specific transport library implements interfaces as wrappers over its native broker message structure:
   - envelope wrapper.
   - dead letter envelope wrapper.
-- pipelines show exactly the natural flow of information [excepting retry plan].
-- envelopes stay at the pipeline edges:
-  - for inbound pipeline at the start boundary with the broker consumer for envelopes.
-  - for inbound pipeline at the end boundary with the broker producer for dead letter envelopes.
-  - for outbound pipeline at the boundary with the broker producer.
 
 ### Transport `Envelope`:
 - envelopes are created by:
@@ -47,9 +47,10 @@
 - dead letter envelopes are transient transport structures and are never persisted directly by the core pipeline.
 
 ## Persistence
-- persistent structures are classes.
-- inbound pipelines process inbox messages and dead letter messages.
-- outbound pipelines process outbox messages.
+- persistence structures:
+  - inbox message [interface and class].
+  - dead letter message [interface and class].
+  - outbox message [interface and class].
 
 ### Persistence `InboxMessage`
 - inbox messages are created by the inbound pipeline mapping envelopes.
@@ -73,7 +74,7 @@
 ### Persistence `OutboxMessage`
 - outbox messages are created by the user to publish them to brokers.
 - outbox message class has 2 open generics `<TKey, TPayload>`:
-  - `TKey` the outbox message type should be the same as the inbox message `TKey` (reasons in decisions.md).
+  - `TKey` the outbox message type should be the same as the inbox message `TKey`.
   - `TPayload` the outbox message payload should be the same as the inbox message `TPayload`.
 - outbox message statuses are: Processing, Published, Abandoned.
 - outbox message fields have constraints used for validation before persistence.
@@ -83,27 +84,15 @@
 
 ## Operations
 - transport operations process transient transport structures and return explicit operation states.
-- persistence operations process durable structures and return explicit operation states.
-  - implement transactional inbox pattern.
-  - implement transactional outbox pattern.
+- persistence operations process persistent structures and return explicit operation states.
 - each operation -> one-task responsibility (eg. capturing, inserting, handling, mapping).
 - each operation is independent of the others.
-- each operation wrap one main function.
-- each operation follow one implementation pattern:
-  - prepare the data.
-  - invoke the main function.
-  - analize function result [optional].
-  - return state.
 - each operation uses specialized interfaces for services and data based on composition root pattern.
-- execution types:
-  - `side-effects` operations [async].
-  - `pure`, `side-effects-free` operations [sync].
-- use try/catch blocks wrappers consistently [even for `sync` operations];
 - all operations have the same signature:
-  - input data + services + cancellation token as parameters.
+  - services, shared data, cancellation token as parameters.
   - (output data, state, exception?) as return type.
-- operations.* projects are organized by message type and direction.
-- the repository is the source of truth for exact operation outcome states.
+- use try/catch blocks wrappers consistently [even for `sync` operations];
+- operations.* projects are organized by structure type and direction.
 
 ### Operations.Inbound.Envelope
 
@@ -156,36 +145,64 @@
 * **Dispatching** — processes the asynchronous broker produce result.
 
 ## Pipelines
-- operations produce outcomes; pipelines define semantic continuation from those outcomes.
-- operation actions = connection mechanism: connect last operation -> next operation.
-- one pipeline action could be:
-  - prescriptive ["do this"].
-  - descriptive ["terminal"].
-- one pipeline = mapper between last operation state and next action.
-- each pipeline segment implement:
-  - pipeline actions group [eg. `CapturingActions`].
-  - specialized services and data interfaces [eg. `ICapturingServices`, `ICapturingData`].
-  - action -> operation = action mapper [eg. `GetCapturingOperation`].
-  - operation -> action = pipeline mapper [eg. `MapCapturingAction`].
 
-### Inbound Pipeline
-- inbound pipeline is composed from 6 pipeline segments:
-  - capturing.
-  - redirecting.
-  - handling.
-  - deadlettering.
-  - publishing.
-  - dispatching.
-- inbound happy path: capturing -> verifying -> mapping -> validating -> inserting -> confirming -> handling -> transacting.
-- inbound pipeline:
-  - define pipeline services interface composing all pipeline segments services interfaces [eg. `InboundPipelineServices`].
-  - define pipeline data interface composing all pipeline segments data interfaces [eg. `InboundPipelineData`].
-- `TerminalActions` signal pipelines terminal action.
+Pipelines define semantic processing flow by mapping operation outcomes to the next action, another pipeline, or a terminal continuation.
 
-### Resiliency `RetryPlan`
-- retry plan is an in-memory recovery mechanism.
-- retry plan mechanism is used for non-persisted structures [scheduling for persisted structures].
-- retry plan mechanism is transparent for operations and is used at router level.
+### Inbound Pipelines
+
+#### Capturing
+
+Receives a broker envelope and drives it through verification, mapping, InboxMessage validation, persistence, and confirmation.
+
+#### Redirecting
+
+Handles inbound failures that occur before a durable InboxMessage can continue processing.
+
+#### Handling
+
+Processes a persisted `InboxMessage`.
+
+#### Dead-lettering
+
+Converts a persisted `InboxMessage` into a persisted `DeadLetterMessage`.
+
+#### Publishing
+
+Publishes a persisted `DeadLetterMessage`.
+
+#### Dispatching
+
+Processes asynchronous broker produce results for DeadLetterEnvelope publishing.
+
+### Outbound Pipelines
+
+#### Persisting
+
+Validates and persists a developer-created `OutboxMessage`.
+
+#### Publishing
+
+Publishes a persisted `OutboxMessage`.
+
+#### Dispatching
+
+Processes asynchronous broker produce results for outbound Envelope publishing.
+
+### Pipeline Design Rules
+
+* A pipeline maps an operation outcome to its semantic continuation.
+* A continuation may be:
+  * another action in the same pipeline;
+  * another pipeline;
+  * `Exit`;
+  * `Unrecoverable`.
+* `Exit` means the current router/pipeline invocation has no further continuation; it does not necessarily mean the overall message lifecycle is finished.
+* Persisted messages must not remain indefinitely active after unrecoverable processing failure; such flows continue to the appropriate abandoning operation.
+* Pre-persistence failures must not use persisted-message abandonment when no durable message exists.
+* Domain failures and technical failures remain distinct protocol outcomes.
+* Pipelines must not inspect message internals to infer control flow; continuation is determined from explicit operation outcomes.
+* Pipeline definitions should contain only semantic flow. Cross-cutting concerns such as retry and centralized error-field handling belong outside the pipeline.
+* Pipeline and operation identifiers are unique within their owning component; exact outcome-state names remain source-code implementation details.
 
 ## Design Vocabulary
 - transport & persistence:
