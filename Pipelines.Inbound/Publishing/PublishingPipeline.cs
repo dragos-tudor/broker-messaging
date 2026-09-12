@@ -6,8 +6,10 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static string? MapPublishingAction(string state, InboundPipelineConfig config) => state switch
+  internal static string? PublishingPipeline(string state, InboundPipelineConfig config) => state switch
   {
+    PipelineTypes.Publishing => PublishingActions.Mapping,
+
     DeadLetterStates.MappingSuccess => config.UseBrokerPublisher?
       PublishingActions.Publishing:
       PublishingActions.Producing,

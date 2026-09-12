@@ -6,8 +6,10 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static string? MapDispatchingAction(string state, InboundPipelineConfig _) => state switch
+  internal static string? DispatchingPipeline(string state, InboundPipelineConfig _) => state switch
   {
+    PipelineTypes.Dispatching => DispatchingActions.Dispatching,
+
     DeadLetterEnvelopeStates.DispatchingAck => DispatchingActions.Closing,
     DeadLetterEnvelopeStates.DispatchingNotAck => DispatchingActions.Scheduling,
     DeadLetterEnvelopeStates.DispatchingError => DispatchingActions.Abandoning,

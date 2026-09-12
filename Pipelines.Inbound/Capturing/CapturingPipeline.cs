@@ -5,30 +5,33 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static string? MapCapturingAction(string state, InboundPipelineConfig _) => state switch
+  internal static string? CapturingPipeline(string state, InboundPipelineConfig config) => state switch
   {
+    PipelineTypes.Capturing => CapturingActions.Capturing,
+
     EnvelopeStates.CapturingSuccess => CapturingActions.Verifying,
     EnvelopeStates.CapturingNotCaptured => TerminalActions.Exit,
     EnvelopeStates.CapturingError => TerminalActions.Exit,
 
     EnvelopeStates.VerifyingSuccess => CapturingActions.Mapping,
     EnvelopeStates.VerifyingInvalidError => TerminalActions.Unrecoverable,
-    EnvelopeStates.VerifyingInvalidConfirmableError => InboundPipelines.Redirecting,
+    EnvelopeStates.VerifyingInvalidConfirmableError => PipelineTypes.Redirecting,
     EnvelopeStates.VerifyingError => TerminalActions.Unrecoverable,
 
     EnvelopeStates.MappingSuccess => CapturingActions.Validating,
-    EnvelopeStates.MappingValueError => InboundPipelines.Redirecting,
-    EnvelopeStates.MappingError => TerminalActions.Unrecoverable,
+    EnvelopeStates.MappingError => PipelineTypes.Redirecting,
 
     InboxStates.ValidatingSuccess => CapturingActions.Inserting,
-    InboxStates.ValidatingInvalidError => InboundPipelines.Redirecting,
-    InboxStates.ValidatingError => TerminalActions.Unrecoverable,
+    InboxStates.ValidatingInvalidError => PipelineTypes.Redirecting,
+    InboxStates.ValidatingError => PipelineTypes.Redirecting,
 
     InboxStates.InsertingSuccess => CapturingActions.Confirming,
     InboxStates.InsertingIdempotent => CapturingActions.ConfirmingFinal,
     InboxStates.InsertingError => TerminalActions.Exit,
 
-    EnvelopeStates.ConfirmingSuccess => InboundPipelines.Handling,
+    EnvelopeStates.ConfirmingSuccess => config.HandleAfterCapture?
+      PipelineTypes.Handling:
+      TerminalActions.Exit,
     EnvelopeStates.ConfirmingError => TerminalActions.Exit,
 
     EnvelopeStates.ConfirmingFinalSuccess => TerminalActions.Exit,

@@ -5,4 +5,8 @@ global using Shouldly;
 namespace Pipelines.Outbound;
 
 [TestClass]
-public partial class OutboundTests;
+public partial class OutboundTests
+{
+  [TestMethod]
+  public void TestFake() {}
+}

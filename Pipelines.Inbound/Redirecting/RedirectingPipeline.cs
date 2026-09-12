@@ -5,8 +5,10 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static string? MapRedirectingAction(string state, InboundPipelineConfig _) => state switch
+  internal static string? RedirectingPipeline(string state, InboundPipelineConfig _) => state switch
   {
+    PipelineTypes.Redirecting => RedirectingActions.Converting,
+
     EnvelopeStates.ConvertingSuccess => RedirectingActions.Redirecting,
     EnvelopeStates.ConvertingInvalid => RedirectingActions.ConfirmingFinal,
     EnvelopeStates.ConvertingError => TerminalActions.Unrecoverable,

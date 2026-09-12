@@ -6,8 +6,10 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static string? GetDispatchingAction(string state, OutboundPipelineConfig config) => state switch
+  internal static string? DispatchingPipeline(string state, OutboundPipelineConfig config) => state switch
   {
+    PipelinesTypes.Dispatching => DispatchingActions.Dispatching,
+
     EnvelopeStates.DispatchingAck => DispatchingActions.Closing,
     EnvelopeStates.DispatchingNotAck => DispatchingActions.Scheduling,
     EnvelopeStates.DispatchingError => DispatchingActions.Abandoning,

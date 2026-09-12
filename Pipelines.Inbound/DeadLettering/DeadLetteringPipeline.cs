@@ -6,8 +6,10 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static string? MapDeadLetteringAction(string state, InboundPipelineConfig _) => state switch
+  internal static string? DeadLetteringPipeline(string state, InboundPipelineConfig _) => state switch
   {
+    PipelineTypes.DeadLettering => DeadLetteringActions.Converting,
+
     InboxStates.ConvertingSuccess => DeadLetteringActions.Inserting,
     InboxStates.ConvertingError => DeadLetteringActions.Abandoning,
 
@@ -18,7 +20,7 @@ partial class InboundFuncs
     InboxStates.AbandoningSuccess => TerminalActions.Exit,
     InboxStates.AbandoningError => TerminalActions.Exit,
 
-    InboxStates.ClosingSuccess => InboundPipelines.Publishing,
+    InboxStates.ClosingSuccess => PipelineTypes.Publishing,
     InboxStates.ClosingError => TerminalActions.Exit,
 
     _ => default
