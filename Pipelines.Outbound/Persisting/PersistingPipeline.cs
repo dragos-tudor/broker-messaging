@@ -5,7 +5,7 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static string? PersistingPipeline(string state, OutboundPipelineConfig config) => state switch
+  internal static string? GetPersistingAction(string state, OutboundPipelineConfig config) => state switch
   {
     PipelinesTypes.Persisting => PersistingActions.Validating,
 
