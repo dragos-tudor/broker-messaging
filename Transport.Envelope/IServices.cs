@@ -22,7 +22,3 @@ public interface IEnvelopePublisherService<TKey, TValue, TMetadata, TConfirmatio
 public interface IEnvelopeReaderService<TKey, TValue, TMetadata, TConfirmation> {
   ValueTask<IEnvelope<TKey, TValue, TMetadata, TConfirmation>> ReadEnvelope(CancellationToken ct = default);
 }
-
-public interface IEnvelopeValueMapperService<TValue, TPayload> {
-  TPayload FromEnvelopeValue(TValue value);
-}

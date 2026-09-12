@@ -12,10 +12,6 @@ public interface IDeadLetterMessageOptionsReaderService {
   DeadLetterMessageOptions GetDeadLetterMessageOptions();
 }
 
-public interface IDeadLetterMessagePayloadMapperService<TKey, TValue, TMetadata, TConfirmation, TPayload> {
-  TValue FromDeadLetterMessagePayload(TPayload value);
-}
-
 public interface IDeadLetterMessageUpdateService<TKey, TPayload>
 {
   Task UpdateDeadLetterMessageAsync<TMessage, TParams>(
