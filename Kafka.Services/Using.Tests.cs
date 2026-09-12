@@ -5,4 +5,8 @@ global using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Kafka.Services;
 
 [TestClass]
-public partial class ServicesTests;
+public partial class ServicesTests
+{
+  [TestMethod]
+  public void TestFake() {}
+}
