@@ -51,6 +51,19 @@
   - `NSubstitute` for mocking.
 - keep test files adjacent to the code they test (e.g., Verifying.Tests.cs next to Verifying.cs).
 
+### Testing Execution
+
+- This repository uses Microsoft.Testing.Platform via `global.json`.
+- Run tests with:
+  `dotnet test --project <project>.csproj`
+- If project restore/build fails during parallel MSBuild traversal, use:
+  `dotnet restore <project>.csproj --disable-parallel`
+  followed by:
+  `dotnet build <project>.csproj --no-restore -m:1 -p:BuildInParallel=false`
+- In restricted environments where `dotnet test` fails with an IPC or named-pipe permission error, run the generated test module directly after building:
+  `dotnet artifacts/bin/<Project>/debug_linux-x64/<Project>.dll --no-progress`
+- Test execution must report the total, failed, succeeded, and skipped test counts.
+
 ### Names
 - use naming styles for methods:
   - `<Action><Object>` (e.g., `CaptureEnvelope`).
