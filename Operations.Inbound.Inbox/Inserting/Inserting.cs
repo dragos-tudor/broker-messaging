@@ -20,11 +20,8 @@ partial class InboxFuncs
   static (TData, string, Exception?) InsertInboxMessageError<TServices, TData, TKey, TPayload>(
     TData data,
     Exception exception)
-  where TData : IInsertingData<TKey, TPayload>
-  {
-    Funcs.SetInboxMessageLastError(data.InboxMessage!, exception.Message);
-    return (data, InsertingError, exception);
-  }
+  where TData : IInsertingData<TKey, TPayload> =>
+    (data, InsertingError, exception);
 
   internal static ValueTask<(TData, string, Exception?)> InsertInboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,

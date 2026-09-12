@@ -14,7 +14,7 @@ partial class EnvelopeFuncs
 
     var error = Funcs.ValidateEnvelope(envelope);
     if (error is not null)
-      return IsValidEnvelopeConfirmation(envelope)?
+      return IsValidEnvelopeConfirmation(envelope.Confirmation)?
         (data, VerifyingInvalidConfirmableError, CreateValidationException(error)):
         (data, VerifyingInvalidError, CreateValidationException(error));
 

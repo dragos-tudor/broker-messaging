@@ -7,7 +7,7 @@ partial class OutboxFuncs
     model ?? throw new InvalidOperationException("Outbound domain model is required.");
 
   static IOutboxMessage<TKey, TPayload> RequireOutboxMessage<TKey, TPayload>(IOutboxMessage<TKey, TPayload>? message) =>
-    message ?? throw new ArgumentNullException(nameof(message), "Outbox message is required");
+    message ?? throw new InvalidOperationException("Outbox message is required");
 }
 
 partial class OutboxFuncs
