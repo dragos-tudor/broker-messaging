@@ -12,14 +12,4 @@ partial class OutboxMessageFuncs
     this IOutboxMessage<TKey, TPayload> message,
     string? error)
       { message.LastError = error; return message; }
-
-  internal static IOutboxMessage<TKey, TPayload> SetOutboxMessageNextAttemptAt<TKey, TPayload>(
-    this IOutboxMessage<TKey, TPayload> message,
-    DateTimeOffset? nextAttemptAt)
-      { message.NextAttemptAt = nextAttemptAt; return message; }
-
-  internal static IOutboxMessage<TKey, TPayload> SetOutboxMessageStatus<TKey, TPayload>(
-    IOutboxMessage<TKey, TPayload> message,
-    OutboxMessageStatus status)
-      { message.Status = status; return message; }
 }

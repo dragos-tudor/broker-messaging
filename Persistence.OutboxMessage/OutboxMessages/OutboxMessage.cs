@@ -1,4 +1,4 @@
-using static Persistence.OutboxMessage.OutboxMessageConstraints;
+using static Persistence.OutboxMessage.FieldConstraints;
 
 namespace Persistence.OutboxMessage;
 

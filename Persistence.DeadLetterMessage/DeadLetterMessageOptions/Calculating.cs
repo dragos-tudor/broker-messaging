@@ -6,30 +6,28 @@ partial class DeadLetterMessageFuncs
   internal static DateTime CalculateNextAttemptAt(
     int retryCount,
     DateTime date,
-    DeadLetterMessageOptions options)
-  {
-    var retryInterval = CalculateNextRetryInterval(retryCount, options);
-    return date.Add(retryInterval);
-  }
-
-  internal static int CalculateNextRetryCount(int? retryCount) =>
-      (retryCount ?? 0) + 1;
+    DeadLetterMessageOptions options) =>
+      date +
+      CalculateNextRetryInterval(
+        CalculateRetryInterval(
+          CalculateRetryFactor(retryCount, options),
+          options),
+        options);
 
   internal static TimeSpan CalculateNextRetryInterval(
-    int retryCount,
-    DeadLetterMessageOptions options)
-  {
-    var retryFactor = Math.Pow(options.RetryBackoffFactor, retryCount);
-    var retryInterval = options.RetryBaseDelay * retryFactor;
-    return retryInterval > options.MaxRetryDelay ?
-      options.MaxRetryDelay :
-      retryInterval;
-  }
-
-  internal static DeadLetterMessageStatus CalculateDeadLetterMessageNextStatus(
-    int nextRetryCount,
+    TimeSpan retryInterval,
     DeadLetterMessageOptions options) =>
-      nextRetryCount <= options.MaxRetryAttempts?
-        DeadLetterMessageStatus.Processing:
-        DeadLetterMessageStatus.Abandoned;
+      retryInterval > options.MaxRetryDelay?
+        options.MaxRetryDelay:
+        retryInterval;
+
+  static double CalculateRetryFactor(
+    int retryCount,
+    DeadLetterMessageOptions options) =>
+      Math.Pow(options.RetryBackoffFactor, retryCount);
+
+  static TimeSpan CalculateRetryInterval(
+    double retryFactor,
+    DeadLetterMessageOptions options) =>
+      options.RetryBaseDelay * retryFactor;
 }

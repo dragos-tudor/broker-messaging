@@ -13,9 +13,9 @@ partial class OutboxFuncs
     var message = RequireOutboxMessage(data.OutboxMessage);
     var options = services.GetOutboxMessageOptions();
 
-    var nextRetryCount = CalculateNextRetryCount(message.RetryCount);
+    var nextRetryCount = IncrementOutboxRetryCount(message.RetryCount);
     var nextAttemptAt = CalculateNextAttemptAt(nextRetryCount, services.GetUtcDateTime(), options);
-    var nextStatus = CalculateOutboxMessageNextStatus(nextRetryCount, options);
+    var nextStatus = GetOutboxMessageStatus(nextRetryCount, options);
     var lastError = message.LastError;
     var @params = new SchedulingUpdate(nextRetryCount, nextAttemptAt, nextStatus, lastError);
 

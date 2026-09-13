@@ -1,4 +1,4 @@
-using static Persistence.InboxMessage.InboxMessageConstraints;
+using static Persistence.InboxMessage.FieldConstraints;
 
 namespace Persistence.InboxMessage;
 

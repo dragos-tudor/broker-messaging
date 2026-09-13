@@ -1,7 +1,7 @@
 
 namespace Persistence.OutboxMessage;
 
-static class OutboxMessageConstraints
+static class FieldConstraints
 {
   internal const int PayloadMaxLength = 10_240_000;
   internal const int TypeMaxLength = 512;

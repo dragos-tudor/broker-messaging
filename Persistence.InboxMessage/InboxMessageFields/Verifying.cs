@@ -1,5 +1,5 @@
 
-using static Persistence.InboxMessage.InboxMessageConstraints;
+using static Persistence.InboxMessage.FieldConstraints;
 
 namespace Persistence.InboxMessage;
 
@@ -17,11 +17,15 @@ partial class InboxMessageFuncs
     _ => true
   };
 
-  static bool IsValidInboxMessagePayload<TPayload> (TPayload payload) => GetInboxMessagePayloadLength(payload) <= PayloadMaxLength;
+  static bool IsValidInboxMessageLastError (string? messageLastError) =>
+    (messageLastError?.Length ?? 0) <= LastErrorMaxLength;
 
-  static bool IsValidInboxMessageType (string? messageType) => (messageType?.Length ?? 0) <= TypeMaxLength;
+  static bool IsValidInboxMessagePayload<TPayload> (TPayload payload) =>
+    GetInboxMessagePayloadLength(payload) <= PayloadMaxLength;
 
-  static bool IsValidInboxMessageMetadata (string? messageMetadata) => (messageMetadata?.Length ?? 0) <= MetadataMaxLength;
+  static bool IsValidInboxMessageMetadata (string? messageMetadata) =>
+    (messageMetadata?.Length ?? 0) <= MetadataMaxLength;
 
-  static bool IsValidInboxMessageLastError (string? messageLastError) => (messageLastError?.Length ?? 0) <= LastErrorMaxLength;
+  static bool IsValidInboxMessageType (string? messageType) =>
+    (messageType?.Length ?? 0) <= TypeMaxLength;
 }

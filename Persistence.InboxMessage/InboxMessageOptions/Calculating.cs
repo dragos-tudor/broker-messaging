@@ -6,30 +6,28 @@ partial class InboxMessageFuncs
   internal static DateTime CalculateNextAttemptAt(
     int retryCount,
     DateTime date,
-    InboxMessageOptions options)
-  {
-    var retryInterval = CalculateNextRetryInterval(retryCount, options);
-    return date.Add(retryInterval);
-  }
-
-  internal static int CalculateNextRetryCount(int? retryCount) =>
-      (retryCount ?? 0) + 1;
+    InboxMessageOptions options) =>
+      date +
+      CalculateNextRetryInterval(
+        CalculateRetryInterval(
+          CalculateRetryFactor(retryCount, options),
+          options),
+        options);
 
   internal static TimeSpan CalculateNextRetryInterval(
-    int retryCount,
-    InboxMessageOptions options)
-  {
-    var retryFactor = Math.Pow(options.RetryBackoffFactor, retryCount);
-    var retryInterval = options.RetryBaseDelay * retryFactor;
-    return retryInterval > options.MaxRetryDelay ?
-      options.MaxRetryDelay :
-      retryInterval;
-  }
-
-  internal static InboxMessageStatus CalculateNextStatus(
-    int nextRetryCount,
+    TimeSpan retryInterval,
     InboxMessageOptions options) =>
-      nextRetryCount <= options.MaxRetryAttempts
-          ? InboxMessageStatus.Processing
-          : InboxMessageStatus.DeadLettering;
+      retryInterval > options.MaxRetryDelay?
+        options.MaxRetryDelay:
+        retryInterval;
+
+  static double CalculateRetryFactor(
+    int retryCount,
+    InboxMessageOptions options) =>
+      Math.Pow(options.RetryBackoffFactor, retryCount);
+
+  static TimeSpan CalculateRetryInterval(
+    double retryFactor,
+    InboxMessageOptions options) =>
+      options.RetryBaseDelay * retryFactor;
 }

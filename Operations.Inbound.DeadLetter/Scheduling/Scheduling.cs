@@ -13,9 +13,9 @@ partial class DeadLetterFuncs
     var message = RequireDeadLetterMessage(data.DeadLetterMessage);
     var options = services.GetDeadLetterMessageOptions();
 
-    var nextRetryCount = CalculateNextRetryCount(message.RetryCount);
+    var nextRetryCount = IncrementDeadLetterRetryCount(message.RetryCount);
     var nextAttemptAt = CalculateNextAttemptAt(nextRetryCount, services.GetUtcDateTime(), options);
-    var nextStatus = CalculateDeadLetterMessageNextStatus(nextRetryCount, options);
+    var nextStatus = GetDeadLetterMessageStatus(nextRetryCount, options);
     var lastError = message.LastError;
     var @params = new SchedulingUpdate(nextRetryCount, nextAttemptAt, nextStatus, lastError);
 

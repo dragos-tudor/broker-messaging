@@ -1,5 +1,5 @@
 
-using static Persistence.OutboxMessage.OutboxMessageConstraints;
+using static Persistence.OutboxMessage.FieldConstraints;
 
 namespace Persistence.OutboxMessage;
 
@@ -17,11 +17,15 @@ partial class OutboxMessageFuncs
     _ => true
   };
 
-  static bool IsValidOutboxMessagePayload<TPayload> (TPayload payload) => GetOutboxMessagePayloadLength(payload) <= PayloadMaxLength;
+  static bool IsValidOutboxMessageLastError (string? messageLastError) =>
+    (messageLastError?.Length ?? 0) <= LastErrorMaxLength;
 
-  static bool IsValidOutboxMessageType (string? messageType) => (messageType?.Length ?? 0) <= TypeMaxLength;
+  static bool IsValidOutboxMessageMetadata (string? messageMetadata) =>
+    (messageMetadata?.Length ?? 0) <= MetadataMaxLength;
 
-  static bool IsValidOutboxMessageMetadata (string? messageMetadata) => (messageMetadata?.Length ?? 0) <= MetadataMaxLength;
+  static bool IsValidOutboxMessagePayload<TPayload> (TPayload payload) =>
+    GetOutboxMessagePayloadLength(payload) <= PayloadMaxLength;
 
-  static bool IsValidOutboxMessageLastError (string? messageLastError) => (messageLastError?.Length ?? 0) <= LastErrorMaxLength;
+  static bool IsValidOutboxMessageType (string? messageType) =>
+    (messageType?.Length ?? 0) <= TypeMaxLength;
 }

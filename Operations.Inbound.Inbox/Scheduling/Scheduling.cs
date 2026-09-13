@@ -1,4 +1,3 @@
-using Funcs = Persistence.InboxMessage.InboxMessageFuncs;
 
 namespace Operations.Inbound.Inbox;
 
@@ -14,9 +13,9 @@ partial class InboxFuncs
     var message = RequireInboxMessage(data.InboxMessage);
     var options = services.GetInboxMessageOptions();
 
-    var nextRetryCount = Funcs.CalculateNextRetryCount(message.RetryCount);
+    var nextRetryCount = IncrementInboxRetryCount(message.RetryCount);
     var nextAttemptAt = CalculateNextAttemptAt(nextRetryCount, services.GetUtcDateTime(), options);
-    var nextStatus = CalculateNextStatus(nextRetryCount, options);
+    var nextStatus = GetInboxMessageStatus(nextRetryCount, options);
     var failureReason = message.FailureReason;
     var lastError = message.LastError;
     var @params = new SchedulingUpdate(nextRetryCount, nextAttemptAt, nextStatus, lastError, failureReason);
