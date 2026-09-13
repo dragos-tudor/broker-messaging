@@ -3,8 +3,8 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static Func<string, InboundPipelineConfig, string?>? GetInboundPipeline(string pipeline) =>
-    pipeline switch
+  internal static Func<string, InboundPipelineConfig, string?>? GetInboundPipeline(string pipelineType) =>
+    pipelineType switch
     {
       PipelineTypes.Capturing => GetCapturingAction,
       PipelineTypes.Redirecting => GetRedirectingAction,

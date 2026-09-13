@@ -11,7 +11,7 @@ partial class OutboundTests
     foreach (var state in path)
     {
       possibleStates.ShouldContain(state, $"{state} is not valid. Expected one of: {string.Join(", ", possibleStates)}");
-      if (path[^1] == state) return;
+      if (IsLastPathState(path, state)) return;
 
       var action = GetDispatchingAction(state, config);
       action.ShouldNotBeNull($"{state} -> {action} is missing.");
@@ -29,4 +29,7 @@ partial class OutboundTests
       DispatchingActions.Closing => [ClosingSuccess, ClosingError],
       _ => [action],
     };
+
+  static bool IsLastPathState(string[] path, string state) =>
+    path[^1] == state;
 }

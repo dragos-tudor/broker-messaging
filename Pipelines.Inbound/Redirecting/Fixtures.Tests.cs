@@ -11,7 +11,7 @@ partial class InboundTests
     foreach(var state in path)
     {
       possibleStates.ShouldContain(state, $"{state} is not valid. Expected one of: {string.Join(", ", possibleStates)}");
-      if (path[^1] == state) return;
+      if (IsLastPathState(path, state)) return;
 
       var action = GetRedirectingAction(state, config);
       action.ShouldNotBeNull($"{state} -> {action} is missing.");

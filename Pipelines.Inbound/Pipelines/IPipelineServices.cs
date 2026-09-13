@@ -1,7 +1,7 @@
 
 namespace Pipelines.Inbound;
 
-public interface IInboundPipelineServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession> :
+public interface IPipelineServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession> :
   ICapturingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>,
   IRedirectingServices<TKey, TValue, TMetadata, TConfirmation>,
   IHandlingServices<TKey, TPayload, TSession>,

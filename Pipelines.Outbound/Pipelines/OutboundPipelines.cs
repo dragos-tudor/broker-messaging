@@ -3,8 +3,8 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static Func<string, OutboundPipelineConfig, string?>? GetOutboundPipeline(string pipeline) =>
-    pipeline switch
+  internal static Func<string, OutboundPipelineConfig, string?>? GetOutboundPipeline(string pipelineType) =>
+    pipelineType switch
     {
       PipelinesTypes.Persisting => GetPersistingAction,
       PipelinesTypes.Publishing => GetPublishingAction,
