@@ -9,12 +9,12 @@ partial class InboundTests
   [TestMethod]
   public void happy_path__exit()
   {
-    string[] states = [
+    string[] path = [
       PipelineTypes.Capturing, CapturingSuccess, VerifyingSuccess,
       MappingSuccess, ValidatingSuccess, InsertingSuccess,
       ConfirmingSuccess, TerminalActions.Exit
     ];
-    RunCapturingPipeline(states);
+    RunCapturingPipeline(path);
   }
 
   [TestMethod]
