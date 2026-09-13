@@ -15,8 +15,8 @@
   - outbound envelopes.
 - inbound and outbound envelopes share the same envelope abstraction.
 - each broker-specific transport library implements interfaces as wrappers over its native broker message structure:
-  - envelope wrapper.
-  - dead letter envelope wrapper.
+  - envelope wrapper [`Envelope`].
+  - dead letter envelope wrapper [`DeadLetterEnvelope`].
 
 ### Transport.Envelope:
 - envelopes are created by:
@@ -84,118 +84,99 @@
 
 ## Operations
 - transport operations process transient transport structures and return explicit operation states.
-- persistence operations process persistent structures and return explicit operation states.
-- each operation -> one-task responsibility (eg. capturing, inserting, handling, mapping).
+- persistence operations process persistent structures and return explicit operation
+states.
+
+### Operations.Inbound.Envelope
+
+- capturing — obtains the next broker envelope.
+- verifying — performs lightweight envelope verification before mapping.
+- mapping — maps the inbound envelope into an `InboxMessage`.
+- converting — converts an inbound envelope failure into a `DeadLetterEnvelope`.
+- confirming — confirms the original broker envelope, including final confirmation when processing ends without entering Handling.
+
+### Operations.Inbound.Inbox
+
+- validating — validates `InboxMessage` data.
+- inserting — persists the `InboxMessage`.
+- handling — invokes developer-provided business handling.
+- transacting — persists handling-side transactional changes.
+- scheduling — persists retry scheduling information for later handling.
+- deadlettering — hands the `InboxMessage` to dead-letter processing.
+- converting — converts the `InboxMessage` into a `DeadLetterMessage`.
+- closing — completes the original `InboxMessage` lifecycle.
+- abandoning — marks the `InboxMessage` as abandoned when processing cannot continue.
+
+### Operations.Inbound.DeadLetter
+
+- mapping — maps a persisted `DeadLetterMessage` into a `DeadLetterEnvelope`.
+- inserting — persists a `DeadLetterMessage`.
+- scheduling — persists retry scheduling information for later publishing.
+- closing — completes the `DeadLetterMessage` lifecycle after successful publication.
+- abandoning — marks the `DeadLetterMessage` as abandoned when publishing cannot continue.
+
+### Operations.Inbound.DeadLetterEnvelope
+
+- redirecting — publishes a `DeadLetterEnvelope` created from an inbound pre-persistence failure.
+- publishing — publishes a `DeadLetterEnvelope` synchronously.
+- producing — submits a `DeadLetterEnvelope` asynchronously and registers broker-result handling.
+- dispatching — processes the asynchronous broker produce result.
+
+### Operations.Outbound.Outbox
+
+- validating — validates `OutboxMessage` data.
+- transacting — persists the `OutboxMessage` within the developer transaction.
+- mapping — maps a persisted `OutboxMessage` into an outbound `Envelope`.
+- scheduling — persists retry scheduling information for later publishing.
+- closing — completes the `OutboxMessage` lifecycle after successful publication.
+- abandoning — marks the `OutboxMessage` as abandoned when publishing cannot continue.
+
+### Operations.Outbound.Envelope
+
+- publishing — publishes the outbound `Envelope` synchronously.
+- producing — submits the outbound `Envelope` asynchronously and registers broker-result handling.
+- dispatching — processes the asynchronous broker produce result.
+
+### Operations Design Rules
+- each operation has one-task responsibility [eg. capture an envelope, map a dead-letter message, validate an envelope, insert an inbox message].
 - each operation is independent of the others.
 - each operation uses specialized interfaces for services and data based on composition root pattern.
 - all operations have the same signature:
   - services, shared data, cancellation token as parameters.
   - (output data, state, exception?) as return type.
+- operations expected failures must return explicit states.
+- operations mutate only their owned pipeline data.
+- operations error handling is delegated to a centralized router function.
 - use try/catch blocks wrappers consistently [even for `sync` operations];
-- operations.* projects are organized by structure type and direction.
-
-### Operations.Inbound.Envelope
-
-* **Capturing** — obtains the next broker envelope.
-* **Verifying** — performs lightweight envelope verification before mapping.
-* **Mapping** — maps the inbound envelope into an `InboxMessage`.
-* **Converting** — converts an inbound envelope failure into a `DeadLetterEnvelope`.
-* **Confirming** — confirms the original broker envelope, including final confirmation when processing ends without entering Handling.
-
-### Operations.Inbound.Inbox
-
-* **Validating** — validates `InboxMessage` data.
-* **Inserting** — persists the `InboxMessage`.
-* **Handling** — invokes developer-provided business handling.
-* **Transacting** — persists handling-side transactional changes.
-* **Scheduling** — persists retry scheduling information for later handling.
-* **DeadLettering** — hands the `InboxMessage` to dead-letter processing.
-* **Converting** — converts the `InboxMessage` into a `DeadLetterMessage`.
-* **Closing** — completes the original `InboxMessage` lifecycle.
-* **Abandoning** — marks the `InboxMessage` as abandoned when processing cannot continue.
-
-### Operations.Inbound.DeadLetter
-
-* **Mapping** — maps a persisted `DeadLetterMessage` into a `DeadLetterEnvelope`.
-* **Inserting** — persists a `DeadLetterMessage`.
-* **Scheduling** — persists retry scheduling information for later publishing.
-* **Closing** — completes the `DeadLetterMessage` lifecycle after successful publication.
-* **Abandoning** — marks the `DeadLetterMessage` as abandoned when publishing cannot continue.
-
-### Operations.Inbound.DeadLetterEnvelope
-
-* **Redirecting** — publishes a `DeadLetterEnvelope` created from an inbound pre-persistence failure.
-* **Publishing** — publishes a `DeadLetterEnvelope` synchronously.
-* **Producing** — submits a `DeadLetterEnvelope` asynchronously and registers broker-result handling.
-* **Dispatching** — processes the asynchronous broker produce result.
-
-### Operations.Outbound.Outbox
-
-* **Validating** — validates `OutboxMessage` data.
-* **Transacting** — persists the `OutboxMessage` within the developer transaction.
-* **Mapping** — maps a persisted `OutboxMessage` into an outbound `Envelope`.
-* **Scheduling** — persists retry scheduling information for later publishing.
-* **Closing** — completes the `OutboxMessage` lifecycle after successful publication.
-* **Abandoning** — marks the `OutboxMessage` as abandoned when publishing cannot continue.
-
-### Operations.Outbound.Envelope
-
-* **Publishing** — publishes the outbound `Envelope` synchronously.
-* **Producing** — submits the outbound `Envelope` asynchronously and registers broker-result handling.
-* **Dispatching** — processes the asynchronous broker produce result.
+- operations.* projects are organized by direction and structure type.
 
 ## Pipelines
 
 Pipelines define semantic processing flow by mapping operation outcomes to the next action, another pipeline, or a terminal continuation.
 
-### Inbound Pipelines
+### Pipelines.Inbound
 
-#### Capturing
+- capturing: receives a broker envelope and drives it through verification, mapping, InboxMessage validation, persistence, and confirmation.
+- redirecting: handles inbound failures that occur before a durable InboxMessage can continue processing.
+- handling: processes a persisted `InboxMessage`.
+- dead-lettering: converts a persisted `InboxMessage` into a persisted `DeadLetterMessage`.
+- publishing: publishes a persisted `DeadLetterMessage`.
+- dispatching: processes asynchronous broker produce results for DeadLetterEnvelope publishing.
 
-Receives a broker envelope and drives it through verification, mapping, InboxMessage validation, persistence, and confirmation.
+### Pipelines.Outbound
 
-#### Redirecting
-
-Handles inbound failures that occur before a durable InboxMessage can continue processing.
-
-#### Handling
-
-Processes a persisted `InboxMessage`.
-
-#### Dead-lettering
-
-Converts a persisted `InboxMessage` into a persisted `DeadLetterMessage`.
-
-#### Publishing
-
-Publishes a persisted `DeadLetterMessage`.
-
-#### Dispatching
-
-Processes asynchronous broker produce results for DeadLetterEnvelope publishing.
-
-### Outbound Pipelines
-
-#### Persisting
-
-Validates and persists a developer-created `OutboxMessage`.
-
-#### Publishing
-
-Publishes a persisted `OutboxMessage`.
-
-#### Dispatching
-
-Processes asynchronous broker produce results for outbound Envelope publishing.
+- persisting: validates and persists a developer-created `OutboxMessage`.
+- publishing: publishes a persisted `OutboxMessage`.
+- dispatching: processes asynchronous broker produce results for outbound Envelope publishing.
 
 ### Pipeline Design Rules
 
-- a pipeline maps an operation outcome to its semantic continuation.
-- a continuation may be:
-  * another action in the same pipeline;
-  * another pipeline;
-  * `Exit`;
-  * `Unrecoverable`.
+- pipeline maps an operation outcome to its semantic continuation.
+- pipeline continuation may be:
+  - another action in the same pipeline;
+  - another pipeline;
+  - `Exit`;
+  - `Unrecoverable`.
 - `Exit` means the current router/pipeline invocation has no further continuation; it does not necessarily mean the overall message lifecycle is finished.
 - persisted messages must not remain indefinitely active after unrecoverable processing failure; such flows continue to the appropriate abandoning operation.
 - pre-persistence failures must not use persisted-message abandonment when no durable message exists.
