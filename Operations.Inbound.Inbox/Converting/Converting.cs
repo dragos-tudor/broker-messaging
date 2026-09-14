@@ -3,7 +3,7 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  internal static (TData, string, Exception?) ConvertInboxMessageSuccess<TServices, TData, TKey, TPayload>(
+  internal static (TData, ConvertingStates, Exception?) ConvertInboxMessageSuccess<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data)
   where TServices : IConvertingServices
@@ -17,13 +17,13 @@ partial class InboxFuncs
     return (data, ConvertingSuccess, null);
   }
 
-  static (TData, string, Exception?) ConvertInboxMessageError<TData, TKey, TPayload>(
+  static (TData, ConvertingStates, Exception?) ConvertInboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IConvertingData<TKey, TPayload> =>
     (data, ConvertingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> ConvertInboxMessage<TServices, TData, TKey, TPayload>(
+  internal static ValueTask<(TData, ConvertingStates, Exception?)> ConvertInboxMessage<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

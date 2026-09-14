@@ -3,11 +3,11 @@ namespace Operations.Outbound.Envelope;
 public partial class EnvelopeTests
 {
   [TestMethod]
-  [DataRow(true, "Envelope.ProducingEnqueue")]
-  [DataRow(false, "Envelope.ProducingNotEnqueue")]
+  [DataRow(true, ProducingStates.ProducingEnqueue)]
+  [DataRow(false, ProducingStates.ProducingNotEnqueue)]
   public async Task produce_envelope__broker_enqueue_result_varies__returns_matching_state(
     bool isEnqueued,
-    string expectedState)
+    Enum expectedState)
   {
     var services = Substitute.For<IProducingServices<string, byte[], object, string, string>>();
     var envelope = Substitute.For<IEnvelope<string, byte[], object, string>>();

@@ -1,9 +1,9 @@
 
 namespace Operations.Inbound.Envelope;
 
-static partial class EnvelopeStates
+internal enum ConvertingStates
 {
-  internal const string ConvertingSuccess = $"{Scope}.{nameof(ConvertingSuccess)}";
-  internal const string ConvertingInvalid = $"{Scope}.{nameof(ConvertingInvalid)}";
-  internal const string ConvertingError = $"{Scope}.{nameof(ConvertingError)}";
+  ConvertingSuccess,
+  ConvertingInvalid,
+  ConvertingError
 }

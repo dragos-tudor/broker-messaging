@@ -3,7 +3,7 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async ValueTask<(TData, string, Exception?)> AbandonInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
+  static async ValueTask<(TData, AbandoningStates, Exception?)> AbandonInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -20,13 +20,13 @@ partial class InboxFuncs
     return (data, AbandoningSuccess, null);
   }
 
-  static (TData, string, Exception?) AbandonInboxMessageError<TData, TKey, TPayload>(
+  static (TData, AbandoningStates, Exception?) AbandonInboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IAbandoningData<TKey, TPayload> =>
     (data, AbandoningError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> AbandonInboxMessageAsync<TServices, TData, TKey, TPayload>(
+  internal static ValueTask<(TData, AbandoningStates, Exception?)> AbandonInboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

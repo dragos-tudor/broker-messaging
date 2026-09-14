@@ -1,10 +1,9 @@
 
 namespace Operations.Outbound.Envelope;
 
-static partial class EnvelopeStates
+internal enum ProducingStates
 {
-  const string Scope = "Envelope";
-  internal const string ProducingEnqueue = $"{Scope}.{nameof(ProducingEnqueue)}";
-  internal const string ProducingNotEnqueue = $"{Scope}.{nameof(ProducingNotEnqueue)}";
-  internal const string ProducingError = $"{Scope}.{nameof(ProducingError)}";
+  ProducingEnqueue,
+  ProducingNotEnqueue,
+  ProducingError
 }

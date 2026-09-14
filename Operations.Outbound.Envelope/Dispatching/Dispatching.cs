@@ -3,7 +3,7 @@ namespace Operations.Outbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  internal static (TData, string, Exception?) DispatchEnvelopeSuccess<TServices, TData>(
+  internal static (TData, DispatchingStates, Exception?) DispatchEnvelopeSuccess<TServices, TData>(
     TServices services,
     TData data)
   where TServices : IDispatchingServices
@@ -11,21 +11,21 @@ partial class EnvelopeFuncs
   {
     var result = RequireProduceResult(data.ProduceResult);
 
-    return result.IsAcknowledged?
-      (data, DispatchingAck, null):
+    return result.IsAcknowledged ?
+      (data, DispatchingAck, null) :
       (data, DispatchingNotAck, null);
   }
 
-  static (TData, string, Exception?) DispatchEnvelopeError<TData>(
+  static (TData, DispatchingStates, Exception?) DispatchEnvelopeError<TData>(
     TData data,
     Exception exception)
   where TData : IDispatchingData =>
     (data, DispatchingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> DispatchEnvelope<TServices, TData>(
+  internal static ValueTask<(TData, DispatchingStates, Exception?)> DispatchEnvelope<TServices, TData>(
     TServices services,
     TData data,
-    CancellationToken ct = default)
+    CancellationToken _ = default)
   where TServices : IDispatchingServices
   where TData : IDispatchingData =>
     TryCatch(

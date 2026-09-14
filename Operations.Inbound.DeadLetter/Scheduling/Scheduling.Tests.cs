@@ -3,9 +3,9 @@ namespace Operations.Inbound.DeadLetter;
 public partial class DeadLetterTests
 {
   [TestMethod]
-  [DataRow(5, "DeadLetterStates.SchedulingNotExhausted")]
-  [DataRow(0, "DeadLetterStates.SchedulingExhausted")]
-  public async Task schedule_dead_letter_message__retry_limit_varies__returns_matching_state(int maxRetries, string expectedState)
+  [DataRow(5, SchedulingStates.SchedulingNotExhausted)]
+  [DataRow(0, SchedulingStates.SchedulingExhausted)]
+  public async Task schedule_dead_letter_message__retry_limit_varies__returns_matching_state(int maxRetries, Enum expectedState)
   {
     var services = Substitute.For<ISchedulingServices<string, string>>();
     var inputData = new DeadLetterData { DeadLetterMessage = Substitute.For<IDeadLetterMessage<string, string>>() };

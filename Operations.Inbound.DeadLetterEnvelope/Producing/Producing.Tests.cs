@@ -3,9 +3,9 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 public partial class DeadLetterEnvelopeTests
 {
   [TestMethod]
-  [DataRow(true, "DeadLetterEnvelope.ProducingEnqueue")]
-  [DataRow(false, "DeadLetterEnvelope.ProducingNotEnqueue")]
-  public async Task produce_dead_letter_envelope__enqueue_result_varies__returns_matching_state(bool enqueued, string expectedState)
+  [DataRow(true, ProducingStates.ProducingEnqueue)]
+  [DataRow(false, ProducingStates.ProducingNotEnqueue)]
+  public async Task produce_dead_letter_envelope__enqueue_result_varies__returns_matching_state(bool enqueued, Enum expectedState)
   {
     var services = Substitute.For<IProducingServices<string, byte[], object, string, string>>();
     var envelope = Substitute.For<IDeadLetterEnvelope<string, byte[], object, string>>();

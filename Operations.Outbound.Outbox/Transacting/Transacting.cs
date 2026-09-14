@@ -3,7 +3,7 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static async ValueTask<(TData, string, Exception?)> TransactOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload, TSession>(
+  static async ValueTask<(TData, TransactingStates, Exception?)> TransactOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload, TSession>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -30,13 +30,13 @@ partial class OutboxFuncs
     return (data, TransactingSuccess, null);
   }
 
-  static (TData, string, Exception?) TransactOutboxMessageError<TData, TKey, TPayload>(
+  static (TData, TransactingStates, Exception?) TransactOutboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : ITransactingData<TKey, TPayload>  =>
     (data, TransactingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> TransactOutboxMessageAsync<TServices, TData, TKey, TPayload, TSession>(
+  internal static ValueTask<(TData, TransactingStates, Exception?)> TransactOutboxMessageAsync<TServices, TData, TKey, TPayload, TSession>(
     TServices services,
     TData data,
     CancellationToken ct = default)

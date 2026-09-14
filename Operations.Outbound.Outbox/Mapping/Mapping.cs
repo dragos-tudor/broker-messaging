@@ -3,7 +3,7 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static ValueTask<(TData, string, Exception?)> MapOutboxMessageSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  static ValueTask<(TData, MappingStates, Exception?)> MapOutboxMessageSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -18,13 +18,13 @@ partial class OutboxFuncs
     return new ((data, MappingSuccess, null));
   }
 
-  static (TData, string, Exception?) MapOutboxMessageError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  static (TData, MappingStates, Exception?) MapOutboxMessageError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TData data,
     Exception exception)
   where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
     (data, MappingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> MapOutboxMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  internal static ValueTask<(TData, MappingStates, Exception?)> MapOutboxMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

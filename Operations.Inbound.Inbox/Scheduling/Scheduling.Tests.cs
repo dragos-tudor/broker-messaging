@@ -3,9 +3,9 @@ namespace Operations.Inbound.Inbox;
 public partial class InboxTests
 {
   [TestMethod]
-  [DataRow(5, "InboxStates.SchedulingNotExhausted")]
-  [DataRow(0, "InboxStates.SchedulingExhausted")]
-  public async Task schedule_inbox_message__retry_limit_varies__returns_matching_state(int maxRetries, string expectedState)
+  [DataRow(5, SchedulingStates.SchedulingNotExhausted)]
+  [DataRow(0, SchedulingStates.SchedulingExhausted)]
+  public async Task schedule_inbox_message__retry_limit_varies__returns_matching_state(int maxRetries, Enum expectedState)
   {
     var services = Substitute.For<ISchedulingServices<string, string>>();
     var inputData = new InboxData { InboxMessage = InboxData.CreateMessage() };

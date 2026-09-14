@@ -3,7 +3,7 @@ namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  static async ValueTask<(TData, string, Exception?)> AbandonDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>(
+  static async ValueTask<(TData, AbandoningStates, Exception?)> AbandonDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct)
@@ -20,13 +20,13 @@ partial class DeadLetterFuncs
     return (data, AbandoningSuccess, null);
   }
 
-  static (TData, string, Exception?) AbandonDeadLetterMessageError<TData, TKey, TPayload>(
+  static (TData, AbandoningStates, Exception?) AbandonDeadLetterMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IAbandoningData<TKey, TPayload> =>
     (data, AbandoningError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> AbandonDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
+  internal static ValueTask<(TData, AbandoningStates, Exception?)> AbandonDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct)

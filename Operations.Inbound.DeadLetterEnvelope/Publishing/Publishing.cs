@@ -3,7 +3,7 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  static async ValueTask<(TData, string, Exception?)> PublishDeadLetterEnvelopeSuccessAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  static async ValueTask<(TData, PublishingStates, Exception?)> PublishDeadLetterEnvelopeSuccessAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -16,13 +16,13 @@ partial class DeadLetterEnvelopeFuncs
     return (data, PublishingSuccess, null);
   }
 
-  static (TData, string, Exception?) PublishDeadLetterEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  static (TData, PublishingStates, Exception?) PublishDeadLetterEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TData data,
     Exception exception)
   where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
       (data, PublishingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> PublishDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  internal static ValueTask<(TData, PublishingStates, Exception?)> PublishDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

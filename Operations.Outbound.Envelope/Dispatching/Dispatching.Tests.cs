@@ -3,11 +3,11 @@ namespace Operations.Outbound.Envelope;
 public partial class EnvelopeTests
 {
   [TestMethod]
-  [DataRow(true, "Envelope.DispatchingAck")]
-  [DataRow(false, "Envelope.DispatchingNotAck")]
+  [DataRow(true, DispatchingAck)]
+  [DataRow(false, DispatchingNotAck)]
   public async Task dispatch_envelope__produce_result_acknowledgement_varies__returns_matching_state(
     bool isAcknowledged,
-    string expectedState)
+    Enum expectedState)
   {
     var services = Substitute.For<IDispatchingServices>();
     var inputData = new EnvelopeData {

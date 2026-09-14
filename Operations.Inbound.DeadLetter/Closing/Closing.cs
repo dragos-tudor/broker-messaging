@@ -3,7 +3,7 @@ namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  static async ValueTask<(TData, string, Exception?)> CloseDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>(
+  static async ValueTask<(TData, ClosingStates, Exception?)> CloseDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct)
@@ -18,13 +18,13 @@ partial class DeadLetterFuncs
     return (data, ClosingSuccess, null);
   }
 
-  static (TData, string, Exception?) CloseDeadLetterMessageError<TData, TKey, TPayload>(
+  static (TData, ClosingStates, Exception?) CloseDeadLetterMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IClosingData<TKey, TPayload> =>
     (data, ClosingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> CloseDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
+  internal static ValueTask<(TData, ClosingStates, Exception?)> CloseDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct)

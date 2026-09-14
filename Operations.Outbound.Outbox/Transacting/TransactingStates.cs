@@ -1,8 +1,8 @@
 
 namespace Operations.Outbound.Outbox;
 
-static partial class OutboxStates
+internal enum TransactingStates
 {
-  internal const string TransactingSuccess = $"{Scope}.{nameof(TransactingSuccess)}";
-  internal const string TransactingError = $"{Scope}.{nameof(TransactingError)}";
+  TransactingSuccess,
+  TransactingError
 }

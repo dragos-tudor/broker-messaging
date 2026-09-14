@@ -3,7 +3,7 @@ namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static (TData, string, Exception?) MapEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  static (TData, MappingStates, Exception?) MapEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
     TData data)
   where TServices : IMappingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
@@ -17,13 +17,13 @@ partial class EnvelopeFuncs
     return (data, MappingSuccess, null);
   }
 
-  static (TData, string, Exception?) MapEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  static (TData, MappingStates, Exception?) MapEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TData data,
     Exception exception)
   where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
     (data, MappingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> MapEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  internal static ValueTask<(TData, MappingStates, Exception?)> MapEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

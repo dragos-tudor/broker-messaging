@@ -6,8 +6,11 @@ global using Persistence.DeadLetterMessage;
 global using Transport.DeadLetterEnvelope;
 global using static Foundation.Extensions.ExtensionsFuncs;
 global using static Persistence.DeadLetterMessage.DeadLetterMessageFuncs;
-global using static Operations.Inbound.DeadLetter.DeadLetterFuncs;
-global using static Operations.Inbound.DeadLetter.DeadLetterStates;
+global using static Operations.Inbound.DeadLetter.AbandoningStates;
+global using static Operations.Inbound.DeadLetter.ClosingStates;
+global using static Operations.Inbound.DeadLetter.InsertingStates;
+global using static Operations.Inbound.DeadLetter.MappingStates;
+global using static Operations.Inbound.DeadLetter.SchedulingStates;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Pipelines.Inbound")]

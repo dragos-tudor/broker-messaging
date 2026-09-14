@@ -1,5 +1,5 @@
 
-namespace Operations.Inbound.DeadLetter;
+namespace Operations.Inbound.Inbox;
 
 internal enum InsertingStates
 {

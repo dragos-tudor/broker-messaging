@@ -3,7 +3,7 @@ namespace Operations.Outbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static (TData, string, Exception?) ProduceEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  static (TData, ProducingStates, Exception?) ProduceEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
     TData data)
   where TServices : IProducingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
@@ -25,13 +25,13 @@ partial class EnvelopeFuncs
       : (data, ProducingNotEnqueue, null);
   }
 
-  static (TData, string, Exception?) ProduceEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  static (TData, ProducingStates, Exception?) ProduceEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TData data,
     Exception exception)
   where TData : IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
     (data, ProducingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> ProduceEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  internal static ValueTask<(TData, ProducingStates, Exception?)> ProduceEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

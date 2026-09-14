@@ -1,10 +1,9 @@
-using Funcs = Persistence.InboxMessage.InboxMessageFuncs;
 
 namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async ValueTask<(TData, string, Exception?)> InsertInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
+  static async ValueTask<(TData, InsertingStates, Exception?)> InsertInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -17,13 +16,13 @@ partial class InboxFuncs
       (data, InsertingIdempotent, null);
   }
 
-  static (TData, string, Exception?) InsertInboxMessageError<TServices, TData, TKey, TPayload>(
+  static (TData, InsertingStates, Exception?) InsertInboxMessageError<TServices, TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IInsertingData<TKey, TPayload> =>
     (data, InsertingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> InsertInboxMessageAsync<TServices, TData, TKey, TPayload>(
+  internal static ValueTask<(TData, InsertingStates, Exception?)> InsertInboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

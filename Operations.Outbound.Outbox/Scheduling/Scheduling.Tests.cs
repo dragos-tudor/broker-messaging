@@ -3,9 +3,9 @@ namespace Operations.Outbound.Outbox;
 public partial class OutboxTests
 {
   [TestMethod]
-  [DataRow(5, "OutboxStates.SchedulingNotExhausted")]
-  [DataRow(0, "OutboxStates.SchedulingExhausted")]
-  public async Task schedule_outbox_message__retry_limit_varies__returns_matching_state(int maxRetries, string expectedState)
+  [DataRow(5, SchedulingStates.SchedulingNotExhausted)]
+  [DataRow(0, SchedulingStates.SchedulingExhausted)]
+  public async Task schedule_outbox_message__retry_limit_varies__returns_matching_state(int maxRetries, Enum expectedState)
   {
     var services = Substitute.For<ISchedulingServices<string, string>>();
     var inputData = new OutboxData { OutboxMessage = Substitute.For<IOutboxMessage<string, string>>() };

@@ -1,5 +1,5 @@
 
 namespace Operations.Outbound.Envelope;
 
-public interface IDispatchingData:
+public interface IDispatchingData :
   IProduceResultProp;

@@ -1,5 +1,4 @@
 
-
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
 global using NSubstitute;
 global using NSubstitute.ExceptionExtensions;

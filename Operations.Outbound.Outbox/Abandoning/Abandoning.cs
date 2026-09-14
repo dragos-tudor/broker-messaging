@@ -3,7 +3,7 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static async ValueTask<(TData, string, Exception?)> AbandonOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
+  static async ValueTask<(TData, AbandoningStates, Exception?)> AbandonOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -20,13 +20,13 @@ partial class OutboxFuncs
     return (data, AbandoningSuccess, null);
   }
 
-  static (TData, string, Exception?) AbandonOutboxMessageError<TServices, TData, TKey, TPayload>(
+  static (TData, AbandoningStates, Exception?) AbandonOutboxMessageError<TServices, TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IAbandoningData<TKey, TPayload> =>
     (data, AbandoningError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> AbandonOutboxMessageAsync<TServices, TData, TKey, TPayload>(
+  internal static ValueTask<(TData, AbandoningStates, Exception?)> AbandonOutboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

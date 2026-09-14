@@ -3,7 +3,7 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async ValueTask<(TData, string, Exception?)> DeadLetterInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
+  static async ValueTask<(TData, DeadLetteringStates, Exception?)> DeadLetterInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -19,13 +19,13 @@ partial class InboxFuncs
     return (data, DeadLetteringSuccess, null);
   }
 
-  static (TData, string, Exception?) DeadLetterInboxMessageError<TData, TKey, TPayload>(
+  static (TData, DeadLetteringStates, Exception?) DeadLetterInboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IDeadLetteringData<TKey, TPayload> =>
     (data, DeadLetteringError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> DeadLetterInboxMessageAsync<TServices, TData, TKey, TPayload>(
+  internal static ValueTask<(TData, DeadLetteringStates, Exception?)> DeadLetterInboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

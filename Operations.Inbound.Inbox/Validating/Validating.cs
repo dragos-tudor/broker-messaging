@@ -4,7 +4,7 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static (TData, string, Exception?) ValidateInboxMessageSuccess<TServices, TData, TKey, TPayload>(
+  static (TData, ValidatingStates, Exception?) ValidateInboxMessageSuccess<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data)
   where TServices : IValidatingServices
@@ -18,13 +18,13 @@ partial class InboxFuncs
       (data, ValidatingSuccess, null);
   }
 
-  static (TData, string, Exception?) ValidateInboxMessageError<TData, TKey, TPayload>(
+  static (TData, ValidatingStates, Exception?) ValidateInboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IValidatingData<TKey, TPayload> =>
     (data, ValidatingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> ValidateInboxMessage<TServices, TData, TKey, TPayload>(
+  internal static ValueTask<(TData, ValidatingStates, Exception?)> ValidateInboxMessage<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

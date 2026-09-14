@@ -3,7 +3,7 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  internal static async ValueTask<(TData, string, Exception?)> HandleInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
+  internal static async ValueTask<(TData, HandlingStates, Exception?)> HandleInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -20,13 +20,13 @@ partial class InboxFuncs
     return (data, HandlingSuccess, null);
   }
 
-  static (TData, string, Exception?) HandleInboxMessageError<TData, TKey, TPayload>(
+  static (TData, HandlingStates, Exception?) HandleInboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IHandlingData<TKey, TPayload> =>
     (data, HandlingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> HandleInboxMessageAsync<TServices, TData, TKey, TPayload>(
+  internal static ValueTask<(TData, HandlingStates, Exception?)> HandleInboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

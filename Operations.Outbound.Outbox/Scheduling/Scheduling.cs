@@ -3,7 +3,7 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static async ValueTask<(TData, string, Exception?)> ScheduleOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
+  static async ValueTask<(TData, SchedulingStates, Exception?)> ScheduleOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -26,13 +26,13 @@ partial class OutboxFuncs
       (data, SchedulingExhausted, null);
   }
 
-  static (TData, string, Exception?) ScheduleOutboxMessageError<TData, TKey, TPayload>(
+  static (TData, SchedulingStates, Exception?) ScheduleOutboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : ISchedulingData<TKey, TPayload> =>
     (data, SchedulingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> ScheduleOutboxMessageAsync<TServices, TData, TKey, TPayload>(
+  internal static ValueTask<(TData, SchedulingStates, Exception?)> ScheduleOutboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

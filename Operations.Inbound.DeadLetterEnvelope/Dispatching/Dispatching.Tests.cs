@@ -3,9 +3,9 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 public partial class DeadLetterEnvelopeTests
 {
   [TestMethod]
-  [DataRow(true, "DeadLetterEnvelope.DispatchingAck")]
-  [DataRow(false, "DeadLetterEnvelope.DispatchingNotAck")]
-  public async Task dispatch_dead_letter_envelope__acknowledgement_varies__returns_matching_state(bool acknowledged, string expectedState)
+  [DataRow(true, DispatchingStates.DispatchingAck)]
+  [DataRow(false, DispatchingStates.DispatchingNotAck)]
+  public async Task dispatch_dead_letter_envelope__acknowledgement_varies__returns_matching_state(bool acknowledged, Enum expectedState)
   {
     var services = Substitute.For<IDispatchingServices>();
     var inputData = new DeadLetterEnvelopeData {

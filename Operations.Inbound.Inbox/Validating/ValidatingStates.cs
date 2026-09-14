@@ -1,9 +1,9 @@
 
 namespace Operations.Inbound.Inbox;
 
-static partial class InboxStates
+internal enum ValidatingStates
 {
-  internal const string ValidatingSuccess = $"{Scope}.{nameof(ValidatingSuccess)}";
-  internal const string ValidatingError = $"{Scope}.{nameof(ValidatingError)}";
-  internal const string ValidatingInvalidError = $"{Scope}.{nameof(ValidatingInvalidError)}";
+  ValidatingSuccess,
+  ValidatingError,
+  ValidatingInvalidError
 }

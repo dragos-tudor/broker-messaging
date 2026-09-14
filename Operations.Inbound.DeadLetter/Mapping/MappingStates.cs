@@ -1,8 +1,8 @@
 
 namespace Operations.Inbound.DeadLetter;
 
-partial class DeadLetterStates
+internal enum MappingStates
 {
-  internal const string MappingSuccess = $"{Scope}.{nameof(MappingSuccess)}";
-  internal const string MappingError = $"{Scope}.{nameof(MappingError)}";
+  MappingSuccess,
+  MappingError
 }

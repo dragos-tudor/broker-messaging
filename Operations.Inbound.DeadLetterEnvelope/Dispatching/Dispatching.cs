@@ -3,7 +3,7 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  internal static (TData, string, Exception?) DispatchDeadLetterEnvelopeSuccess<TServices, TData>(
+  internal static (TData, DispatchingStates, Exception?) DispatchDeadLetterEnvelopeSuccess<TServices, TData>(
     TServices services,
     TData data)
   where TServices : IDispatchingServices
@@ -16,13 +16,13 @@ partial class DeadLetterEnvelopeFuncs
       (data, DispatchingNotAck, null);
   }
 
-  static (TData, string, Exception?) DispatchDeadLetterEnvelopeError<TData>(
+  static (TData, DispatchingStates, Exception?) DispatchDeadLetterEnvelopeError<TData>(
     TData data,
     Exception exception)
   where TData : IDispatchingData =>
     (data, DispatchingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> DispatchDeadLetterEnvelope<TServices, TData>(
+  internal static ValueTask<(TData, DispatchingStates, Exception?)> DispatchDeadLetterEnvelope<TServices, TData>(
     TServices services,
     TData data,
     CancellationToken ct = default)

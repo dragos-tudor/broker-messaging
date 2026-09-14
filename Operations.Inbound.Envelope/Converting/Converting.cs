@@ -3,7 +3,7 @@ namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static (TData, string, Exception?) ConvertEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  static (TData, ConvertingStates, Exception?) ConvertEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
     TData data)
   where TServices : IConvertingServices<TKey, TValue, TMetadata, TConfirmation>
@@ -18,13 +18,13 @@ partial class EnvelopeFuncs
     return (data, ConvertingSuccess, null);
   }
 
-  static (TData, string, Exception?) ConvertEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  static (TData, ConvertingStates, Exception?) ConvertEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TData data,
     Exception exception)
   where TData : IConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
     (data, ConvertingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> ConvertEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  internal static ValueTask<(TData, ConvertingStates, Exception?)> ConvertEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

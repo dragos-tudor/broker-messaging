@@ -3,7 +3,7 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  internal static (TData, string, Exception?) ProduceDeadLetterEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  internal static (TData, ProducingStates, Exception?) ProduceDeadLetterEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
     TData data)
   where TServices : IProducingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
@@ -25,13 +25,13 @@ partial class DeadLetterEnvelopeFuncs
       (data, ProducingNotEnqueue, null);
   }
 
-  static (TData, string, Exception?) ProduceDeadLetterEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  static (TData, ProducingStates, Exception?) ProduceDeadLetterEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TData data,
     Exception exception)
   where TData : IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
     (data, ProducingError, exception);
 
-  internal static ValueTask<(TData, string, Exception?)> ProduceDeadLetterEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  internal static ValueTask<(TData, ProducingStates, Exception?)> ProduceDeadLetterEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
