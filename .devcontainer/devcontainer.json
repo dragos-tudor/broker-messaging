@@ -18,17 +18,18 @@
     "KAFKA_PASSWORD": "p@ssw0rd!",
     "CONTAINERS_REGISTRIES_CONF": "/workspaces/broker-messaging/.podman/registries.conf",
     "CONTAINERS_STORAGE_CONF": "/workspaces/broker-messaging/.podman/storage.conf",
+    "DOTNET_ROOT": "/root/.dotnet",   
     "WORKSPACE_ROOT": "/workspaces/broker-messaging"
 	},
 	"runArgs": [
-		"--name=messaging",
+		"--name=broker-messaging",
 		"--hostname=messaging",
     "--add-host=host.containers.internal:host-gateway",
     "--network=messaging-network",
     "--dns=127.0.0.1", "--dns=8.8.8.8", "--dns=1.1.1.1",
 		"--privileged"
 	],
-	"initializeCommand": "chmod u+x .services/*.sh .scripts/*.sh; .services/initializing.sh",
-  "postCreateCommand": "chmod u+x .services/**/*.sh; .services/creating.sh",
-  "postStartCommand": ".services/starting.sh"
+	"initializeCommand": "chmod u+x .services/**/*.sh .scripts/*.sh; .services/devcontainer/initializing.sh",
+  "postCreateCommand": ".services/containers/creating.sh; .services/dotnet/installing.sh",
+  "postStartCommand": ".services/containers/starting.sh"
 }
