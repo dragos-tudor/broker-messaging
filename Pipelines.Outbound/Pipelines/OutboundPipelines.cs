@@ -3,12 +3,5 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static Func<string, OutboundPipelineConfig, string?>? GetOutboundPipeline(string pipelineType) =>
-    pipelineType switch
-    {
-      PipelinesTypes.Persisting => GetPersistingAction,
-      PipelinesTypes.Publishing => GetPublishingAction,
-      PipelinesTypes.Dispatching => GetDispatchingAction,
-      _ => default
-    };
+  // The outbound router will be migrated to the typed pipeline continuations separately.
 }

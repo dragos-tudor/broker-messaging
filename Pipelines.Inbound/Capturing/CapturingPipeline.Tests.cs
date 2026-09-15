@@ -1,6 +1,6 @@
 
-using static Operations.Inbound.Envelope.EnvelopeStates;
-using static Operations.Inbound.Inbox.InboxStates;
+using Operations.Inbound.Envelope;
+using Operations.Inbound.Inbox;
 
 namespace Pipelines.Inbound;
 
@@ -9,145 +9,152 @@ partial class InboundTests
   [TestMethod]
   public void happy_path__exit()
   {
-    string[] path = [
-      PipelineTypes.Capturing, CapturingSuccess, VerifyingSuccess,
-      MappingSuccess, ValidatingSuccess, InsertingSuccess,
-      ConfirmingSuccess, TerminalActions.Exit
+    CapturingInput[] path = [
+      CapturingEntry.Start, CapturingStates.Success,
+      VerifyingStates.Success, MappingStates.Success,
+      ValidatingStates.Success, InsertingStates.Success,
+      ConfirmingStates.Success
     ];
-    RunCapturingPipeline(path);
+    RunCapturingPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod]
   public void happy_path_and_handle_after_capture__handling()
   {
-    string[] path = [
-      PipelineTypes.Capturing, CapturingSuccess, VerifyingSuccess,
-      MappingSuccess, ValidatingSuccess, InsertingSuccess,
-      ConfirmingSuccess, PipelineTypes.Handling
+    CapturingInput[] path = [
+      CapturingEntry.Start, CapturingStates.Success,
+      VerifyingStates.Success, MappingStates.Success,
+      ValidatingStates.Success, InsertingStates.Success,
+      ConfirmingStates.Success
     ];
     var config = new InboundPipelineConfig() { HandleAfterCapture = true };
-    RunCapturingPipeline(path, config);
+    RunCapturingPipeline(path, PipelineTypes.Handling, config);
   }
 
   [TestMethod]
   public void not_captured__exit()
   {
-    string[] path = [
-      PipelineTypes.Capturing, CapturingNotCaptured, TerminalActions.Exit
+    CapturingInput[] path = [
+      CapturingEntry.Start, CapturingStates.NotCaptured
     ];
-    RunCapturingPipeline(path);
+    RunCapturingPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod]
   public void capturing_error__exit()
   {
-    string[] path = [
-      PipelineTypes.Capturing, CapturingError, TerminalActions.Exit
+    CapturingInput[] path = [
+      CapturingEntry.Start, CapturingStates.Error
     ];
-    RunCapturingPipeline(path);
+    RunCapturingPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod]
   public void verifying_invalid__unrecoverable()
   {
-    string[] path = [
-      PipelineTypes.Capturing, CapturingSuccess, VerifyingInvalidError,
-      TerminalActions.Unrecoverable
+    CapturingInput[] path = [
+      CapturingEntry.Start, CapturingStates.Success,
+      VerifyingStates.InvalidError
     ];
-    RunCapturingPipeline(path);
+    RunCapturingPipeline(path, TerminalActions.Unrecoverable);
   }
 
   [TestMethod]
   public void verifying_invalid_confirmable__redirecting()
   {
-    string[] path = [
-      PipelineTypes.Capturing, CapturingSuccess,
-      VerifyingInvalidConfirmableError, PipelineTypes.Redirecting
+    CapturingInput[] path = [
+      CapturingEntry.Start, CapturingStates.Success,
+      VerifyingStates.InvalidConfirmableError
     ];
-    RunCapturingPipeline(path);
+    RunCapturingPipeline(path, PipelineTypes.Redirecting);
   }
 
   [TestMethod]
   public void verifying_error__unrecoverable()
   {
-    string[] path = [
-      PipelineTypes.Capturing, CapturingSuccess, VerifyingError,
-      TerminalActions.Unrecoverable
+    CapturingInput[] path = [
+      CapturingEntry.Start, CapturingStates.Success,
+      VerifyingStates.Error
     ];
-    RunCapturingPipeline(path);
+    RunCapturingPipeline(path, TerminalActions.Unrecoverable);
   }
 
   [TestMethod]
   public void mapping_error__redirecting()
   {
-    string[] path = [
-      PipelineTypes.Capturing, CapturingSuccess, VerifyingSuccess,
-      MappingError, PipelineTypes.Redirecting
+    CapturingInput[] path = [
+      CapturingEntry.Start, CapturingStates.Success,
+      VerifyingStates.Success, MappingStates.Error
     ];
-    RunCapturingPipeline(path);
+    RunCapturingPipeline(path, PipelineTypes.Redirecting);
   }
 
   [TestMethod]
   public void validating_invalid__redirecting()
   {
-    string[] path = [
-      PipelineTypes.Capturing, CapturingSuccess, VerifyingSuccess,
-      MappingSuccess, ValidatingInvalidError, PipelineTypes.Redirecting
+    CapturingInput[] path = [
+      CapturingEntry.Start, CapturingStates.Success,
+      VerifyingStates.Success, MappingStates.Success,
+      ValidatingStates.InvalidError
     ];
-    RunCapturingPipeline(path);
+    RunCapturingPipeline(path, PipelineTypes.Redirecting);
   }
 
   [TestMethod]
   public void validating_error__redirecting()
   {
-    string[] path = [
-      PipelineTypes.Capturing, CapturingSuccess, VerifyingSuccess,
-      MappingSuccess, ValidatingError, PipelineTypes.Redirecting
+    CapturingInput[] path = [
+      CapturingEntry.Start, CapturingStates.Success,
+      VerifyingStates.Success, MappingStates.Success,
+      ValidatingStates.Error
     ];
-    RunCapturingPipeline(path);
+    RunCapturingPipeline(path, PipelineTypes.Redirecting);
   }
 
   [TestMethod]
   public void inserting_idempotent__confirm_final__exit()
   {
-    string[] path = [
-      PipelineTypes.Capturing, CapturingSuccess, VerifyingSuccess,
-      MappingSuccess, ValidatingSuccess, InsertingIdempotent,
-      ConfirmingFinalSuccess, TerminalActions.Exit
+    CapturingInput[] path = [
+      CapturingEntry.Start, CapturingStates.Success,
+      VerifyingStates.Success, MappingStates.Success,
+      ValidatingStates.Success, InsertingStates.Idempotent,
+      ConfirmingFinalStates.Success
     ];
-    RunCapturingPipeline(path);
+    RunCapturingPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod]
   public void inserting_error__exit()
   {
-    string[] path = [
-      PipelineTypes.Capturing, CapturingSuccess, VerifyingSuccess,
-      MappingSuccess, ValidatingSuccess, InsertingError,
-      TerminalActions.Exit
+    CapturingInput[] path = [
+      CapturingEntry.Start, CapturingStates.Success,
+      VerifyingStates.Success, MappingStates.Success,
+      ValidatingStates.Success, InsertingStates.Error
     ];
-    RunCapturingPipeline(path);
+    RunCapturingPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod]
   public void confirming_error__exit()
   {
-    string[] path = [
-      PipelineTypes.Capturing, CapturingSuccess, VerifyingSuccess,
-      MappingSuccess, ValidatingSuccess, InsertingSuccess,
-      ConfirmingError, TerminalActions.Exit
+    CapturingInput[] path = [
+      CapturingEntry.Start, CapturingStates.Success,
+      VerifyingStates.Success, MappingStates.Success,
+      ValidatingStates.Success, InsertingStates.Success,
+      ConfirmingStates.Error
     ];
-    RunCapturingPipeline(path);
+    RunCapturingPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod]
   public void confirming_final_error__exit()
   {
-    string[] path = [
-      PipelineTypes.Capturing, CapturingSuccess, VerifyingSuccess,
-      MappingSuccess, ValidatingSuccess, InsertingIdempotent,
-      ConfirmingFinalError, TerminalActions.Exit
+    CapturingInput[] path = [
+      CapturingEntry.Start, CapturingStates.Success,
+      VerifyingStates.Success, MappingStates.Success,
+      ValidatingStates.Success, InsertingStates.Idempotent,
+      ConfirmingFinalStates.Error
     ];
-    RunCapturingPipeline(path);
+    RunCapturingPipeline(path, TerminalActions.Exit);
   }
 }

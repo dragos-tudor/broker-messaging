@@ -1,34 +1,30 @@
-using static Operations.Inbound.DeadLetter.DeadLetterStates;
-using static Operations.Inbound.DeadLetterEnvelope.DeadLetterEnvelopeStates;
+using DeadLetter = Operations.Inbound.DeadLetter;
+using DeadLetterEnvelope = Operations.Inbound.DeadLetterEnvelope;
 
 namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunPublishingPipeline(string[] path, InboundPipelineConfig config = default)
+  static void RunPublishingPipeline(PublishingInput[] path, PublishingContinuation end, InboundPipelineConfig config = default)
   {
-    string[] possibleStates = [PipelineTypes.Publishing];
-    foreach(var state in path)
+    PublishingInput[] possibleInputs = [PublishingEntry.Start];
+    foreach (var input in path)
     {
-      possibleStates.ShouldContain(state, $"{state} is not valid. Expected one of: {string.Join(", ", possibleStates)}");
-      if (IsLastPathState(path, state)) return;
-
-      var action = GetPublishingAction(state, config);
-      action.ShouldNotBeNull($"{state} -> {action} is missing.");
-
-      possibleStates = GetPublishingPossibleStates(action);
+      possibleInputs.ShouldContain(input);
+      var continuation = GetPublishingContinuation(input, config);
+      if (path[^1].Value == input.Value) { continuation.ShouldBe(end); return; }
+      possibleInputs = continuation switch { PublishingActions action => [.. GetPublishingPossibleInputs(action)], _ => [] };
     }
   }
 
-  static string[] GetPublishingPossibleStates(string action) =>
-    action switch
-    {
-      PublishingActions.Mapping => [MappingSuccess, MappingError],
-      PublishingActions.Publishing => [PublishingSuccess, PublishingError],
-      PublishingActions.Producing => [ProducingEnqueue, ProducingNotEnqueue, ProducingError],
-      PublishingActions.Scheduling => [SchedulingExhausted, SchedulingNotExhausted, SchedulingError],
-      PublishingActions.Abandoning => [AbandoningSuccess, AbandoningError],
-      PublishingActions.Closing => [ClosingSuccess, ClosingError],
-      _ => [action],
-    };
+  static IEnumerable<PublishingInput> GetPublishingPossibleInputs(PublishingActions action) => action switch
+  {
+    PublishingActions.Mapping => [.. Enum.GetValues<DeadLetter.MappingStates>()],
+    PublishingActions.Publishing => [.. Enum.GetValues<DeadLetterEnvelope.PublishingStates>()],
+    PublishingActions.Producing => [.. Enum.GetValues<DeadLetterEnvelope.ProducingStates>()],
+    PublishingActions.Scheduling => [.. Enum.GetValues<DeadLetter.SchedulingStates>()],
+    PublishingActions.Abandoning => [.. Enum.GetValues<DeadLetter.AbandoningStates>()],
+    PublishingActions.Closing => [.. Enum.GetValues<DeadLetter.ClosingStates>()],
+    _ => throw new InvalidOperationException($"Invalid publishing action {action}")
+  };
 }

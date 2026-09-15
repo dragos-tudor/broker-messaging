@@ -5,38 +5,40 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static string? GetCapturingAction(string state, InboundPipelineConfig config) => state switch
-  {
-    PipelineTypes.Capturing => CapturingActions.Capturing,
+  internal static CapturingContinuation GetCapturingContinuation(
+    CapturingInput input,
+    InboundPipelineConfig config) => input switch
+    {
+      CapturingEntry.Start => CapturingActions.Capturing,
 
-    EnvelopeStates.CapturingSuccess => CapturingActions.Verifying,
-    EnvelopeStates.CapturingNotCaptured => TerminalActions.Exit,
-    EnvelopeStates.CapturingError => TerminalActions.Exit,
+      CapturingStates.Success => CapturingActions.Verifying,
+      CapturingStates.NotCaptured => TerminalActions.Exit,
+      CapturingStates.Error => TerminalActions.Exit,
 
-    EnvelopeStates.VerifyingSuccess => CapturingActions.Mapping,
-    EnvelopeStates.VerifyingInvalidError => TerminalActions.Unrecoverable,
-    EnvelopeStates.VerifyingInvalidConfirmableError => PipelineTypes.Redirecting,
-    EnvelopeStates.VerifyingError => TerminalActions.Unrecoverable,
+      VerifyingStates.Success => CapturingActions.Mapping,
+      VerifyingStates.InvalidError => TerminalActions.Unrecoverable,
+      VerifyingStates.InvalidConfirmableError => PipelineTypes.Redirecting,
+      VerifyingStates.Error => TerminalActions.Unrecoverable,
 
-    EnvelopeStates.MappingSuccess => CapturingActions.Validating,
-    EnvelopeStates.MappingError => PipelineTypes.Redirecting,
+      MappingStates.Success => CapturingActions.Validating,
+      MappingStates.Error => PipelineTypes.Redirecting,
 
-    InboxStates.ValidatingSuccess => CapturingActions.Inserting,
-    InboxStates.ValidatingInvalidError => PipelineTypes.Redirecting,
-    InboxStates.ValidatingError => PipelineTypes.Redirecting,
+      ValidatingStates.Success => CapturingActions.Inserting,
+      ValidatingStates.InvalidError => PipelineTypes.Redirecting,
+      ValidatingStates.Error => PipelineTypes.Redirecting,
 
-    InboxStates.InsertingSuccess => CapturingActions.Confirming,
-    InboxStates.InsertingIdempotent => CapturingActions.ConfirmingFinal,
-    InboxStates.InsertingError => TerminalActions.Exit,
+      InsertingStates.Success => CapturingActions.Confirming,
+      InsertingStates.Idempotent => CapturingActions.ConfirmingFinal,
+      InsertingStates.Error => TerminalActions.Exit,
 
-    EnvelopeStates.ConfirmingSuccess => config.HandleAfterCapture?
-      PipelineTypes.Handling:
-      TerminalActions.Exit,
-    EnvelopeStates.ConfirmingError => TerminalActions.Exit,
+      ConfirmingStates.Success => config.HandleAfterCapture ?
+        PipelineTypes.Handling :
+        TerminalActions.Exit,
+      ConfirmingStates.Error => TerminalActions.Exit,
 
-    EnvelopeStates.ConfirmingFinalSuccess => TerminalActions.Exit,
-    EnvelopeStates.ConfirmingFinalError => TerminalActions.Exit,
+      ConfirmingFinalStates.Success => TerminalActions.Exit,
+      ConfirmingFinalStates.Error => TerminalActions.Exit,
 
-    _ => default
-  };
+      _ => TerminalActions.Unknown
+    };
 }

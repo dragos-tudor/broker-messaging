@@ -6,24 +6,26 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static string? GetDispatchingAction(string state, OutboundPipelineConfig config) => state switch
+  internal static DispatchingContinuation GetDispatchingContinuation(
+    DispatchingInput input,
+    OutboundPipelineConfig config) => input switch
   {
-    PipelinesTypes.Dispatching => DispatchingActions.Dispatching,
+    DispatchingEntry.Start => DispatchingActions.Dispatching,
 
-    EnvelopeStates.DispatchingAck => DispatchingActions.Closing,
-    EnvelopeStates.DispatchingNotAck => DispatchingActions.Scheduling,
-    EnvelopeStates.DispatchingError => DispatchingActions.Abandoning,
+    DispatchingStates.Ack => DispatchingActions.Closing,
+    DispatchingStates.NotAck => DispatchingActions.Scheduling,
+    DispatchingStates.Error => DispatchingActions.Abandoning,
 
-    OutboxStates.SchedulingExhausted => DispatchingActions.Abandoning,
-    OutboxStates.SchedulingNotExhausted => TerminalActions.Exit,
-    OutboxStates.SchedulingError => TerminalActions.Exit,
+    SchedulingStates.Exhausted => DispatchingActions.Abandoning,
+    SchedulingStates.NotExhausted => TerminalActions.Exit,
+    SchedulingStates.Error => TerminalActions.Exit,
 
-    OutboxStates.AbandoningSuccess => TerminalActions.Exit,
-    OutboxStates.AbandoningError => TerminalActions.Exit,
+    AbandoningStates.Success => TerminalActions.Exit,
+    AbandoningStates.Error => TerminalActions.Exit,
 
-    OutboxStates.ClosingSuccess => TerminalActions.Exit,
-    OutboxStates.ClosingError => TerminalActions.Exit,
+    ClosingStates.Success => TerminalActions.Exit,
+    ClosingStates.Error => TerminalActions.Exit,
 
-    _ => default
+    _ => TerminalActions.Unknown
   };
 }

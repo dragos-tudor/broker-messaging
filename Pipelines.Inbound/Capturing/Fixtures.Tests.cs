@@ -1,39 +1,45 @@
 
-using static Operations.Inbound.Envelope.EnvelopeStates;
-using static Operations.Inbound.Inbox.InboxStates;
+
+using Operations.Inbound.Envelope;
+using Operations.Inbound.Inbox;
 
 namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunCapturingPipeline(string[] path, InboundPipelineConfig config = default)
+  static void RunCapturingPipeline(CapturingInput[] path, CapturingContinuation end, InboundPipelineConfig config = default)
   {
-    string[] possibleStates = [PipelineTypes.Capturing];
-    foreach(var state in path)
+    CapturingInput[] possibleInputs = [CapturingEntry.Start];
+    foreach (var input in path)
     {
-      possibleStates.ShouldContain(state, $"{state} is not valid. Expected one of: {string.Join(", ", possibleStates)}");
-      if (IsLastPathState(path, state)) return;
+      possibleInputs.ShouldContain(input, $"{input} is not valid. Expected one of: {string.Join(", ", possibleInputs)}");
 
-      var action = GetCapturingAction(state, config);
-      action.ShouldNotBeNull($"{state} -> {action} is missing.");
+      var continuation = GetCapturingContinuation(input, config);
+      if (IsLastPathInput(path, input)) {
+        continuation.ShouldBe(end);
+        return;
+      }
 
-      possibleStates = GetCapturingPossibleStates(action);
+      possibleInputs = continuation switch {
+        CapturingActions action => [.. GetCapturingPossibleInputs(action)],
+        _ => []
+      };
     }
   }
 
-  static string[] GetCapturingPossibleStates(string action) =>
+  static IEnumerable<CapturingInput> GetCapturingPossibleInputs(CapturingActions action) =>
     action switch
     {
-      CapturingActions.Capturing => [CapturingSuccess, CapturingNotCaptured, CapturingError],
-      CapturingActions.Verifying => [VerifyingSuccess, VerifyingInvalidError, VerifyingInvalidConfirmableError, VerifyingError],
-      CapturingActions.Mapping => [MappingSuccess, MappingError],
-      CapturingActions.Validating => [ValidatingSuccess, ValidatingInvalidError, ValidatingError],
-      CapturingActions.Inserting => [InsertingSuccess, InsertingIdempotent, InsertingError],
-      CapturingActions.Confirming => [ConfirmingSuccess, ConfirmingError],
-      CapturingActions.ConfirmingFinal => [ConfirmingFinalSuccess, ConfirmingFinalError],
-      _ => [action],
+      CapturingActions.Capturing => [.. Enum.GetValues<CapturingStates>()],
+      CapturingActions.Verifying => [.. Enum.GetValues<VerifyingStates>()],
+      CapturingActions.Mapping => [.. Enum.GetValues<MappingStates>()],
+      CapturingActions.Validating => [.. Enum.GetValues<ValidatingStates>()],
+      CapturingActions.Inserting => [.. Enum.GetValues<InsertingStates>()],
+      CapturingActions.Confirming => [.. Enum.GetValues<ConfirmingStates>()],
+      CapturingActions.ConfirmingFinal => [.. Enum.GetValues<ConfirmingFinalStates>()],
+      _ => throw new InvalidOperationException($"Invalid capturing action {action}")
     };
 
-  static bool IsLastPathState(string[] path, string state) =>
-    path[^1] == state;
+  static bool IsLastPathInput(CapturingInput[] path, CapturingInput input) =>
+    path[^1].Value == input.Value;
 }

@@ -5,19 +5,21 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static string? GetPersistingAction(string state, OutboundPipelineConfig config) => state switch
+  internal static PersistingContinuation GetPersistingContinuation(
+    PersistingInput input,
+    OutboundPipelineConfig config) => input switch
   {
-    PipelinesTypes.Persisting => PersistingActions.Validating,
+    PersistingEntry.Start => PersistingActions.Validating,
 
-    OutboxStates.ValidatingSuccess => PersistingActions.Transacting,
-    OutboxStates.ValidatingInvalidError => TerminalActions.Exit,
-    OutboxStates.ValidatingError => TerminalActions.Exit,
+    ValidatingStates.Success => PersistingActions.Transacting,
+    ValidatingStates.InvalidError => TerminalActions.Exit,
+    ValidatingStates.Error => TerminalActions.Exit,
 
-    OutboxStates.TransactingSuccess => config.PublishAfterPersist?
+    TransactingStates.Success => config.PublishAfterPersist?
       PipelinesTypes.Publishing:
       TerminalActions.Exit,
-    OutboxStates.TransactingError => TerminalActions.Exit,
+    TransactingStates.Error => TerminalActions.Exit,
 
-    _ => default
+    _ => TerminalActions.Unknown
   };
 }

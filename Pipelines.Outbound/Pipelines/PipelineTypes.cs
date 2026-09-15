@@ -1,9 +1,9 @@
 
 namespace Pipelines.Outbound;
 
-static class PipelinesTypes
+internal enum PipelinesTypes
 {
-  internal const string Persisting = $"{nameof(Persisting)}";
-  internal const string Publishing = $"{nameof(Publishing)}";
-  internal const string Dispatching = $"{nameof(Dispatching)}";
+  Persisting,
+  Publishing,
+  Dispatching
 }

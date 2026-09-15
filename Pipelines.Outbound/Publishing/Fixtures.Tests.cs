@@ -1,34 +1,30 @@
-using static Operations.Outbound.Envelope.EnvelopeStates;
-using static Operations.Outbound.Outbox.OutboxStates;
+using Outbox = Operations.Outbound.Outbox;
+using Envelope = Operations.Outbound.Envelope;
 
 namespace Pipelines.Outbound;
 
 partial class OutboundTests
 {
-  static void RunPublishingPipeline(string[] path, OutboundPipelineConfig config = default)
+  static void RunPublishingPipeline(PublishingInput[] path, PublishingContinuation end, OutboundPipelineConfig config = default)
   {
-    string[] possibleStates = [PipelinesTypes.Publishing];
-    foreach (var state in path)
+    PublishingInput[] possibleInputs = [PublishingEntry.Start];
+    foreach (var input in path)
     {
-      possibleStates.ShouldContain(state, $"{state} is not valid. Expected one of: {string.Join(", ", possibleStates)}");
-      if (IsLastPathState(path, state)) return;
-
-      var action = GetPublishingAction(state, config);
-      action.ShouldNotBeNull($"{state} -> {action} is missing.");
-
-      possibleStates = GetPublishingPossibleStates(action);
+      possibleInputs.ShouldContain(input);
+      var continuation = GetPublishingContinuation(input, config);
+      if (path[^1].Value == input.Value) { continuation.ShouldBe(end); return; }
+      possibleInputs = continuation switch { PublishingActions action => [.. GetPublishingPossibleInputs(action)], _ => [] };
     }
   }
 
-  static string[] GetPublishingPossibleStates(string action) =>
-    action switch
-    {
-      PublishingActions.Mapping => [MappingSuccess, MappingError],
-      PublishingActions.Publishing => [PublishingSuccess, PublishingError],
-      PublishingActions.Producing => [ProducingEnqueue, ProducingNotEnqueue, ProducingError],
-      PublishingActions.Scheduling => [SchedulingExhausted, SchedulingNotExhausted, SchedulingError],
-      PublishingActions.Abandoning => [AbandoningSuccess, AbandoningError],
-      PublishingActions.Closing => [ClosingSuccess, ClosingError],
-      _ => [action],
-    };
+  static IEnumerable<PublishingInput> GetPublishingPossibleInputs(PublishingActions action) => action switch
+  {
+    PublishingActions.Mapping => [.. Enum.GetValues<Outbox.MappingStates>()],
+    PublishingActions.Publishing => [.. Enum.GetValues<Envelope.PublishingStates>()],
+    PublishingActions.Producing => [.. Enum.GetValues<Envelope.ProducingStates>()],
+    PublishingActions.Scheduling => [.. Enum.GetValues<Outbox.SchedulingStates>()],
+    PublishingActions.Abandoning => [.. Enum.GetValues<Outbox.AbandoningStates>()],
+    PublishingActions.Closing => [.. Enum.GetValues<Outbox.ClosingStates>()],
+    _ => throw new InvalidOperationException($"Invalid publishing action {action}")
+  };
 }

@@ -1,24 +1,26 @@
-using Operations.Inbound.DeadLetterEnvelope;
 using Operations.Inbound.Envelope;
+using Operations.Inbound.DeadLetterEnvelope;
 
 namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static string? GetRedirectingAction(string state, InboundPipelineConfig _) => state switch
+  internal static RedirectingContinuation GetRedirectingContinuation(
+    RedirectingInput input,
+    InboundPipelineConfig _) => input switch
   {
-    PipelineTypes.Redirecting => RedirectingActions.Converting,
+    RedirectingEntry.Start => RedirectingActions.Converting,
 
-    EnvelopeStates.ConvertingSuccess => RedirectingActions.Redirecting,
-    EnvelopeStates.ConvertingInvalid => RedirectingActions.ConfirmingFinal,
-    EnvelopeStates.ConvertingError => TerminalActions.Unrecoverable,
+    ConvertingStates.Success => RedirectingActions.Redirecting,
+    ConvertingStates.Invalid => RedirectingActions.ConfirmingFinal,
+    ConvertingStates.Error => TerminalActions.Unrecoverable,
 
-    DeadLetterEnvelopeStates.RedirectingSuccess => RedirectingActions.ConfirmingFinal,
-    DeadLetterEnvelopeStates.RedirectingError => TerminalActions.Exit,
+    RedirectingStates.Success => RedirectingActions.ConfirmingFinal,
+    RedirectingStates.Error => TerminalActions.Exit,
 
-    EnvelopeStates.ConfirmingFinalSuccess => TerminalActions.Exit,
-    EnvelopeStates.ConfirmingFinalError => TerminalActions.Exit,
+    ConfirmingFinalStates.Success => TerminalActions.Exit,
+    ConfirmingFinalStates.Error => TerminalActions.Exit,
 
-    _ => default
+    _ => TerminalActions.Unknown
   };
 }

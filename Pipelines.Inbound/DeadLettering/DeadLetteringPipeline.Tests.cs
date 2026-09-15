@@ -1,5 +1,5 @@
-using static Operations.Inbound.DeadLetter.DeadLetterStates;
-using Inbox = Operations.Inbound.Inbox.InboxStates;
+using Operations.Inbound.Inbox;
+using DeadLetter = Operations.Inbound.DeadLetter;
 
 namespace Pipelines.Inbound;
 
@@ -8,71 +8,69 @@ partial class InboundTests
   [TestMethod]
   public void dead_lettering__happy_path__publishing()
   {
-    string[] path = [
-      PipelineTypes.DeadLettering,
-      Inbox.ConvertingSuccess,
-      InsertingSuccess, Inbox.ClosingSuccess,
-      PipelineTypes.Publishing
+    DeadLetteringInput[] path = [
+      DeadLetteringEntry.Start,
+      ConvertingStates.Success,
+      DeadLetter.InsertingStates.Success,
+      ClosingStates.Success
     ];
-    RunDeadLetteringPipeline(path);
+    RunDeadLetteringPipeline(path, PipelineTypes.Publishing);
   }
 
   [TestMethod]
   public void dead_lettering__idempotent_insert__publishing()
   {
-    string[] path = [
-      PipelineTypes.DeadLettering,
-      Inbox.ConvertingSuccess,
-      InsertingIdempotent, Inbox.ClosingSuccess,
-      PipelineTypes.Publishing
+    DeadLetteringInput[] path = [
+      DeadLetteringEntry.Start,
+      ConvertingStates.Success,
+      DeadLetter.InsertingStates.Idempotent,
+      ClosingStates.Success
     ];
-    RunDeadLetteringPipeline(path);
+    RunDeadLetteringPipeline(path, PipelineTypes.Publishing);
   }
 
   [TestMethod]
   public void dead_lettering__converting_error__abandon_and_exit()
   {
-    string[] path = [
-      PipelineTypes.DeadLettering,
-      Inbox.ConvertingError,
-      Inbox.AbandoningSuccess,
-      TerminalActions.Exit
+    DeadLetteringInput[] path = [
+      DeadLetteringEntry.Start,
+      ConvertingStates.Error,
+      AbandoningStates.Success
     ];
-    RunDeadLetteringPipeline(path);
+    RunDeadLetteringPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod]
   public void dead_lettering__converting_error_and_abandoning_error__exit()
   {
-    string[] path = [
-      PipelineTypes.DeadLettering,
-      Inbox.ConvertingError,
-      Inbox.AbandoningError,
-      TerminalActions.Exit
+    DeadLetteringInput[] path = [
+      DeadLetteringEntry.Start,
+      ConvertingStates.Error,
+      AbandoningStates.Error
     ];
-    RunDeadLetteringPipeline(path);
+    RunDeadLetteringPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod]
   public void dead_lettering__inserting_error__exit()
   {
-    string[] path = [
-      PipelineTypes.DeadLettering,
-      Inbox.ConvertingSuccess,
-      InsertingError, TerminalActions.Exit
+    DeadLetteringInput[] path = [
+      DeadLetteringEntry.Start,
+      ConvertingStates.Success,
+      DeadLetter.InsertingStates.Error
     ];
-    RunDeadLetteringPipeline(path);
+    RunDeadLetteringPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod]
   public void dead_lettering__closing_error__exit()
   {
-    string[] path = [
-      PipelineTypes.DeadLettering,
-      Inbox.ConvertingSuccess,
-      InsertingSuccess, Inbox.ClosingError,
-      TerminalActions.Exit
+    DeadLetteringInput[] path = [
+      DeadLetteringEntry.Start,
+      ConvertingStates.Success,
+      DeadLetter.InsertingStates.Success,
+      ClosingStates.Error
     ];
-    RunDeadLetteringPipeline(path);
+    RunDeadLetteringPipeline(path, TerminalActions.Exit);
   }
 }

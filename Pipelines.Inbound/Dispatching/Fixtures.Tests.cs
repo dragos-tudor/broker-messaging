@@ -1,32 +1,28 @@
-using static Operations.Inbound.DeadLetter.DeadLetterStates;
-using static Operations.Inbound.DeadLetterEnvelope.DeadLetterEnvelopeStates;
+using DeadLetter = Operations.Inbound.DeadLetter;
+using DeadLetterEnvelope = Operations.Inbound.DeadLetterEnvelope;
 
 namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunDispatchingPipeline(string[] path, InboundPipelineConfig config = default)
+  static void RunDispatchingPipeline(DispatchingInput[] path, DispatchingContinuation end, InboundPipelineConfig config = default)
   {
-    string[] possibleStates = [PipelineTypes.Dispatching];
-    foreach(var state in path)
+    DispatchingInput[] possibleInputs = [DispatchingEntry.Start];
+    foreach (var input in path)
     {
-      possibleStates.ShouldContain(state, $"{state} is not valid. Expected one of: {string.Join(", ", possibleStates)}");
-      if (IsLastPathState(path, state)) return;
-
-      var action = GetDispatchingAction(state, config);
-      action.ShouldNotBeNull($"{state} -> {action} is missing.");
-
-      possibleStates = GetDispatchingPossibleStates(action);
+      possibleInputs.ShouldContain(input);
+      var continuation = GetDispatchingContinuation(input, config);
+      if (path[^1].Value == input.Value) { continuation.ShouldBe(end); return; }
+      possibleInputs = continuation switch { DispatchingActions action => [.. GetDispatchingPossibleInputs(action)], _ => [] };
     }
   }
 
-  static string[] GetDispatchingPossibleStates(string action) =>
-    action switch
-    {
-      DispatchingActions.Dispatching => [DispatchingAck, DispatchingNotAck, DispatchingError],
-      DispatchingActions.Scheduling => [SchedulingExhausted, SchedulingNotExhausted, SchedulingError],
-      DispatchingActions.Abandoning => [AbandoningSuccess, AbandoningError],
-      DispatchingActions.Closing => [ClosingSuccess, ClosingError],
-      _ => [action],
-    };
+  static IEnumerable<DispatchingInput> GetDispatchingPossibleInputs(DispatchingActions action) => action switch
+  {
+    DispatchingActions.Dispatching => [.. Enum.GetValues<DeadLetterEnvelope.DispatchingStates>()],
+    DispatchingActions.Scheduling => [.. Enum.GetValues<DeadLetter.SchedulingStates>()],
+    DispatchingActions.Abandoning => [.. Enum.GetValues<DeadLetter.AbandoningStates>()],
+    DispatchingActions.Closing => [.. Enum.GetValues<DeadLetter.ClosingStates>()],
+    _ => throw new InvalidOperationException($"Invalid dispatching action {action}")
+  };
 }

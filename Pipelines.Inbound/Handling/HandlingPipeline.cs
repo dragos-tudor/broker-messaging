@@ -5,24 +5,26 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static string? GetHandlingAction(string state, InboundPipelineConfig _) => state switch
+  internal static HandlingContinuation GetHandlingContinuation(
+    HandlingInput input,
+    InboundPipelineConfig _) => input switch
   {
-    PipelineTypes.Handling => HandlingActions.Handling,
+    HandlingEntry.Start => HandlingActions.Handling,
 
-    InboxStates.HandlingSuccess => HandlingActions.Transacting,
-    InboxStates.HandlingDomainError => HandlingActions.Abandoning,
-    InboxStates.HandlingError => HandlingActions.Scheduling,
+    HandlingStates.Success => HandlingActions.Transacting,
+    HandlingStates.DomainError => HandlingActions.Abandoning,
+    HandlingStates.Error => HandlingActions.Scheduling,
 
-    InboxStates.TransactingSuccess => TerminalActions.Exit,
-    InboxStates.TransactingError => HandlingActions.Scheduling,
+    TransactingStates.Success => TerminalActions.Exit,
+    TransactingStates.Error => HandlingActions.Scheduling,
 
-    InboxStates.SchedulingExhausted => HandlingActions.Abandoning,
-    InboxStates.SchedulingNotExhausted => TerminalActions.Exit,
-    InboxStates.SchedulingError => TerminalActions.Exit,
+    SchedulingStates.Exhausted => HandlingActions.Abandoning,
+    SchedulingStates.NotExhausted => TerminalActions.Exit,
+    SchedulingStates.Error => TerminalActions.Exit,
 
-    InboxStates.AbandoningSuccess => TerminalActions.Exit,
-    InboxStates.AbandoningError => TerminalActions.Exit,
+    AbandoningStates.Success => TerminalActions.Exit,
+    AbandoningStates.Error => TerminalActions.Exit,
 
-    _ => default
+    _ => TerminalActions.Unknown
   };
 }

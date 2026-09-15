@@ -6,32 +6,34 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static string? GetPublishingAction(string state, OutboundPipelineConfig config) => state switch
+  internal static PublishingContinuation GetPublishingContinuation(
+    PublishingInput input,
+    OutboundPipelineConfig config) => input switch
   {
-    PipelinesTypes.Publishing => PublishingActions.Mapping,
+    PublishingEntry.Start => PublishingActions.Mapping,
 
-    OutboxStates.MappingSuccess => config.UseBrokerPublisher?
+    MappingStates.Success => config.UseBrokerPublisher?
       PublishingActions.Publishing:
       PublishingActions.Producing,
-    OutboxStates.MappingError => PublishingActions.Abandoning,
+    MappingStates.Error => PublishingActions.Abandoning,
 
-    EnvelopeStates.PublishingSuccess => PublishingActions.Closing,
-    EnvelopeStates.PublishingError => PublishingActions.Scheduling,
+    PublishingStates.Success => PublishingActions.Closing,
+    PublishingStates.Error => PublishingActions.Scheduling,
 
-    EnvelopeStates.ProducingEnqueue => TerminalActions.Exit,
-    EnvelopeStates.ProducingNotEnqueue => TerminalActions.Exit,
-    EnvelopeStates.ProducingError => PublishingActions.Scheduling,
+    ProducingStates.Enqueue => TerminalActions.Exit,
+    ProducingStates.NotEnqueue => TerminalActions.Exit,
+    ProducingStates.Error => PublishingActions.Scheduling,
 
-    OutboxStates.SchedulingExhausted => PublishingActions.Abandoning,
-    OutboxStates.SchedulingNotExhausted => TerminalActions.Exit,
-    OutboxStates.SchedulingError => TerminalActions.Exit,
+    SchedulingStates.Exhausted => PublishingActions.Abandoning,
+    SchedulingStates.NotExhausted => TerminalActions.Exit,
+    SchedulingStates.Error => TerminalActions.Exit,
 
-    OutboxStates.AbandoningSuccess => TerminalActions.Exit,
-    OutboxStates.AbandoningError => TerminalActions.Exit,
+    AbandoningStates.Success => TerminalActions.Exit,
+    AbandoningStates.Error => TerminalActions.Exit,
 
-    OutboxStates.ClosingSuccess => TerminalActions.Exit,
-    OutboxStates.ClosingError => TerminalActions.Exit,
+    ClosingStates.Success => TerminalActions.Exit,
+    ClosingStates.Error => TerminalActions.Exit,
 
-    _ => default
+    _ => TerminalActions.Unknown
   };
 }

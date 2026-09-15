@@ -1,29 +1,25 @@
-using static Operations.Outbound.Outbox.OutboxStates;
+using Outbox = Operations.Outbound.Outbox;
 
 namespace Pipelines.Outbound;
 
 partial class OutboundTests
 {
-  static void RunPersistingPipeline(string[] path, OutboundPipelineConfig config = default)
+  static void RunPersistingPipeline(PersistingInput[] path, PersistingContinuation end, OutboundPipelineConfig config = default)
   {
-    string[] possibleStates = [PipelinesTypes.Persisting];
-    foreach (var state in path)
+    PersistingInput[] possibleInputs = [PersistingEntry.Start];
+    foreach (var input in path)
     {
-      possibleStates.ShouldContain(state, $"{state} is not valid. Expected one of: {string.Join(", ", possibleStates)}");
-      if (IsLastPathState(path, state)) return;
-
-      var action = GetPersistingAction(state, config);
-      action.ShouldNotBeNull($"{state} -> {action} is missing.");
-
-      possibleStates = GetPersistingPossibleStates(action);
+      possibleInputs.ShouldContain(input);
+      var continuation = GetPersistingContinuation(input, config);
+      if (path[^1].Value == input.Value) { continuation.ShouldBe(end); return; }
+      possibleInputs = continuation switch { PersistingActions action => [.. GetPersistingPossibleInputs(action)], _ => [] };
     }
   }
 
-  static string[] GetPersistingPossibleStates(string action) =>
-    action switch
-    {
-      PersistingActions.Validating => [ValidatingSuccess, ValidatingInvalidError, ValidatingError],
-      PersistingActions.Transacting => [TransactingSuccess, TransactingError],
-      _ => [action],
-    };
+  static IEnumerable<PersistingInput> GetPersistingPossibleInputs(PersistingActions action) => action switch
+  {
+    PersistingActions.Validating => [.. Enum.GetValues<Outbox.ValidatingStates>()],
+    PersistingActions.Transacting => [.. Enum.GetValues<Outbox.TransactingStates>()],
+    _ => throw new InvalidOperationException($"Invalid persisting action {action}")
+  };
 }

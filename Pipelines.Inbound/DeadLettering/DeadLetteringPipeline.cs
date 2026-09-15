@@ -1,28 +1,30 @@
 
-using Operations.Inbound.DeadLetter;
 using Operations.Inbound.Inbox;
+using DeadLetter = Operations.Inbound.DeadLetter;
 
 namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static string? GetDeadLetteringAction(string state, InboundPipelineConfig _) => state switch
+  internal static DeadLetteringContinuation GetDeadLetteringContinuation(
+    DeadLetteringInput input,
+    InboundPipelineConfig _) => input switch
   {
-    PipelineTypes.DeadLettering => DeadLetteringActions.Converting,
+    DeadLetteringEntry.Start => DeadLetteringActions.Converting,
 
-    InboxStates.ConvertingSuccess => DeadLetteringActions.Inserting,
-    InboxStates.ConvertingError => DeadLetteringActions.Abandoning,
+    ConvertingStates.Success => DeadLetteringActions.Inserting,
+    ConvertingStates.Error => DeadLetteringActions.Abandoning,
 
-    DeadLetterStates.InsertingSuccess => DeadLetteringActions.Closing,
-    DeadLetterStates.InsertingIdempotent => DeadLetteringActions.Closing,
-    DeadLetterStates.InsertingError => TerminalActions.Exit,
+    DeadLetter.InsertingStates.Success => DeadLetteringActions.Closing,
+    DeadLetter.InsertingStates.Idempotent => DeadLetteringActions.Closing,
+    DeadLetter.InsertingStates.Error => TerminalActions.Exit,
 
-    InboxStates.AbandoningSuccess => TerminalActions.Exit,
-    InboxStates.AbandoningError => TerminalActions.Exit,
+    AbandoningStates.Success => TerminalActions.Exit,
+    AbandoningStates.Error => TerminalActions.Exit,
 
-    InboxStates.ClosingSuccess => PipelineTypes.Publishing,
-    InboxStates.ClosingError => TerminalActions.Exit,
+    ClosingStates.Success => PipelineTypes.Publishing,
+    ClosingStates.Error => TerminalActions.Exit,
 
-    _ => default
+    _ => TerminalActions.Unknown
   };
 }

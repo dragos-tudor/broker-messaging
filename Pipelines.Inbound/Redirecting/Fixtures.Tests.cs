@@ -1,31 +1,27 @@
-using static Operations.Inbound.DeadLetterEnvelope.DeadLetterEnvelopeStates;
-using static Operations.Inbound.Envelope.EnvelopeStates;
+using Envelope = Operations.Inbound.Envelope;
+using DeadLetterEnvelope = Operations.Inbound.DeadLetterEnvelope;
 
 namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunRedirectingPipeline(string[] path, InboundPipelineConfig config = default)
+  static void RunRedirectingPipeline(RedirectingInput[] path, RedirectingContinuation end, InboundPipelineConfig config = default)
   {
-    string[] possibleStates = [PipelineTypes.Redirecting];
-    foreach(var state in path)
+    RedirectingInput[] possibleInputs = [RedirectingEntry.Start];
+    foreach (var input in path)
     {
-      possibleStates.ShouldContain(state, $"{state} is not valid. Expected one of: {string.Join(", ", possibleStates)}");
-      if (IsLastPathState(path, state)) return;
-
-      var action = GetRedirectingAction(state, config);
-      action.ShouldNotBeNull($"{state} -> {action} is missing.");
-
-      possibleStates = GetRedirectingPossibleStates(action);
+      possibleInputs.ShouldContain(input);
+      var continuation = GetRedirectingContinuation(input, config);
+      if (path[^1].Value == input.Value) { continuation.ShouldBe(end); return; }
+      possibleInputs = continuation switch { RedirectingActions action => [.. GetRedirectingPossibleInputs(action)], _ => [] };
     }
   }
 
-  static string[] GetRedirectingPossibleStates(string action) =>
-    action switch
-    {
-      RedirectingActions.Converting => [ConvertingSuccess, ConvertingInvalid, ConvertingError],
-      RedirectingActions.Redirecting => [RedirectingSuccess, RedirectingError],
-      RedirectingActions.ConfirmingFinal => [ConfirmingFinalSuccess, ConfirmingFinalError],
-      _ => [action],
-    };
+  static IEnumerable<RedirectingInput> GetRedirectingPossibleInputs(RedirectingActions action) => action switch
+  {
+    RedirectingActions.Converting => [.. Enum.GetValues<Envelope.ConvertingStates>()],
+    RedirectingActions.Redirecting => [.. Enum.GetValues<DeadLetterEnvelope.RedirectingStates>()],
+    RedirectingActions.ConfirmingFinal => [.. Enum.GetValues<Envelope.ConfirmingFinalStates>()],
+    _ => throw new InvalidOperationException($"Invalid redirecting action {action}")
+  };
 }

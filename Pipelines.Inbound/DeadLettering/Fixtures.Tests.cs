@@ -1,31 +1,42 @@
-using static Operations.Inbound.DeadLetter.DeadLetterStates;
+using Inbox = Operations.Inbound.Inbox;
+using DeadLetter = Operations.Inbound.DeadLetter;
 
 namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunDeadLetteringPipeline(string[] path, InboundPipelineConfig config = default)
+  static void RunDeadLetteringPipeline(
+    DeadLetteringInput[] path,
+    DeadLetteringContinuation end,
+    InboundPipelineConfig config = default)
   {
-    string[] possibleStates = [PipelineTypes.DeadLettering];
-    foreach(var state in path)
+    DeadLetteringInput[] possibleInputs = [DeadLetteringEntry.Start];
+    foreach (var input in path)
     {
-      possibleStates.ShouldContain(state, $"{state} is not valid. Expected one of: {string.Join(", ", possibleStates)}");
-      if (IsLastPathState(path, state)) return;
+      possibleInputs.ShouldContain(input, $"{input} is not valid. Expected one of: {string.Join(", ", possibleInputs)}");
 
-      var action = GetDeadLetteringAction(state, config);
-      action.ShouldNotBeNull($"{state} -> {action} is missing.");
+      var continuation = GetDeadLetteringContinuation(input, config);
+      if (path[^1].Value == input.Value)
+      {
+        continuation.ShouldBe(end);
+        return;
+      }
 
-      possibleStates = GetDeadLetteringPossibleStates(action);
+      possibleInputs = continuation switch
+      {
+        DeadLetteringActions action => [.. GetDeadLetteringPossibleInputs(action)],
+        _ => []
+      };
     }
   }
 
-  static string[] GetDeadLetteringPossibleStates(string action) =>
+  static IEnumerable<DeadLetteringInput> GetDeadLetteringPossibleInputs(DeadLetteringActions action) =>
     action switch
     {
-      DeadLetteringActions.Converting => [Operations.Inbound.Inbox.InboxStates.ConvertingSuccess, Operations.Inbound.Inbox.InboxStates.ConvertingError],
-      DeadLetteringActions.Inserting => [InsertingSuccess, InsertingIdempotent, InsertingError],
-      DeadLetteringActions.Abandoning => [Operations.Inbound.Inbox.InboxStates.AbandoningSuccess, Operations.Inbound.Inbox.InboxStates.AbandoningError],
-      DeadLetteringActions.Closing => [Operations.Inbound.Inbox.InboxStates.ClosingSuccess, Operations.Inbound.Inbox.InboxStates.ClosingError],
-      _ => [action],
+      DeadLetteringActions.Converting => [.. Enum.GetValues<Inbox.ConvertingStates>()],
+      DeadLetteringActions.Inserting => [.. Enum.GetValues<DeadLetter.InsertingStates>()],
+      DeadLetteringActions.Abandoning => [.. Enum.GetValues<Inbox.AbandoningStates>()],
+      DeadLetteringActions.Closing => [.. Enum.GetValues<Inbox.ClosingStates>()],
+      _ => throw new InvalidOperationException($"Invalid dead-lettering action {action}"),
     };
 }

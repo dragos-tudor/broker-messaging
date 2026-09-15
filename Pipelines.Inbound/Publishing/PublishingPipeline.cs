@@ -6,32 +6,34 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static string? GetPublishingAction(string state, InboundPipelineConfig config) => state switch
+  internal static PublishingContinuation GetPublishingContinuation(
+    PublishingInput input,
+    InboundPipelineConfig config) => input switch
   {
-    PipelineTypes.Publishing => PublishingActions.Mapping,
+    PublishingEntry.Start => PublishingActions.Mapping,
 
-    DeadLetterStates.MappingSuccess => config.UseBrokerPublisher?
+    MappingStates.Success => config.UseBrokerPublisher ?
       PublishingActions.Publishing:
       PublishingActions.Producing,
-    DeadLetterStates.MappingError => PublishingActions.Abandoning,
+    MappingStates.Error => PublishingActions.Abandoning,
 
-    DeadLetterEnvelopeStates.PublishingSuccess => PublishingActions.Closing,
-    DeadLetterEnvelopeStates.PublishingError => PublishingActions.Scheduling,
+    PublishingStates.Success => PublishingActions.Closing,
+    PublishingStates.Error => PublishingActions.Scheduling,
 
-    DeadLetterEnvelopeStates.ProducingEnqueue => TerminalActions.Exit,
-    DeadLetterEnvelopeStates.ProducingNotEnqueue => TerminalActions.Exit,
-    DeadLetterEnvelopeStates.ProducingError => PublishingActions.Scheduling,
+    ProducingStates.Enqueue => TerminalActions.Exit,
+    ProducingStates.NotEnqueue => TerminalActions.Exit,
+    ProducingStates.Error => PublishingActions.Scheduling,
 
-    DeadLetterStates.SchedulingExhausted => PublishingActions.Abandoning,
-    DeadLetterStates.SchedulingNotExhausted => TerminalActions.Exit,
-    DeadLetterStates.SchedulingError => TerminalActions.Exit,
+    SchedulingStates.Exhausted => PublishingActions.Abandoning,
+    SchedulingStates.NotExhausted => TerminalActions.Exit,
+    SchedulingStates.Error => TerminalActions.Exit,
 
-    DeadLetterStates.AbandoningSuccess => TerminalActions.Exit,
-    DeadLetterStates.AbandoningError => TerminalActions.Exit,
+    AbandoningStates.Success => TerminalActions.Exit,
+    AbandoningStates.Error => TerminalActions.Exit,
 
-    DeadLetterStates.ClosingSuccess => TerminalActions.Exit,
-    DeadLetterStates.ClosingError => TerminalActions.Exit,
+    ClosingStates.Success => TerminalActions.Exit,
+    ClosingStates.Error => TerminalActions.Exit,
 
-    _ => default
+    _ => TerminalActions.Unknown
   };
 }
