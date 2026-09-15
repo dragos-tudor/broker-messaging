@@ -52,17 +52,18 @@
 - keep test files adjacent to the code they test (e.g., Verifying.Tests.cs next to Verifying.cs).
 
 ### Testing Execution
-
-- this repository uses Microsoft.Testing.Platform via `global.json`.
-- run tests with:
-  `dotnet test --project <project>.csproj`
-- if project restore/build fails during parallel MSBuild traversal, use:
-  `dotnet restore <project>.csproj --disable-parallel`
-  followed by:
-  `dotnet build <project>.csproj --no-restore -m:1 -p:BuildInParallel=false`
-- in restricted environments where `dotnet test` fails with an IPC or named-pipe permission error, run the generated test module directly after building:
-  `dotnet artifacts/bin/<Project>/debug_linux-x64/<Project>.dll --no-progress`
-- test execution must report the total, failed, succeeded, and skipped test counts.
+- commands may run in a non-interactive process inside the Podman dev container.
+- persistent MSBuild servers can occasionally fail because their IPC endpoint is unavailable or inaccessible.
+- if dotnet build/test reports “MSBuild server unavailable” and then hangs during fallback, interrupt the command and rerun with --disable-build-servers. This is an environment issue, not necessarily a project or SDK issue.
+- this repository uses Microsoft.Testing.Platform via global.json.
+- if restore or build fails during parallel MSBuild traversal, use:
+  dotnet restore <project>.csproj --disable-parallel
+  dotnet build <project>.csproj --no-restore --disable-build-servers -m:1 -p:BuildInParallel=false
+- run tests normally with:
+  dotnet test --project <project>.csproj
+- in restricted environments where dotnet test fails with an IPC or named-pipe permission error, run the generated test module directly after building:
+  dotnet artifacts/bin/<Project>/debug_linux-x64/<Project>.dll --no-progress
+- test execution must report total, failed, succeeded, and skipped test counts.
 
 ### Names
 - use naming styles for methods:

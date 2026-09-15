@@ -134,14 +134,14 @@ states.
 ### Operations.Outbound.Envelope
 
 - publishing — publishes the outbound `Envelope` synchronously.
-- producing — submits the outbound `Envelope` asynchronously and registers broker-result handling.
+- producing — submits the outbound `Envelope` asynchronously and registers broker-result handling [`ProduceResult`].
 - dispatching — processes the asynchronous broker produce result.
 
 ### Operations Design Rules
 - each operation has one-task responsibility [eg. capture an envelope, map a dead-letter message, validate an envelope, insert an inbox message].
 - each operation is independent of the others.
 - each operation uses specialized interfaces for services and data based on composition root pattern.
-- all operations have the same signature:
+- all operations have similar signature:
   - services, shared data, cancellation token as parameters.
   - (output data, state, exception?) as return type.
 - operations expected failures must return explicit states.
@@ -156,18 +156,18 @@ Pipelines define semantic processing flow by mapping operation outcomes to the n
 
 ### Pipelines.Inbound
 
-- capturing: receives a broker envelope and drives it through verification, mapping, InboxMessage validation, persistence, and confirmation.
-- redirecting: handles inbound failures that occur before a durable InboxMessage can continue processing.
+- capturing: receives a broker envelope and drives it through `IEnvelope` verification, mapping, `InboxMessage` validation, persistence, and confirmation.
+- redirecting: handles inbound failures that occur before a durable `InboxMessage` can continue processing.
 - handling: processes a persisted `InboxMessage`.
 - dead-lettering: converts a persisted `InboxMessage` into a persisted `DeadLetterMessage`.
 - publishing: publishes a persisted `DeadLetterMessage`.
-- dispatching: processes asynchronous broker produce results for DeadLetterEnvelope publishing.
+- dispatching: processes asynchronous broker produce results for `IDeadLetterEnvelope` publishing.
 
 ### Pipelines.Outbound
 
 - persisting: validates and persists a developer-created `OutboxMessage`.
 - publishing: publishes a persisted `OutboxMessage`.
-- dispatching: processes asynchronous broker produce results for outbound Envelope publishing.
+- dispatching: processes asynchronous broker produce results for outbound `IEnvelope` publishing.
 
 ### Pipeline Design Rules
 
