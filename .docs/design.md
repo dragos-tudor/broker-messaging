@@ -178,13 +178,9 @@ Pipelines define semantic processing flow by mapping operation outcomes to the n
   - `Exit`;
   - `Unrecoverable`.
 - `Exit` means the current router/pipeline invocation has no further continuation; it does not necessarily mean the overall message lifecycle is finished.
-- persisted messages must not remain indefinitely active after unrecoverable processing failure; such flows continue to the appropriate abandoning operation.
-- pre-persistence failures must not use persisted-message abandonment when no durable message exists.
-- domain failures and technical failures remain distinct protocol outcomes.
 - pipelines must not inspect message internals to infer control flow; continuation is determined from explicit operation outcomes.
-- pipeline definitions should contain only semantic flow. Cross-cutting concerns such as retry and centralized error-field handling belong outside the pipeline.
 - pipeline and operation identifiers are unique within their owning component; exact outcome-state names remain source-code implementation details.\
-- each pipeline must define its entry action by mapping its unique pipeline identifier to the first action. Subsequent mappings are driven by operation outcomes.
+- each pipeline must define its entry action by mapping it to the first action. Subsequent mappings are driven by operation outcomes.
 
 ## Design Vocabulary
 - transport & persistence:
