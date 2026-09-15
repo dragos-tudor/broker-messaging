@@ -11,6 +11,7 @@ dotnet_diagnostic.CA1515.severity = none # Maintainability: Consider making publ
 dotnet_diagnostic.CA2007.severity = none # Reliability: Do not directly await a Task
 dotnet_diagnostic.CS8524.severity = none # CS8524: The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
 # dotnet_diagnostic.CS1591.severity = none # Compiler Warning:message severity for generated code files
+dotnet_diagnostic.IDE0055.severity = none # IDE0055: Fix formatting
 
 dotnet_diagnostic.IDE0160.severity = none # Style: Convert to block scoped namespace
 dotnet_diagnostic.IDE0040.severity = none # Style: Add accessibility modifiers
@@ -33,4 +34,7 @@ dotnet_diagnostic.RS0027.severity = warning # PublicApiAnalyzers
 dotnet_diagnostic.RS0036.severity = warning # PublicApiAnalyzers
 dotnet_diagnostic.RS0037.severity = warning # PublicApiAnalyzers
 dotnet_diagnostic.RS0041.severity = warning # PublicApiAnalyzers
+
+
+
 
