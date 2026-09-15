@@ -3,6 +3,7 @@
   <PropertyGroup Label="Project props">
     <TargetFramework>net11.0</TargetFramework>
     <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <LangVersion>preview</LangVersion>
     <UseArtifactsOutput>true</UseArtifactsOutput>
     <NoWarn>$(NoWarn);RS0036;RS0037;CA1031;NU1900</NoWarn>
 
