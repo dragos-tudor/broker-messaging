@@ -14,7 +14,7 @@ public partial class DeadLetterTests
     var (data, state, exception) = await DeadLetterFuncs.MapDeadLetterMessage<IMappingServices<string, byte[], object, string, string>, DeadLetterData, string, byte[], object, string, string>(services, inputData);
 
     data.DeadLetterEnvelope.ShouldBeSameAs(envelope);
-    state.ShouldBe(MappingSuccess);
+    state.ShouldBe(MappingStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -27,7 +27,7 @@ public partial class DeadLetterTests
     var (data, state, exception) = await DeadLetterFuncs.MapDeadLetterMessage<IMappingServices<string, byte[], object, string, string>, DeadLetterData, string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(MappingError);
+    state.ShouldBe(MappingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 
@@ -42,7 +42,7 @@ public partial class DeadLetterTests
     var (data, state, exception) = await DeadLetterFuncs.MapDeadLetterMessage<IMappingServices<string, byte[], object, string, string>, DeadLetterData, string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(MappingError);
+    state.ShouldBe(MappingStates.Error);
     exception.ShouldBeSameAs(expectedException);
   }
 }

@@ -12,7 +12,7 @@ public partial class DeadLetterTests
     var (data, state, exception) = await DeadLetterFuncs.AbandonDeadLetterMessageAsync<IAbandoningServices<string, string>, DeadLetterData, string, string>(services, inputData, default);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(AbandoningSuccess);
+    state.ShouldBe(AbandoningStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -27,7 +27,7 @@ public partial class DeadLetterTests
     var (data, state, exception) = await DeadLetterFuncs.AbandonDeadLetterMessageAsync<IAbandoningServices<string, string>, DeadLetterData, string, string>(services, inputData, default);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(AbandoningError);
+    state.ShouldBe(AbandoningStates.Error);
     exception.ShouldBeSameAs(expectedException);
   }
 }

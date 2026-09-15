@@ -3,7 +3,7 @@ namespace Operations.Inbound.Inbox;
 
 internal enum HandlingStates
 {
-  HandlingSuccess,
-  HandlingDomainError,
-  HandlingError
+  Success,
+  DomainError,
+  Error
 }

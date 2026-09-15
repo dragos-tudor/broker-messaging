@@ -18,7 +18,7 @@ public partial class EnvelopeTests
 
     data.ShouldBeSameAs(inputData);
     data.DeadLetterEnvelope.ShouldBeSameAs(deadLetter);
-    state.ShouldBe(ConvertingSuccess);
+    state.ShouldBe(ConvertingStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -33,13 +33,13 @@ public partial class EnvelopeTests
     var deadLetter = Substitute.For<IDeadLetterEnvelope<string, byte[], object, string>>();
     services.GetUtcDateTime().Returns(DateTime.UtcNow);
     services.FromEnvelope(envelope, "inbox invalid message", Arg.Any<DateTime>()).Returns(deadLetter);
-    var inputData = new EnvelopeData { Envelope = envelope, InboxMessage= inboxMessage };
+    var inputData = new EnvelopeData { Envelope = envelope, InboxMessage = inboxMessage };
 
     var (data, state, exception) = await EnvelopeFuncs.ConvertEnvelope<IConvertingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
     data.DeadLetterEnvelope.ShouldBeSameAs(deadLetter);
-    state.ShouldBe(ConvertingSuccess);
+    state.ShouldBe(ConvertingStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -54,7 +54,7 @@ public partial class EnvelopeTests
     var (data, state, exception) = await EnvelopeFuncs.ConvertEnvelope<IConvertingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ConvertingError);
+    state.ShouldBe(ConvertingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 }

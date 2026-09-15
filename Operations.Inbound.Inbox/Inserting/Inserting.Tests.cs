@@ -3,8 +3,8 @@ namespace Operations.Inbound.Inbox;
 public partial class InboxTests
 {
   [TestMethod]
-  [DataRow(true, InsertingStates.InsertingSuccess)]
-  [DataRow(false, InsertingStates.InsertingIdempotent)]
+  [DataRow(true, InsertingStates.Success)]
+  [DataRow(false, InsertingStates.Idempotent)]
   public async Task insert_inbox_message__persistence_result_varies__returns_matching_state(bool inserted, Enum expectedState)
   {
     var services = Substitute.For<IInsertingServices<string, string>>();
@@ -27,7 +27,7 @@ public partial class InboxTests
     var (data, state, exception) = await InboxFuncs.InsertInboxMessageAsync<IInsertingServices<string, string>, InboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(InsertingError);
+    state.ShouldBe(InsertingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 }

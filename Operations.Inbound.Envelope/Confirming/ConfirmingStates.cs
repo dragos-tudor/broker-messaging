@@ -3,12 +3,12 @@ namespace Operations.Inbound.Envelope;
 
 internal enum ConfirmingStates
 {
-  ConfirmingSuccess,
-  ConfirmingError
+  Success,
+  Error
 }
 
 internal enum ConfirmingFinalStates
 {
-  ConfirmingFinalSuccess,
-  ConfirmingFinalError
+  Success,
+  Error
 }

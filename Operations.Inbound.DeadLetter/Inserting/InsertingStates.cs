@@ -3,7 +3,7 @@ namespace Operations.Inbound.DeadLetter;
 
 internal enum InsertingStates
 {
-  InsertingSuccess,
-  InsertingError,
-  InsertingIdempotent
+  Success,
+  Error,
+  Idempotent
 }

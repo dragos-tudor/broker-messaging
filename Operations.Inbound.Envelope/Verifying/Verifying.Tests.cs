@@ -20,7 +20,7 @@ public partial class EnvelopeTests
       string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(VerifyingSuccess);
+    state.ShouldBe(VerifyingStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -38,7 +38,7 @@ public partial class EnvelopeTests
       string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(VerifyingInvalidConfirmableError);
+    state.ShouldBe(VerifyingStates.InvalidConfirmableError);
     exception.ShouldNotBeNull();
   }
 
@@ -56,7 +56,7 @@ public partial class EnvelopeTests
       string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(VerifyingInvalidError);
+    state.ShouldBe(VerifyingStates.InvalidError);
     exception.ShouldNotBeNull();
   }
 
@@ -71,7 +71,7 @@ public partial class EnvelopeTests
       string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(VerifyingError);
+    state.ShouldBe(VerifyingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 }

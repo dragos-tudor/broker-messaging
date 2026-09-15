@@ -11,7 +11,7 @@ public partial class InboxTests
     var (data, state, exception) = await InboxFuncs.ValidateInboxMessage<IValidatingServices, InboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ValidatingSuccess);
+    state.ShouldBe(ValidatingStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -24,7 +24,7 @@ public partial class InboxTests
     var (data, state, exception) = await InboxFuncs.ValidateInboxMessage<IValidatingServices, InboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ValidatingError);
+    state.ShouldBe(ValidatingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 
@@ -38,7 +38,7 @@ public partial class InboxTests
     var (data, state, exception) = await InboxFuncs.ValidateInboxMessage<IValidatingServices, InboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ValidatingInvalidError);
+    state.ShouldBe(ValidatingStates.InvalidError);
     exception.ShouldNotBeNull();
   }
 }

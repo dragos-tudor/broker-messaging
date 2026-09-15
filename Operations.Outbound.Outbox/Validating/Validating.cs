@@ -14,15 +14,15 @@ partial class OutboxFuncs
 
     var error = Funcs.ValidateOutboxMessage(message);
     return error is null ?
-        (data, ValidatingSuccess, null) :
-        (data, ValidatingInvalidError, CreateValidationException(error));
+        (data, ValidatingStates.Success, null) :
+        (data, ValidatingStates.InvalidError, CreateValidationException(error));
   }
 
   static (TData, ValidatingStates, Exception?) ValidateOutboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IValidatingData<TKey, TPayload> =>
-    (data, ValidatingError, exception);
+    (data, ValidatingStates.Error, exception);
 
   internal static ValueTask<(TData, ValidatingStates, Exception?)> ValidateOutboxMessage<TServices, TData, TKey, TPayload>(
     TServices services,

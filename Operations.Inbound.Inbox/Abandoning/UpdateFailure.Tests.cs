@@ -13,7 +13,7 @@ public partial class InboxTests
     var (data, state, exception) = await InboxFuncs.AbandonInboxMessageAsync<IAbandoningServices<string, string>, InboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(AbandoningError);
+    state.ShouldBe(AbandoningStates.Error);
     exception.ShouldBeSameAs(expectedException);
   }
 }

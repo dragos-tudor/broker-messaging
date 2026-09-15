@@ -15,14 +15,14 @@ partial class OutboxFuncs
     var envelope = services.FromOutboxMessage(outboxMessage, outboxMessage.CreatedAt);
     SetEnvelope(data, envelope);
 
-    return new ((data, MappingSuccess, null));
+    return new ((data, MappingStates.Success, null));
   }
 
   static (TData, MappingStates, Exception?) MapOutboxMessageError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TData data,
     Exception exception)
   where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
-    (data, MappingError, exception);
+    (data, MappingStates.Error, exception);
 
   internal static ValueTask<(TData, MappingStates, Exception?)> MapOutboxMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,

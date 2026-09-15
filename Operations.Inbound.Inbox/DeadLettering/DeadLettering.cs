@@ -16,14 +16,14 @@ partial class InboxFuncs
 
     await services.UpdateInboxMessageAsync(message, @params, ct);
 
-    return (data, DeadLetteringSuccess, null);
+    return (data, DeadLetteringStates.Success, null);
   }
 
   static (TData, DeadLetteringStates, Exception?) DeadLetterInboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IDeadLetteringData<TKey, TPayload> =>
-    (data, DeadLetteringError, exception);
+    (data, DeadLetteringStates.Error, exception);
 
   internal static ValueTask<(TData, DeadLetteringStates, Exception?)> DeadLetterInboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,

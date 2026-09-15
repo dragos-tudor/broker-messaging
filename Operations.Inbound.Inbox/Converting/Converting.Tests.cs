@@ -12,7 +12,7 @@ public partial class InboxTests
     var (data, state, exception) = await InboxFuncs.ConvertInboxMessage<IConvertingServices, InboxData, string, string>(services, inputData);
 
     data.DeadLetterMessage.ShouldNotBeNull();
-    state.ShouldBe(ConvertingSuccess);
+    state.ShouldBe(ConvertingStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -25,7 +25,7 @@ public partial class InboxTests
     var (data, state, exception) = await InboxFuncs.ConvertInboxMessage<IConvertingServices, InboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ConvertingError);
+    state.ShouldBe(ConvertingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 }

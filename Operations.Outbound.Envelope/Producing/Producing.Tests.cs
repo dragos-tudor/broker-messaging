@@ -3,8 +3,8 @@ namespace Operations.Outbound.Envelope;
 public partial class EnvelopeTests
 {
   [TestMethod]
-  [DataRow(true, ProducingStates.ProducingEnqueue)]
-  [DataRow(false, ProducingStates.ProducingNotEnqueue)]
+  [DataRow(true, ProducingStates.Enqueue)]
+  [DataRow(false, ProducingStates.NotEnqueue)]
   public async Task produce_envelope__broker_enqueue_result_varies__returns_matching_state(
     bool isEnqueued,
     Enum expectedState)
@@ -44,7 +44,7 @@ public partial class EnvelopeTests
       string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ProducingError);
+    state.ShouldBe(ProducingStates.Error);
     exception.ShouldBeSameAs(expectedException);
   }
 }

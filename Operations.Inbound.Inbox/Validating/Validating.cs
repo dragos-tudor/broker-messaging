@@ -14,15 +14,15 @@ partial class InboxFuncs
 
     var error = Funcs.ValidateInboxMessage(message);
     return error is not null?
-      (data, ValidatingInvalidError, Funcs.CreateValidationException(error)):
-      (data, ValidatingSuccess, null);
+      (data, ValidatingStates.InvalidError, Funcs.CreateValidationException(error)):
+      (data, ValidatingStates.Success, null);
   }
 
   static (TData, ValidatingStates, Exception?) ValidateInboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IValidatingData<TKey, TPayload> =>
-    (data, ValidatingError, exception);
+    (data, ValidatingStates.Error, exception);
 
   internal static ValueTask<(TData, ValidatingStates, Exception?)> ValidateInboxMessage<TServices, TData, TKey, TPayload>(
     TServices services,

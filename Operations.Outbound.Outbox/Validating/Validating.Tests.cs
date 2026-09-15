@@ -12,7 +12,7 @@ public partial class OutboxTests
     var (data, state, exception) = await OutboxFuncs.ValidateOutboxMessage<IValidatingServices<string, string>, OutboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ValidatingSuccess);
+    state.ShouldBe(ValidatingStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -25,7 +25,7 @@ public partial class OutboxTests
     var (data, state, exception) = await OutboxFuncs.ValidateOutboxMessage<IValidatingServices<string, string>, OutboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ValidatingError);
+    state.ShouldBe(ValidatingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 
@@ -39,7 +39,7 @@ public partial class OutboxTests
     var (data, state, exception) = await OutboxFuncs.ValidateOutboxMessage<IValidatingServices<string, string>, OutboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ValidatingInvalidError);
+    state.ShouldBe(ValidatingStates.InvalidError);
     exception.ShouldNotBeNull();
   }
 }

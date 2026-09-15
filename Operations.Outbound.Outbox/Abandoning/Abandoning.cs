@@ -17,14 +17,14 @@ partial class OutboxFuncs
 
     await services.UpdateOutboxMessageAsync(message, @params, ct);
 
-    return (data, AbandoningSuccess, null);
+    return (data, AbandoningStates.Success, null);
   }
 
   static (TData, AbandoningStates, Exception?) AbandonOutboxMessageError<TServices, TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IAbandoningData<TKey, TPayload> =>
-    (data, AbandoningError, exception);
+    (data, AbandoningStates.Error, exception);
 
   internal static ValueTask<(TData, AbandoningStates, Exception?)> AbandonOutboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,

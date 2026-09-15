@@ -3,8 +3,8 @@ namespace Operations.Inbound.DeadLetter;
 public partial class DeadLetterTests
 {
   [TestMethod]
-  [DataRow(true, InsertingStates.InsertingSuccess)]
-  [DataRow(false, InsertingStates.InsertingIdempotent)]
+  [DataRow(true, InsertingStates.Success)]
+  [DataRow(false, InsertingStates.Idempotent)]
   public async Task insert_dead_letter_message__persistence_result_varies__returns_matching_state(bool inserted, Enum expectedState)
   {
     var services = Substitute.For<IInsertingServices<string, string>>();
@@ -29,7 +29,7 @@ public partial class DeadLetterTests
     var (data, state, exception) = await DeadLetterFuncs.InsertDeadLetterMessageAsync<IInsertingServices<string, string>, DeadLetterData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(InsertingError);
+    state.ShouldBe(InsertingStates.Error);
     exception.ShouldBeSameAs(expectedException);
   }
 }

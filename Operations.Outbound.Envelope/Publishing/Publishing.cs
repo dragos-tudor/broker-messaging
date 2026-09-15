@@ -13,14 +13,14 @@ partial class EnvelopeFuncs
     var envelope = RequireEnvelope(data.Envelope);
 
     await services.PublishEnvelopeAsync(envelope, ct);
-    return (data, PublishingSuccess, null);
+    return (data, PublishingStates.Success, null);
   }
 
   static (TData, PublishingStates, Exception?) PublishEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TData data,
     Exception exception)
   where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
-    (data, PublishingError, exception);
+    (data, PublishingStates.Error, exception);
 
   internal static ValueTask<(TData, PublishingStates, Exception?)> PublishEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,

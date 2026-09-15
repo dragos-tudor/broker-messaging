@@ -14,14 +14,14 @@ partial class EnvelopeFuncs
     var message = services.FromEnvelope(envelope, services.GetUtcDateTime());
     SetInboxMessage(data, message);
 
-    return (data, MappingSuccess, null);
+    return (data, MappingStates.Success, null);
   }
 
   static (TData, MappingStates, Exception?) MapEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TData data,
     Exception exception)
   where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
-    (data, MappingError, exception);
+    (data, MappingStates.Error, exception);
 
   internal static ValueTask<(TData, MappingStates, Exception?)> MapEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,

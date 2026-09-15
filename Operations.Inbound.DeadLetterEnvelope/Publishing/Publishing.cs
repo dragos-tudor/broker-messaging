@@ -13,14 +13,14 @@ partial class DeadLetterEnvelopeFuncs
     var envelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
 
     await services.PublishDeadLetterEnvelopeAsync(envelope, ct);
-    return (data, PublishingSuccess, null);
+    return (data, PublishingStates.Success, null);
   }
 
   static (TData, PublishingStates, Exception?) PublishDeadLetterEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TData data,
     Exception exception)
   where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
-      (data, PublishingError, exception);
+      (data, PublishingStates.Error, exception);
 
   internal static ValueTask<(TData, PublishingStates, Exception?)> PublishDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,

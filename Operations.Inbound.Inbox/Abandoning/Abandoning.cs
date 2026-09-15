@@ -17,14 +17,14 @@ partial class InboxFuncs
 
     await services.UpdateInboxMessageAsync(message, @params, ct);
 
-    return (data, AbandoningSuccess, null);
+    return (data, AbandoningStates.Success, null);
   }
 
   static (TData, AbandoningStates, Exception?) AbandonInboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IAbandoningData<TKey, TPayload> =>
-    (data, AbandoningError, exception);
+    (data, AbandoningStates.Error, exception);
 
   internal static ValueTask<(TData, AbandoningStates, Exception?)> AbandonInboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,

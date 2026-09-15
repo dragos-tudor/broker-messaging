@@ -12,7 +12,7 @@ public partial class OutboxTests
     var (data, state, exception) = await OutboxFuncs.CloseOutboxMessageAsync<IClosingServices<string, string>, OutboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ClosingSuccess);
+    state.ShouldBe(ClosingStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -27,7 +27,7 @@ public partial class OutboxTests
     var (data, state, exception) = await OutboxFuncs.CloseOutboxMessageAsync<IClosingServices<string, string>, OutboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ClosingError);
+    state.ShouldBe(ClosingStates.Error);
     exception.ShouldBeSameAs(expectedException);
   }
 }

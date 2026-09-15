@@ -15,14 +15,14 @@ partial class InboxFuncs
 
     await services.UpdateInboxMessageAsync(message, @params, ct);
 
-    return (data, ClosingSuccess, null);
+    return (data, ClosingStates.Success, null);
   }
 
   static (TData, ClosingStates, Exception?) CloseInboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IClosingData<TKey, TPayload> =>
-    (data, ClosingError, exception);
+    (data, ClosingStates.Error, exception);
 
   internal static ValueTask<(TData, ClosingStates, Exception?)> CloseInboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,

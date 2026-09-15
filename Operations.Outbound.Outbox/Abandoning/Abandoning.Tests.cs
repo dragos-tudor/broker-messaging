@@ -12,7 +12,7 @@ public partial class OutboxTests
     var (data, state, exception) = await OutboxFuncs.AbandonOutboxMessageAsync<IAbandoningServices<string, string>, OutboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(AbandoningSuccess);
+    state.ShouldBe(AbandoningStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -27,7 +27,7 @@ public partial class OutboxTests
     var (data, state, exception) = await OutboxFuncs.AbandonOutboxMessageAsync<IAbandoningServices<string, string>, OutboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(AbandoningError);
+    state.ShouldBe(AbandoningStates.Error);
     exception.ShouldBeSameAs(expectedException);
   }
 }

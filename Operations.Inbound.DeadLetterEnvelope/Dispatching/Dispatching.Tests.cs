@@ -3,8 +3,8 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 public partial class DeadLetterEnvelopeTests
 {
   [TestMethod]
-  [DataRow(true, DispatchingStates.DispatchingAck)]
-  [DataRow(false, DispatchingStates.DispatchingNotAck)]
+  [DataRow(true, DispatchingStates.Ack)]
+  [DataRow(false, DispatchingStates.NotAck)]
   public async Task dispatch_dead_letter_envelope__acknowledgement_varies__returns_matching_state(bool acknowledged, Enum expectedState)
   {
     var services = Substitute.For<IDispatchingServices>();
@@ -28,7 +28,7 @@ public partial class DeadLetterEnvelopeTests
     var (data, state, exception) = await DeadLetterEnvelopeFuncs.DispatchDeadLetterEnvelope<IDispatchingServices, DeadLetterEnvelopeData>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(DispatchingError);
+    state.ShouldBe(DispatchingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 }

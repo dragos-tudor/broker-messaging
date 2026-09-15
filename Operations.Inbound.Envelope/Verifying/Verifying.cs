@@ -15,18 +15,18 @@ partial class EnvelopeFuncs
 
     var error = Funcs.ValidateEnvelope(envelope);
     if (error is not null)
-      return IsValidEnvelopeConfirmation(envelope.Confirmation)?
-        (data, VerifyingInvalidConfirmableError, CreateValidationException(error)):
-        (data, VerifyingInvalidError, CreateValidationException(error));
+      return IsValidEnvelopeConfirmation(envelope.Confirmation) ?
+        (data, VerifyingStates.InvalidConfirmableError, CreateValidationException(error)) :
+        (data, VerifyingStates.InvalidError, CreateValidationException(error));
 
-    return (data, VerifyingSuccess, null);
+    return (data, VerifyingStates.Success, null);
   }
 
   static (TData, VerifyingStates, Exception?) VerifyEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation>(
     TData data,
     Exception exception)
   where TData : IVerifyingData<TKey, TValue, TMetadata, TConfirmation> =>
-    (data, VerifyingError, exception);
+    (data, VerifyingStates.Error, exception);
 
   internal static ValueTask<(TData, VerifyingStates, Exception?)> VerifyEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
     TServices services,

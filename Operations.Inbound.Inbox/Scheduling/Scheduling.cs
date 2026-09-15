@@ -23,15 +23,15 @@ partial class InboxFuncs
     await services.UpdateInboxMessageAsync(message, @params, ct);
 
     return nextStatus == InboxMessageStatus.Processing?
-      (data, SchedulingNotExhausted, null):
-      (data, SchedulingExhausted, null);
+      (data, SchedulingStates.NotExhausted, null):
+      (data, SchedulingStates.Exhausted, null);
   }
 
   static (TData, SchedulingStates, Exception?) ScheduleInboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : ISchedulingData<TKey, TPayload> =>
-    (data, SchedulingError, exception);
+    (data, SchedulingStates.Error, exception);
 
   internal static ValueTask<(TData, SchedulingStates, Exception?)> ScheduleInboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,

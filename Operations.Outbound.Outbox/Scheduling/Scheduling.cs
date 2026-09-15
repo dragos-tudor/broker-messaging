@@ -22,15 +22,15 @@ partial class OutboxFuncs
     await services.UpdateOutboxMessageAsync(message, @params, ct);
 
     return nextStatus == OutboxMessageStatus.Processing?
-      (data, SchedulingNotExhausted, null):
-      (data, SchedulingExhausted, null);
+      (data, SchedulingStates.NotExhausted, null):
+      (data, SchedulingStates.Exhausted, null);
   }
 
   static (TData, SchedulingStates, Exception?) ScheduleOutboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : ISchedulingData<TKey, TPayload> =>
-    (data, SchedulingError, exception);
+    (data, SchedulingStates.Error, exception);
 
   internal static ValueTask<(TData, SchedulingStates, Exception?)> ScheduleOutboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,

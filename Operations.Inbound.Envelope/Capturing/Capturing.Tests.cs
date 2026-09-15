@@ -18,7 +18,7 @@ public partial class EnvelopeTests
 
     data.ShouldBeSameAs(inputData);
     data.Envelope.ShouldBeSameAs(envelope);
-    state.ShouldBe(CapturingSuccess);
+    state.ShouldBe(CapturingStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -36,7 +36,7 @@ public partial class EnvelopeTests
 
     data.ShouldBeSameAs(inputData);
     data.Envelope.ShouldBeNull();
-    state.ShouldBe(CapturingNotCaptured);
+    state.ShouldBe(CapturingStates.NotCaptured);
     exception.ShouldBeNull();
   }
 
@@ -53,7 +53,7 @@ public partial class EnvelopeTests
       string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(CapturingError);
+    state.ShouldBe(CapturingStates.Error);
     exception.ShouldBeSameAs(expectedException);
   }
 }

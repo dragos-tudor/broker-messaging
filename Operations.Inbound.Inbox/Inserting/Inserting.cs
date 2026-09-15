@@ -12,15 +12,15 @@ partial class InboxFuncs
   {
     var message = RequireInboxMessage(data.InboxMessage);
     return await services.InsertInboxMessageAsync(message, ct)?
-      (data, InsertingSuccess, null):
-      (data, InsertingIdempotent, null);
+      (data, InsertingStates.Success, null):
+      (data, InsertingStates.Idempotent, null);
   }
 
   static (TData, InsertingStates, Exception?) InsertInboxMessageError<TServices, TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IInsertingData<TKey, TPayload> =>
-    (data, InsertingError, exception);
+    (data, InsertingStates.Error, exception);
 
   internal static ValueTask<(TData, InsertingStates, Exception?)> InsertInboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,

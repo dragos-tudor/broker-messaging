@@ -11,7 +11,7 @@ public partial class InboxTests
     var (data, state, exception) = await InboxFuncs.TransactInboxMessageAsync<ITransactingServices<string, string, IDisposable>, InboxData, string, string, IDisposable>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(TransactingError);
+    state.ShouldBe(TransactingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 
@@ -27,7 +27,7 @@ public partial class InboxTests
     var (data, state, exception) = await InboxFuncs.TransactInboxMessageAsync<ITransactingServices<string, string, IDisposable>, InboxData, string, string, IDisposable>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(TransactingSuccess);
+    state.ShouldBe(TransactingStates.Success);
     exception.ShouldBeNull();
   }
 }

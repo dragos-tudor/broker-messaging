@@ -14,7 +14,7 @@ public partial class EnvelopeTests
       string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(PublishingSuccess);
+    state.ShouldBe(PublishingStates.Success);
     exception.ShouldBeNull();
     await services.Received(1).PublishEnvelopeAsync(envelope, Arg.Any<CancellationToken>());
   }
@@ -33,7 +33,7 @@ public partial class EnvelopeTests
       string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(PublishingError);
+    state.ShouldBe(PublishingStates.Error);
     exception.ShouldBeSameAs(expectedException);
   }
 }

@@ -28,14 +28,14 @@ partial class InboxFuncs
       ct
     );
 
-    return (data, TransactingSuccess, null);
+    return (data, TransactingStates.Success, null);
   }
 
   static (TData, TransactingStates, Exception?) TransactInboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : ITransactingData<TKey, TPayload> =>
-    (data, TransactingError, exception);
+    (data, TransactingStates.Error, exception);
 
   internal static ValueTask<(TData, TransactingStates, Exception?)> TransactInboxMessageAsync<TServices, TData, TKey, TPayload, TSession>(
     TServices services,

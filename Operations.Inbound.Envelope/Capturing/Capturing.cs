@@ -13,15 +13,15 @@ partial class EnvelopeFuncs
     var envelope = await services.ReadEnvelope(ct);
 
     return SetEnvelope(data, envelope) is not null ?
-      new(data, CapturingSuccess, null) :
-      new(data, CapturingNotCaptured, null);
+      new(data, CapturingStates.Success, null) :
+      new(data, CapturingStates.NotCaptured, null);
   }
 
   static (TData, CapturingStates, Exception?) CaptureEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation>(
     TData data,
     Exception exception)
   where TData : ICapturingData<TKey, TValue, TMetadata, TConfirmation>
-    => (data, CapturingError, exception);
+    => (data, CapturingStates.Error, exception);
 
   internal static ValueTask<(TData, CapturingStates, Exception?)> CaptureEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
     TServices services,

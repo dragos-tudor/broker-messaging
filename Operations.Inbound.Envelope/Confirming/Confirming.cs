@@ -13,14 +13,14 @@ partial class EnvelopeFuncs
     var envelope = RequireEnvelope(data.Envelope);
 
     await services.ConfirmEnvelope(envelope, ct);
-    return (data, ConfirmingSuccess, null);
+    return (data, ConfirmingStates.Success, null);
   }
 
   static (TData, ConfirmingStates, Exception?) ConfirmEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation>(
     TData data,
     Exception? exception)
   where TData : IConfirmingData<TKey, TValue, TMetadata, TConfirmation> =>
-    (data, ConfirmingError, exception);
+    (data, ConfirmingStates.Error, exception);
 
   internal static ValueTask<(TData, ConfirmingStates, Exception?)> ConfirmEnvelope<TService, TData, TKey, TValue, TMetadata, TConfirmation>(
     TService services,
@@ -43,8 +43,8 @@ partial class EnvelopeFuncs
   where TData : IConfirmingData<TKey, TValue, TMetadata, TConfirmation> =>
     await ConfirmEnvelope<TService, TData, TKey, TValue, TMetadata, TConfirmation>(services, data, ct) switch
     {
-      (var confirmedData, ConfirmingSuccess, null) => new(confirmedData, ConfirmingFinalSuccess, null),
-      (var confirmedData, ConfirmingError, var exception) => new(confirmedData, ConfirmingFinalError, exception),
+      (var confirmedData, ConfirmingStates.Success, null) => new(confirmedData, ConfirmingFinalStates.Success, null),
+      (var confirmedData, ConfirmingStates.Error, var exception) => new(confirmedData, ConfirmingFinalStates.Error, exception),
       (var confirmedData, var _, var exception) => new(confirmedData, default, exception)
     };
 }

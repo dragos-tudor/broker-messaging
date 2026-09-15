@@ -13,7 +13,7 @@ public partial class InboxTests
     var (data, state, exception) = await InboxFuncs.DeadLetterInboxMessageAsync<IDeadLetteringServices<string, string>, InboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(DeadLetteringError);
+    state.ShouldBe(DeadLetteringStates.Error);
     exception.ShouldBeSameAs(expectedException);
   }
 }

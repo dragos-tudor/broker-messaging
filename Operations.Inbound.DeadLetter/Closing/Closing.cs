@@ -15,14 +15,14 @@ partial class DeadLetterFuncs
 
     await services.UpdateDeadLetterMessageAsync(message, @params, ct);
 
-    return (data, ClosingSuccess, null);
+    return (data, ClosingStates.Success, null);
   }
 
   static (TData, ClosingStates, Exception?) CloseDeadLetterMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IClosingData<TKey, TPayload> =>
-    (data, ClosingError, exception);
+    (data, ClosingStates.Error, exception);
 
   internal static ValueTask<(TData, ClosingStates, Exception?)> CloseDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,

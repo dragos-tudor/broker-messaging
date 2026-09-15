@@ -11,7 +11,7 @@ public partial class OutboxTests
     var (data, state, exception) = await OutboxFuncs.TransactOutboxMessageAsync<ITransactingServices<string, string, IDisposable>, OutboxData, string, string, IDisposable>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(TransactingError);
+    state.ShouldBe(TransactingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 
@@ -27,7 +27,7 @@ public partial class OutboxTests
     var (data, state, exception) = await OutboxFuncs.TransactOutboxMessageAsync<ITransactingServices<string, string, IDisposable>, OutboxData, string, string, IDisposable>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(TransactingSuccess);
+    state.ShouldBe(TransactingStates.Success);
     exception.ShouldBeNull();
   }
 }

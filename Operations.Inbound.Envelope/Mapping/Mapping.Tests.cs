@@ -8,9 +8,14 @@ public partial class EnvelopeTests
   {
     var services = Substitute.For<IMappingServices<string, byte[], object, string, string>>();
     var envelope = Substitute.For<IEnvelope<string, byte[], object, string>>();
-    var message = new InboxMessage<string, string> {
-      MessageId = Guid.NewGuid(), TransportMessageId = "transport", MessageKey = "key",
-      Payload = "payload", CreatedAt = DateTime.UtcNow, Type = "type"
+    var message = new InboxMessage<string, string>
+    {
+      MessageId = Guid.NewGuid(),
+      TransportMessageId = "transport",
+      MessageKey = "key",
+      Payload = "payload",
+      CreatedAt = DateTime.UtcNow,
+      Type = "type"
     };
     services.GetUtcDateTime().Returns(DateTime.UtcNow);
     services.FromEnvelope(envelope, Arg.Any<DateTime>()).Returns(message);
@@ -20,7 +25,7 @@ public partial class EnvelopeTests
 
     data.ShouldBeSameAs(inputData);
     data.InboxMessage.ShouldBeSameAs(message);
-    state.ShouldBe(MappingSuccess);
+    state.ShouldBe(MappingStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -33,7 +38,7 @@ public partial class EnvelopeTests
     var (data, state, exception) = await EnvelopeFuncs.MapEnvelope<IMappingServices<string, byte[], object, string, string>, EnvelopeData, string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(MappingError);
+    state.ShouldBe(MappingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 
@@ -48,7 +53,7 @@ public partial class EnvelopeTests
     var (data, state, exception) = await EnvelopeFuncs.MapEnvelope<IMappingServices<string, byte[], object, string, string>, EnvelopeData, string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(MappingError);
+    state.ShouldBe(MappingStates.Error);
     exception.ShouldBeSameAs(expectedException);
   }
 }

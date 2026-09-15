@@ -14,14 +14,14 @@ partial class DeadLetterFuncs
     var envelope = services.FromDeadLetterMessage(message, message.OriginatedAt);
     SetDeadLetterEnvelope(data, envelope);
 
-    return (data, MappingSuccess, null);
+    return (data, MappingStates.Success, null);
   }
 
   internal static (TData, MappingStates, Exception?) MapDeadLetterMessageError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TData data,
     Exception exception)
   where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
-    (data, MappingError, exception);
+    (data, MappingStates.Error, exception);
 
   internal static ValueTask<(TData, MappingStates, Exception?)> MapDeadLetterMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,

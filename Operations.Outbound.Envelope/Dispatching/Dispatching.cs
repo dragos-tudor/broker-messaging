@@ -12,15 +12,15 @@ partial class EnvelopeFuncs
     var result = RequireProduceResult(data.ProduceResult);
 
     return result.IsAcknowledged ?
-      (data, DispatchingAck, null) :
-      (data, DispatchingNotAck, null);
+      (data, DispatchingStates.Ack, null) :
+      (data, DispatchingStates.NotAck, null);
   }
 
   static (TData, DispatchingStates, Exception?) DispatchEnvelopeError<TData>(
     TData data,
     Exception exception)
   where TData : IDispatchingData =>
-    (data, DispatchingError, exception);
+    (data, DispatchingStates.Error, exception);
 
   internal static ValueTask<(TData, DispatchingStates, Exception?)> DispatchEnvelope<TServices, TData>(
     TServices services,

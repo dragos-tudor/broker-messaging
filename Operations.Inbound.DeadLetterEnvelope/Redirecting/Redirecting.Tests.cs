@@ -12,7 +12,7 @@ public partial class DeadLetterEnvelopeTests
     var (data, state, exception) = await DeadLetterEnvelopeFuncs.RedirectDeadLetterEnvelopeAsync<IRedirectingServices<string, byte[], object, string>, DeadLetterEnvelopeData, string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(RedirectingSuccess);
+    state.ShouldBe(RedirectingStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -25,7 +25,7 @@ public partial class DeadLetterEnvelopeTests
     var (data, state, exception) = await DeadLetterEnvelopeFuncs.RedirectDeadLetterEnvelopeAsync<IRedirectingServices<string, byte[], object, string>, DeadLetterEnvelopeData, string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(RedirectingError);
+    state.ShouldBe(RedirectingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 }

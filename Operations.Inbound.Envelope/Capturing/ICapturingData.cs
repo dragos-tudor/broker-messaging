@@ -1,5 +1,5 @@
 
 namespace Operations.Inbound.Envelope;
 
-public interface ICapturingData<TKey, TValue, TMetadata, TConfirmation>:
+public interface ICapturingData<TKey, TValue, TMetadata, TConfirmation> :
   IEnvelopeProp<TKey, TValue, TMetadata, TConfirmation>;

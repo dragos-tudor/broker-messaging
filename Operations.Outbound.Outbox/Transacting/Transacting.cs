@@ -27,14 +27,14 @@ partial class OutboxFuncs
       ct
     );
 
-    return (data, TransactingSuccess, null);
+    return (data, TransactingStates.Success, null);
   }
 
   static (TData, TransactingStates, Exception?) TransactOutboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : ITransactingData<TKey, TPayload>  =>
-    (data, TransactingError, exception);
+    (data, TransactingStates.Error, exception);
 
   internal static ValueTask<(TData, TransactingStates, Exception?)> TransactOutboxMessageAsync<TServices, TData, TKey, TPayload, TSession>(
     TServices services,

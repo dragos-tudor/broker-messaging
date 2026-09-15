@@ -13,7 +13,7 @@ public partial class EnvelopeTests
     var (data, state, exception) = await EnvelopeFuncs.ConfirmEnvelope<IConfirmingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ConfirmingSuccess);
+    state.ShouldBe(ConfirmingStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -26,7 +26,7 @@ public partial class EnvelopeTests
     var (data, state, exception) = await EnvelopeFuncs.ConfirmEnvelope<IConfirmingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ConfirmingError);
+    state.ShouldBe(ConfirmingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 
@@ -41,7 +41,7 @@ public partial class EnvelopeTests
     var (data, state, exception) = await EnvelopeFuncs.ConfirmEnvelope<IConfirmingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ConfirmingError);
+    state.ShouldBe(ConfirmingStates.Error);
     exception.ShouldBeSameAs(expectedException);
   }
 
@@ -54,7 +54,7 @@ public partial class EnvelopeTests
     var (data, state, exception) = await EnvelopeFuncs.ConfirmFinalEnvelope<IConfirmingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ConfirmingFinalSuccess);
+    state.ShouldBe(ConfirmingFinalStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -67,7 +67,7 @@ public partial class EnvelopeTests
     var (data, state, exception) = await EnvelopeFuncs.ConfirmFinalEnvelope<IConfirmingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ConfirmingFinalError);
+    state.ShouldBe(ConfirmingFinalStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 
@@ -82,7 +82,7 @@ public partial class EnvelopeTests
     var (data, state, exception) = await EnvelopeFuncs.ConfirmFinalEnvelope<IConfirmingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ConfirmingFinalError);
+    state.ShouldBe(ConfirmingFinalStates.Error);
     exception.ShouldBeSameAs(expectedException);
   }
 }

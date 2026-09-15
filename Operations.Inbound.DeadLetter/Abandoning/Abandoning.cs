@@ -17,14 +17,14 @@ partial class DeadLetterFuncs
 
     await services.UpdateDeadLetterMessageAsync(message, @params, ct);
 
-    return (data, AbandoningSuccess, null);
+    return (data, AbandoningStates.Success, null);
   }
 
   static (TData, AbandoningStates, Exception?) AbandonDeadLetterMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IAbandoningData<TKey, TPayload> =>
-    (data, AbandoningError, exception);
+    (data, AbandoningStates.Error, exception);
 
   internal static ValueTask<(TData, AbandoningStates, Exception?)> AbandonDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,

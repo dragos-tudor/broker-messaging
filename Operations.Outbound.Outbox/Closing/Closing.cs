@@ -15,14 +15,14 @@ partial class OutboxFuncs
 
     await services.UpdateOutboxMessageAsync(message, @param, ct);
 
-    return (data, ClosingSuccess, null);
+    return (data, ClosingStates.Success, null);
   }
 
   static (TData, ClosingStates, Exception?) CloseOutboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IClosingData<TKey, TPayload> =>
-    (data, ClosingError, exception);
+    (data, ClosingStates.Error, exception);
 
   internal static ValueTask<(TData, ClosingStates, Exception?)> CloseOutboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,

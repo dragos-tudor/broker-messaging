@@ -13,7 +13,7 @@ public partial class InboxTests
     var (data, state, exception) = await InboxFuncs.HandleInboxMessageAsync<IHandlingServices<string, string>, InboxData, string, string>(services, inputData);
 
     data.DomainModel.ShouldBeSameAs(model);
-    state.ShouldBe(HandlingSuccess);
+    state.ShouldBe(HandlingStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -27,7 +27,7 @@ public partial class InboxTests
     var (data, state, exception) = await InboxFuncs.HandleInboxMessageAsync<IHandlingServices<string, string>, InboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(HandlingDomainError);
+    state.ShouldBe(HandlingStates.DomainError);
     exception.ShouldBeOfType<DomainException>().Message.ShouldBe("business failure");
   }
 
@@ -40,7 +40,7 @@ public partial class InboxTests
     var (data, state, exception) = await InboxFuncs.HandleInboxMessageAsync<IHandlingServices<string, string>, InboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(HandlingError);
+    state.ShouldBe(HandlingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 }

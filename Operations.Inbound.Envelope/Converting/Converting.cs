@@ -15,14 +15,14 @@ partial class EnvelopeFuncs
     var deadLetter = services.FromEnvelope(envelope, failureReason, services.GetUtcDateTime());
     SetDeadLetterEnvelope(data, deadLetter);
 
-    return (data, ConvertingSuccess, null);
+    return (data, ConvertingStates.Success, null);
   }
 
   static (TData, ConvertingStates, Exception?) ConvertEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TData data,
     Exception exception)
   where TData : IConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
-    (data, ConvertingError, exception);
+    (data, ConvertingStates.Error, exception);
 
   internal static ValueTask<(TData, ConvertingStates, Exception?)> ConvertEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,

@@ -22,15 +22,15 @@ partial class DeadLetterFuncs
     await services.UpdateDeadLetterMessageAsync(message, @params, ct);
 
     return nextStatus == DeadLetterMessageStatus.Processing?
-      (data, SchedulingNotExhausted, null):
-      (data, SchedulingExhausted, null);
+      (data, SchedulingStates.NotExhausted, null):
+      (data, SchedulingStates.Exhausted, null);
   }
 
   static (TData, SchedulingStates, Exception?) ScheduleDeadLetterMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : ISchedulingData<TKey, TPayload> =>
-    (data, SchedulingError, exception);
+    (data, SchedulingStates.Error, exception);
 
   internal static async ValueTask<(TData, SchedulingStates, Exception?)> ScheduleDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,

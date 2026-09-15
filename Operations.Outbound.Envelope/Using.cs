@@ -5,9 +5,6 @@ global using System.Threading.Tasks;
 global using Persistence.OutboxMessage;
 global using Transport.Envelope;
 global using static Foundation.Extensions.ExtensionsFuncs;
-global using static Operations.Outbound.Envelope.DispatchingStates;
-global using static Operations.Outbound.Envelope.ProducingStates;
-global using static Operations.Outbound.Envelope.PublishingStates;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Pipelines.Outbound")]

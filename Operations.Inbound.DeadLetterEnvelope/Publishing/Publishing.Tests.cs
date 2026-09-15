@@ -12,7 +12,7 @@ public partial class DeadLetterEnvelopeTests
     var (data, state, exception) = await DeadLetterEnvelopeFuncs.PublishDeadLetterEnvelopeAsync<IPublishingServices<string, byte[], object, string, string>, DeadLetterEnvelopeData, string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(PublishingSuccess);
+    state.ShouldBe(PublishingStates.Success);
     exception.ShouldBeNull();
   }
 
@@ -25,7 +25,7 @@ public partial class DeadLetterEnvelopeTests
     var (data, state, exception) = await DeadLetterEnvelopeFuncs.PublishDeadLetterEnvelopeAsync<IPublishingServices<string, byte[], object, string, string>, DeadLetterEnvelopeData, string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(PublishingError);
+    state.ShouldBe(PublishingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 }

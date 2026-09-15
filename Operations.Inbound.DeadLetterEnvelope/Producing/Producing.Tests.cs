@@ -3,8 +3,8 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 public partial class DeadLetterEnvelopeTests
 {
   [TestMethod]
-  [DataRow(true, ProducingStates.ProducingEnqueue)]
-  [DataRow(false, ProducingStates.ProducingNotEnqueue)]
+  [DataRow(true, ProducingStates.Enqueue)]
+  [DataRow(false, ProducingStates.NotEnqueue)]
   public async Task produce_dead_letter_envelope__enqueue_result_varies__returns_matching_state(bool enqueued, Enum expectedState)
   {
     var services = Substitute.For<IProducingServices<string, byte[], object, string, string>>();
@@ -30,7 +30,7 @@ public partial class DeadLetterEnvelopeTests
     var (data, state, exception) = await DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope<IProducingServices<string, byte[], object, string, string>, DeadLetterEnvelopeData, string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(ProducingError);
+    state.ShouldBe(ProducingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 }

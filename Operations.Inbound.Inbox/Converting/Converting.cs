@@ -14,14 +14,14 @@ partial class InboxFuncs
     var deadLetter = FromInboxMessage(message, services.GetUtcDateTime());
     SetDeadLetterMessage(data, deadLetter);
 
-    return (data, ConvertingSuccess, null);
+    return (data, ConvertingStates.Success, null);
   }
 
   static (TData, ConvertingStates, Exception?) ConvertInboxMessageError<TData, TKey, TPayload>(
     TData data,
     Exception exception)
   where TData : IConvertingData<TKey, TPayload> =>
-    (data, ConvertingError, exception);
+    (data, ConvertingStates.Error, exception);
 
   internal static ValueTask<(TData, ConvertingStates, Exception?)> ConvertInboxMessage<TServices, TData, TKey, TPayload>(
     TServices services,

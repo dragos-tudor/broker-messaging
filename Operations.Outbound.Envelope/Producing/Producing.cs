@@ -21,15 +21,15 @@ partial class EnvelopeFuncs
       });
 
     return isEnqueued
-      ? (data, ProducingEnqueue, null)
-      : (data, ProducingNotEnqueue, null);
+      ? (data, ProducingStates.Enqueue, null)
+      : (data, ProducingStates.NotEnqueue, null);
   }
 
   static (TData, ProducingStates, Exception?) ProduceEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TData data,
     Exception exception)
   where TData : IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
-    (data, ProducingError, exception);
+    (data, ProducingStates.Error, exception);
 
   internal static ValueTask<(TData, ProducingStates, Exception?)> ProduceEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,

@@ -3,8 +3,8 @@ namespace Operations.Outbound.Envelope;
 public partial class EnvelopeTests
 {
   [TestMethod]
-  [DataRow(true, DispatchingAck)]
-  [DataRow(false, DispatchingNotAck)]
+  [DataRow(true, DispatchingStates.Ack)]
+  [DataRow(false, DispatchingStates.NotAck)]
   public async Task dispatch_envelope__produce_result_acknowledgement_varies__returns_matching_state(
     bool isAcknowledged,
     Enum expectedState)
@@ -32,7 +32,7 @@ public partial class EnvelopeTests
       IDispatchingServices, EnvelopeData>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(DispatchingError);
+    state.ShouldBe(DispatchingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
 }

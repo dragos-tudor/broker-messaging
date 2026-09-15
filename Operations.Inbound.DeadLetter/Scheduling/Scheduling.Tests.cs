@@ -3,8 +3,8 @@ namespace Operations.Inbound.DeadLetter;
 public partial class DeadLetterTests
 {
   [TestMethod]
-  [DataRow(5, SchedulingStates.SchedulingNotExhausted)]
-  [DataRow(0, SchedulingStates.SchedulingExhausted)]
+  [DataRow(5, SchedulingStates.NotExhausted)]
+  [DataRow(0, SchedulingStates.Exhausted)]
   public async Task schedule_dead_letter_message__retry_limit_varies__returns_matching_state(int maxRetries, Enum expectedState)
   {
     var services = Substitute.For<ISchedulingServices<string, string>>();
@@ -33,7 +33,7 @@ public partial class DeadLetterTests
     var (data, state, exception) = await DeadLetterFuncs.ScheduleDeadLetterMessageAsync<ISchedulingServices<string, string>, DeadLetterData, string, string>(services, inputData, default);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(SchedulingError);
+    state.ShouldBe(SchedulingStates.Error);
     exception.ShouldBeSameAs(expectedException);
   }
 }
