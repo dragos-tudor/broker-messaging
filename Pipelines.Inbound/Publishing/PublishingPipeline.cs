@@ -6,9 +6,9 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static PublishingContinuation GetPublishingContinuation(
-    PublishingInput input,
-    InboundPipelineConfig config) => input switch
+  internal static PublishingTransition GetPublishingTransition(
+    PublishingSignal signal,
+    InboundPipelineConfig config) => signal switch
   {
     PublishingEntry.Start => PublishingActions.Mapping,
 
@@ -37,3 +37,4 @@ partial class InboundFuncs
     _ => TerminalActions.Unknown
   };
 }
+

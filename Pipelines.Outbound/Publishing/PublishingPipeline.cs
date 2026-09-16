@@ -6,9 +6,9 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static PublishingContinuation GetPublishingContinuation(
-    PublishingInput input,
-    OutboundPipelineConfig config) => input switch
+  internal static PublishingTransition GetPublishingTransition(
+    PublishingSignal signal,
+    OutboundPipelineConfig config) => signal switch
   {
     PublishingEntry.Start => PublishingActions.Mapping,
 
@@ -37,3 +37,4 @@ partial class OutboundFuncs
     _ => TerminalActions.Unknown
   };
 }
+

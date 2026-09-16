@@ -27,7 +27,7 @@ partial class InboundFuncs
       _ => throw new InvalidOperationException($"Unknown handling action: {action}")
     };
 
-  internal static ValueTask<(TData, HandlingInput, Exception?)>
+  internal static ValueTask<(TData, HandlingSignal, Exception?)>
     ExecuteHandlingOperation<TServices, TData, TKey, TPayload, TSession>(
       HandlingOperation<TServices, TData> operation, TServices services, TData data,
       CancellationToken ct = default)
@@ -36,10 +36,10 @@ partial class InboundFuncs
     where TSession : IDisposable
     => operation switch
     {
-      { Handling: not null } => operation.Handling(services, data, ct).FromResult<TData, Inbox.HandlingStates, HandlingInput>(static state => state),
-      { Transacting: not null } => operation.Transacting(services, data, ct).FromResult<TData, Inbox.TransactingStates, HandlingInput>(static state => state),
-      { Scheduling: not null } => operation.Scheduling(services, data, ct).FromResult<TData, Inbox.SchedulingStates, HandlingInput>(static state => state),
-      { Abandoning: not null } => operation.Abandoning(services, data, ct).FromResult<TData, Inbox.AbandoningStates, HandlingInput>(static state => state),
+      { Handling: not null } => operation.Handling(services, data, ct).FromResult<TData, Inbox.HandlingStates, HandlingSignal>(static state => state),
+      { Transacting: not null } => operation.Transacting(services, data, ct).FromResult<TData, Inbox.TransactingStates, HandlingSignal>(static state => state),
+      { Scheduling: not null } => operation.Scheduling(services, data, ct).FromResult<TData, Inbox.SchedulingStates, HandlingSignal>(static state => state),
+      { Abandoning: not null } => operation.Abandoning(services, data, ct).FromResult<TData, Inbox.AbandoningStates, HandlingSignal>(static state => state),
       _ => throw new InvalidOperationException("Unknown handling operation.")
     };
 }

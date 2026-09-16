@@ -5,19 +5,19 @@ namespace Pipelines.Outbound;
 
 partial class OutboundTests
 {
-  static void RunDispatchingPipeline(DispatchingInput[] path, DispatchingContinuation end, OutboundPipelineConfig config = default)
+  static void RunDispatchingPipeline(DispatchingSignal[] path, DispatchingTransition end, OutboundPipelineConfig config = default)
   {
-    DispatchingInput[] possibleInputs = [DispatchingEntry.Start];
-    foreach (var input in path)
+    DispatchingSignal[] possibleSignals = [DispatchingEntry.Start];
+    foreach (var signal in path)
     {
-      possibleInputs.ShouldContain(input);
-      var continuation = GetDispatchingContinuation(input, config);
-      if (path[^1].Value == input.Value) { continuation.ShouldBe(end); return; }
-      possibleInputs = continuation switch { DispatchingActions action => [.. GetDispatchingPossibleInputs(action)], _ => [] };
+      possibleSignals.ShouldContain(signal);
+      var transition = GetDispatchingTransition(signal, config);
+      if (path[^1].Value == signal.Value) { transition.ShouldBe(end); return; }
+      possibleSignals = transition switch { DispatchingActions action => [.. GetDispatchingPossibleSignals(action)], _ => [] };
     }
   }
 
-  static IEnumerable<DispatchingInput> GetDispatchingPossibleInputs(DispatchingActions action) => action switch
+  static IEnumerable<DispatchingSignal> GetDispatchingPossibleSignals(DispatchingActions action) => action switch
   {
     DispatchingActions.Dispatching => [.. Enum.GetValues<Envelope.DispatchingStates>()],
     DispatchingActions.Scheduling => [.. Enum.GetValues<Outbox.SchedulingStates>()],
@@ -26,3 +26,4 @@ partial class OutboundTests
     _ => throw new InvalidOperationException($"Invalid dispatching action {action}")
   };
 }
+

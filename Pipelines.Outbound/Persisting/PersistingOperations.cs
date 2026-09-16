@@ -22,14 +22,15 @@ partial class OutboundFuncs
         _ => throw new InvalidOperationException($"Unknown persisting action: {action}")
       };
 
-  internal static ValueTask<(TData, PersistingInput, Exception?)> ExecutePersistingOperation<TServices, TData, TKey, TPayload, TSession>(PersistingOperation<TServices, TData> operation, TServices services, TData data, CancellationToken ct = default)
+  internal static ValueTask<(TData, PersistingSignal, Exception?)> ExecutePersistingOperation<TServices, TData, TKey, TPayload, TSession>(PersistingOperation<TServices, TData> operation, TServices services, TData data, CancellationToken ct = default)
     where TServices : IPersistingServices<TKey, TPayload, TSession>
     where TData : IPersistingData<TKey, TPayload>
     where TSession : IDisposable
     => operation switch
     {
-      { Validating: not null } => operation.Validating(services, data, ct).FromResult<TData, ValidatingStates, PersistingInput>(static state => state),
-      { Transacting: not null } => operation.Transacting(services, data, ct).FromResult<TData, TransactingStates, PersistingInput>(static state => state),
+      { Validating: not null } => operation.Validating(services, data, ct).FromResult<TData, ValidatingStates, PersistingSignal>(static state => state),
+      { Transacting: not null } => operation.Transacting(services, data, ct).FromResult<TData, TransactingStates, PersistingSignal>(static state => state),
       _ => throw new InvalidOperationException("Unknown persisting operation.")
     };
 }
+

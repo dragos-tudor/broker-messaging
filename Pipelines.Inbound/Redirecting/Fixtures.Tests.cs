@@ -5,19 +5,19 @@ namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunRedirectingPipeline(RedirectingInput[] path, RedirectingContinuation end, InboundPipelineConfig config = default)
+  static void RunRedirectingPipeline(RedirectingSignal[] path, RedirectingTransition end, InboundPipelineConfig config = default)
   {
-    RedirectingInput[] possibleInputs = [RedirectingEntry.Start];
-    foreach (var input in path)
+    RedirectingSignal[] possibleSignals = [RedirectingEntry.Start];
+    foreach (var signal in path)
     {
-      possibleInputs.ShouldContain(input);
-      var continuation = GetRedirectingContinuation(input, config);
-      if (path[^1].Value == input.Value) { continuation.ShouldBe(end); return; }
-      possibleInputs = continuation switch { RedirectingActions action => [.. GetRedirectingPossibleInputs(action)], _ => [] };
+      possibleSignals.ShouldContain(signal);
+      var transition = GetRedirectingTransition(signal, config);
+      if (path[^1].Value == signal.Value) { transition.ShouldBe(end); return; }
+      possibleSignals = transition switch { RedirectingActions action => [.. GetRedirectingPossibleSignals(action)], _ => [] };
     }
   }
 
-  static IEnumerable<RedirectingInput> GetRedirectingPossibleInputs(RedirectingActions action) => action switch
+  static IEnumerable<RedirectingSignal> GetRedirectingPossibleSignals(RedirectingActions action) => action switch
   {
     RedirectingActions.Converting => [.. Enum.GetValues<Envelope.ConvertingStates>()],
     RedirectingActions.Redirecting => [.. Enum.GetValues<DeadLetterEnvelope.RedirectingStates>()],
@@ -25,3 +25,4 @@ partial class InboundTests
     _ => throw new InvalidOperationException($"Invalid redirecting action {action}")
   };
 }
+

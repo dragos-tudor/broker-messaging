@@ -3,11 +3,13 @@ using Envelope = Operations.Outbound.Envelope;
 
 namespace Pipelines.Outbound;
 
-internal enum DispatchingEntry { Start }
+internal enum PublishingEntry { Start }
 
-internal readonly union DispatchingInput(
-  DispatchingEntry,
-  Envelope.DispatchingStates,
+internal readonly union PublishingSignal(
+  PublishingEntry,
+  Outbox.MappingStates,
+  Envelope.PublishingStates,
+  Envelope.ProducingStates,
   Outbox.SchedulingStates,
   Outbox.AbandoningStates,
   Outbox.ClosingStates

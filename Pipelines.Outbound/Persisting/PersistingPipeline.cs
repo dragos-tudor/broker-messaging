@@ -5,9 +5,9 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static PersistingContinuation GetPersistingContinuation(
-    PersistingInput input,
-    OutboundPipelineConfig config) => input switch
+  internal static PersistingTransition GetPersistingTransition(
+    PersistingSignal signal,
+    OutboundPipelineConfig config) => signal switch
   {
     PersistingEntry.Start => PersistingActions.Validating,
 
@@ -23,3 +23,4 @@ partial class OutboundFuncs
     _ => TerminalActions.Unknown
   };
 }
+

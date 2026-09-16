@@ -1,6 +1,6 @@
 namespace Pipelines.Outbound;
 
-internal readonly union PersistingContinuation(
+internal readonly union PersistingTransition(
   PersistingActions,
   PipelinesTypes,
   TerminalActions

@@ -4,7 +4,7 @@ namespace Pipelines.Inbound;
 
 internal enum HandlingEntry { Start }
 
-internal readonly union HandlingInput(
+internal readonly union HandlingSignal(
   HandlingEntry,
   Inbox.HandlingStates,
   Inbox.TransactingStates,

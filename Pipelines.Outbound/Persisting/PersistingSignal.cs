@@ -4,7 +4,7 @@ namespace Pipelines.Outbound;
 
 internal enum PersistingEntry { Start }
 
-internal readonly union PersistingInput(
+internal readonly union PersistingSignal(
   PersistingEntry,
   Outbox.ValidatingStates,
   Outbox.TransactingStates

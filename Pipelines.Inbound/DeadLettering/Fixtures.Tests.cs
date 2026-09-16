@@ -6,31 +6,31 @@ namespace Pipelines.Inbound;
 partial class InboundTests
 {
   static void RunDeadLetteringPipeline(
-    DeadLetteringInput[] path,
-    DeadLetteringContinuation end,
+    DeadLetteringSignal[] path,
+    DeadLetteringTransition end,
     InboundPipelineConfig config = default)
   {
-    DeadLetteringInput[] possibleInputs = [DeadLetteringEntry.Start];
-    foreach (var input in path)
+    DeadLetteringSignal[] possibleSignals = [DeadLetteringEntry.Start];
+    foreach (var signal in path)
     {
-      possibleInputs.ShouldContain(input, $"{input} is not valid. Expected one of: {string.Join(", ", possibleInputs)}");
+      possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");
 
-      var continuation = GetDeadLetteringContinuation(input, config);
-      if (path[^1].Value == input.Value)
+      var transition = GetDeadLetteringTransition(signal, config);
+      if (path[^1].Value == signal.Value)
       {
-        continuation.ShouldBe(end);
+        transition.ShouldBe(end);
         return;
       }
 
-      possibleInputs = continuation switch
+      possibleSignals = transition switch
       {
-        DeadLetteringActions action => [.. GetDeadLetteringPossibleInputs(action)],
+        DeadLetteringActions action => [.. GetDeadLetteringPossibleSignals(action)],
         _ => []
       };
     }
   }
 
-  static IEnumerable<DeadLetteringInput> GetDeadLetteringPossibleInputs(DeadLetteringActions action) =>
+  static IEnumerable<DeadLetteringSignal> GetDeadLetteringPossibleSignals(DeadLetteringActions action) =>
     action switch
     {
       DeadLetteringActions.Converting => [.. Enum.GetValues<Inbox.ConvertingStates>()],
@@ -40,3 +40,4 @@ partial class InboundTests
       _ => throw new InvalidOperationException($"Invalid dead-lettering action {action}"),
     };
 }
+

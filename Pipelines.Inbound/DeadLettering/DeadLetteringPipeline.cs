@@ -6,9 +6,9 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static DeadLetteringContinuation GetDeadLetteringContinuation(
-    DeadLetteringInput input,
-    InboundPipelineConfig _) => input switch
+  internal static DeadLetteringTransition GetDeadLetteringTransition(
+    DeadLetteringSignal signal,
+    InboundPipelineConfig _) => signal switch
   {
     DeadLetteringEntry.Start => DeadLetteringActions.Converting,
 
@@ -28,3 +28,4 @@ partial class InboundFuncs
     _ => TerminalActions.Unknown
   };
 }
+

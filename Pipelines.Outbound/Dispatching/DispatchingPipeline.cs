@@ -6,9 +6,9 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static DispatchingContinuation GetDispatchingContinuation(
-    DispatchingInput input,
-    OutboundPipelineConfig config) => input switch
+  internal static DispatchingTransition GetDispatchingTransition(
+    DispatchingSignal signal,
+    OutboundPipelineConfig config) => signal switch
   {
     DispatchingEntry.Start => DispatchingActions.Dispatching,
 
@@ -29,3 +29,4 @@ partial class OutboundFuncs
     _ => TerminalActions.Unknown
   };
 }
+

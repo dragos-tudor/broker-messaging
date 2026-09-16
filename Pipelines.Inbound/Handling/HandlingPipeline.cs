@@ -5,9 +5,9 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static HandlingContinuation GetHandlingContinuation(
-    HandlingInput input,
-    InboundPipelineConfig _) => input switch
+  internal static HandlingTransition GetHandlingTransition(
+    HandlingSignal signal,
+    InboundPipelineConfig _) => signal switch
   {
     HandlingEntry.Start => HandlingActions.Handling,
 
@@ -28,3 +28,4 @@ partial class InboundFuncs
     _ => TerminalActions.Unknown
   };
 }
+

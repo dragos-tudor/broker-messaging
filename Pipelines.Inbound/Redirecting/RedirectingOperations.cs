@@ -25,16 +25,16 @@ partial class InboundFuncs
       _ => throw new InvalidOperationException($"Unknown redirecting action: {action}")
     };
 
-  internal static ValueTask<(TData, RedirectingInput, Exception?)>
+  internal static ValueTask<(TData, RedirectingSignal, Exception?)>
     ExecuteRedirectingOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
       RedirectingOperation<TServices, TData> operation, TServices services, TData data, CancellationToken ct = default)
     where TServices : IRedirectingServices<TKey, TValue, TMetadata, TConfirmation>
     where TData : IRedirectingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
     => operation switch
     {
-      { Converting: not null } => operation.Converting(services, data, ct).FromResult<TData, Envelope.ConvertingStates, RedirectingInput>(static state => state),
-      { Redirecting: not null } => operation.Redirecting(services, data, ct).FromResult<TData, DeadLetterEnvelope.RedirectingStates, RedirectingInput>(static state => state),
-      { ConfirmingFinal: not null } => operation.ConfirmingFinal(services, data, ct).FromResult<TData, Envelope.ConfirmingFinalStates, RedirectingInput>(static state => state),
+      { Converting: not null } => operation.Converting(services, data, ct).FromResult<TData, Envelope.ConvertingStates, RedirectingSignal>(static state => state),
+      { Redirecting: not null } => operation.Redirecting(services, data, ct).FromResult<TData, DeadLetterEnvelope.RedirectingStates, RedirectingSignal>(static state => state),
+      { ConfirmingFinal: not null } => operation.ConfirmingFinal(services, data, ct).FromResult<TData, Envelope.ConfirmingFinalStates, RedirectingSignal>(static state => state),
       _ => throw new InvalidOperationException("Unknown redirecting operation.")
     };
 }

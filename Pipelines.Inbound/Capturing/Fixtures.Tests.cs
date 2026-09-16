@@ -7,27 +7,27 @@ namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunCapturingPipeline(CapturingInput[] path, CapturingContinuation end, InboundPipelineConfig config = default)
+  static void RunCapturingPipeline(CapturingSignal[] path, CapturingTransition end, InboundPipelineConfig config = default)
   {
-    CapturingInput[] possibleInputs = [CapturingEntry.Start];
-    foreach (var input in path)
+    CapturingSignal[] possibleSignals = [CapturingEntry.Start];
+    foreach (var signal in path)
     {
-      possibleInputs.ShouldContain(input, $"{input} is not valid. Expected one of: {string.Join(", ", possibleInputs)}");
+      possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");
 
-      var continuation = GetCapturingContinuation(input, config);
-      if (IsLastPathInput(path, input)) {
-        continuation.ShouldBe(end);
+      var transition = GetCapturingTransition(signal, config);
+      if (IsLastPathSignal(path, signal)) {
+        transition.ShouldBe(end);
         return;
       }
 
-      possibleInputs = continuation switch {
-        CapturingActions action => [.. GetCapturingPossibleInputs(action)],
+      possibleSignals = transition switch {
+        CapturingActions action => [.. GetCapturingPossibleSignals(action)],
         _ => []
       };
     }
   }
 
-  static IEnumerable<CapturingInput> GetCapturingPossibleInputs(CapturingActions action) =>
+  static IEnumerable<CapturingSignal> GetCapturingPossibleSignals(CapturingActions action) =>
     action switch
     {
       CapturingActions.Capturing => [.. Enum.GetValues<CapturingStates>()],
@@ -40,6 +40,6 @@ partial class InboundTests
       _ => throw new InvalidOperationException($"Invalid capturing action {action}")
     };
 
-  static bool IsLastPathInput(CapturingInput[] path, CapturingInput input) =>
-    path[^1].Value == input.Value;
+  static bool IsLastPathSignal(CapturingSignal[] path, CapturingSignal signal) =>
+    path[^1].Value == signal.Value;
 }

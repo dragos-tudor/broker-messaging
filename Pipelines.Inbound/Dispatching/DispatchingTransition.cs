@@ -1,6 +1,6 @@
 namespace Pipelines.Inbound;
 
-internal readonly union DispatchingContinuation(
+internal readonly union DispatchingTransition(
   DispatchingActions,
   PipelineTypes,
   TerminalActions

@@ -3,11 +3,13 @@ using DeadLetterEnvelope = Operations.Inbound.DeadLetterEnvelope;
 
 namespace Pipelines.Inbound;
 
-internal enum DispatchingEntry { Start }
+internal enum PublishingEntry { Start }
 
-internal readonly union DispatchingInput(
-  DispatchingEntry,
-  DeadLetterEnvelope.DispatchingStates,
+internal readonly union PublishingSignal(
+  PublishingEntry,
+  DeadLetter.MappingStates,
+  DeadLetterEnvelope.PublishingStates,
+  DeadLetterEnvelope.ProducingStates,
   DeadLetter.SchedulingStates,
   DeadLetter.AbandoningStates,
   DeadLetter.ClosingStates

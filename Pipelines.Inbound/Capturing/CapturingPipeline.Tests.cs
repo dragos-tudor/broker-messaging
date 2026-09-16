@@ -9,7 +9,7 @@ partial class InboundTests
   [TestMethod]
   public void happy_path__exit()
   {
-    CapturingInput[] path = [
+    CapturingSignal[] path = [
       CapturingEntry.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Success, InsertingStates.Success,
@@ -21,7 +21,7 @@ partial class InboundTests
   [TestMethod]
   public void happy_path_and_handle_after_capture__handling()
   {
-    CapturingInput[] path = [
+    CapturingSignal[] path = [
       CapturingEntry.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Success, InsertingStates.Success,
@@ -34,7 +34,7 @@ partial class InboundTests
   [TestMethod]
   public void not_captured__exit()
   {
-    CapturingInput[] path = [
+    CapturingSignal[] path = [
       CapturingEntry.Start, CapturingStates.NotCaptured
     ];
     RunCapturingPipeline(path, TerminalActions.Exit);
@@ -43,7 +43,7 @@ partial class InboundTests
   [TestMethod]
   public void capturing_error__exit()
   {
-    CapturingInput[] path = [
+    CapturingSignal[] path = [
       CapturingEntry.Start, CapturingStates.Error
     ];
     RunCapturingPipeline(path, TerminalActions.Exit);
@@ -52,7 +52,7 @@ partial class InboundTests
   [TestMethod]
   public void verifying_invalid__unrecoverable()
   {
-    CapturingInput[] path = [
+    CapturingSignal[] path = [
       CapturingEntry.Start, CapturingStates.Success,
       VerifyingStates.InvalidError
     ];
@@ -62,7 +62,7 @@ partial class InboundTests
   [TestMethod]
   public void verifying_invalid_confirmable__redirecting()
   {
-    CapturingInput[] path = [
+    CapturingSignal[] path = [
       CapturingEntry.Start, CapturingStates.Success,
       VerifyingStates.InvalidConfirmableError
     ];
@@ -72,7 +72,7 @@ partial class InboundTests
   [TestMethod]
   public void verifying_error__unrecoverable()
   {
-    CapturingInput[] path = [
+    CapturingSignal[] path = [
       CapturingEntry.Start, CapturingStates.Success,
       VerifyingStates.Error
     ];
@@ -82,7 +82,7 @@ partial class InboundTests
   [TestMethod]
   public void mapping_error__redirecting()
   {
-    CapturingInput[] path = [
+    CapturingSignal[] path = [
       CapturingEntry.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Error
     ];
@@ -92,7 +92,7 @@ partial class InboundTests
   [TestMethod]
   public void validating_invalid__redirecting()
   {
-    CapturingInput[] path = [
+    CapturingSignal[] path = [
       CapturingEntry.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.InvalidError
@@ -103,7 +103,7 @@ partial class InboundTests
   [TestMethod]
   public void validating_error__redirecting()
   {
-    CapturingInput[] path = [
+    CapturingSignal[] path = [
       CapturingEntry.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Error
@@ -114,7 +114,7 @@ partial class InboundTests
   [TestMethod]
   public void inserting_idempotent__confirm_final__exit()
   {
-    CapturingInput[] path = [
+    CapturingSignal[] path = [
       CapturingEntry.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Success, InsertingStates.Idempotent,
@@ -126,7 +126,7 @@ partial class InboundTests
   [TestMethod]
   public void inserting_error__exit()
   {
-    CapturingInput[] path = [
+    CapturingSignal[] path = [
       CapturingEntry.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Success, InsertingStates.Error
@@ -137,7 +137,7 @@ partial class InboundTests
   [TestMethod]
   public void confirming_error__exit()
   {
-    CapturingInput[] path = [
+    CapturingSignal[] path = [
       CapturingEntry.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Success, InsertingStates.Success,
@@ -149,7 +149,7 @@ partial class InboundTests
   [TestMethod]
   public void confirming_final_error__exit()
   {
-    CapturingInput[] path = [
+    CapturingSignal[] path = [
       CapturingEntry.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Success, InsertingStates.Idempotent,
@@ -158,3 +158,4 @@ partial class InboundTests
     RunCapturingPipeline(path, TerminalActions.Exit);
   }
 }
+

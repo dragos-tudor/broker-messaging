@@ -6,9 +6,9 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static DispatchingContinuation GetDispatchingContinuation(
-    DispatchingInput input,
-    InboundPipelineConfig _) => input switch
+  internal static DispatchingTransition GetDispatchingTransition(
+    DispatchingSignal signal,
+    InboundPipelineConfig _) => signal switch
   {
     DispatchingEntry.Start => DispatchingActions.Dispatching,
 
@@ -29,3 +29,4 @@ partial class InboundFuncs
     _ => TerminalActions.Unknown
   };
 }
+

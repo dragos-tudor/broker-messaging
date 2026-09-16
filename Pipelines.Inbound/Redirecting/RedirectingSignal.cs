@@ -5,7 +5,7 @@ namespace Pipelines.Inbound;
 
 internal enum RedirectingEntry { Start }
 
-internal readonly union RedirectingInput(
+internal readonly union RedirectingSignal(
   RedirectingEntry,
   Envelope.ConvertingStates,
   DeadLetterEnvelope.RedirectingStates,

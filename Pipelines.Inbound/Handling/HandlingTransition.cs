@@ -1,6 +1,6 @@
 namespace Pipelines.Inbound;
 
-internal readonly union HandlingContinuation(
+internal readonly union HandlingTransition(
   HandlingActions,
   PipelineTypes,
   TerminalActions

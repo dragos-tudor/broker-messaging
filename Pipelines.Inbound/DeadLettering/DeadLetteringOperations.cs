@@ -30,7 +30,7 @@ partial class InboundFuncs
 
   internal static ValueTask<(
     TData,
-    DeadLetteringInput,
+    DeadLetteringSignal,
     Exception?)>
     ExecuteDeadLetteringOperation<TServices, TData, TKey, TPayload>(
       DeadLetteringOperation<TServices, TData> operation,
@@ -41,10 +41,10 @@ partial class InboundFuncs
     where TData : IDeadLetteringData<TKey, TPayload>
     => operation switch
     {
-      { Converting: not null } => operation.Converting(services, data, ct).FromResult<TData, ConvertingStates, DeadLetteringInput>(static state => state),
-      { Inserting: not null } => operation.Inserting(services, data, ct).FromResult<TData, DeadLetter.InsertingStates, DeadLetteringInput>(static state => state),
-      { Abandoning: not null } => operation.Abandoning(services, data, ct).FromResult<TData, AbandoningStates, DeadLetteringInput>(static state => state),
-      { Closing: not null } => operation.Closing(services, data, ct).FromResult<TData, ClosingStates, DeadLetteringInput>(static state => state),
+      { Converting: not null } => operation.Converting(services, data, ct).FromResult<TData, ConvertingStates, DeadLetteringSignal>(static state => state),
+      { Inserting: not null } => operation.Inserting(services, data, ct).FromResult<TData, DeadLetter.InsertingStates, DeadLetteringSignal>(static state => state),
+      { Abandoning: not null } => operation.Abandoning(services, data, ct).FromResult<TData, AbandoningStates, DeadLetteringSignal>(static state => state),
+      { Closing: not null } => operation.Closing(services, data, ct).FromResult<TData, ClosingStates, DeadLetteringSignal>(static state => state),
       _ => throw new InvalidOperationException("Unknown dead-lettering operation.")
     };
 }

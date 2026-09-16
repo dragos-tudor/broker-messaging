@@ -4,29 +4,29 @@ namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunHandlingPipeline(HandlingInput[] path, HandlingContinuation end, InboundPipelineConfig config = default)
+  static void RunHandlingPipeline(HandlingSignal[] path, HandlingTransition end, InboundPipelineConfig config = default)
   {
-    HandlingInput[] possibleInputs = [HandlingEntry.Start];
-    foreach (var input in path)
+    HandlingSignal[] possibleSignals = [HandlingEntry.Start];
+    foreach (var signal in path)
     {
-      possibleInputs.ShouldContain(input, $"{input} is not valid. Expected one of: {string.Join(", ", possibleInputs)}");
+      possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");
 
-      var continuation = GetHandlingContinuation(input, config);
-      if (path[^1].Value == input.Value)
+      var transition = GetHandlingTransition(signal, config);
+      if (path[^1].Value == signal.Value)
       {
-        continuation.ShouldBe(end);
+        transition.ShouldBe(end);
         return;
       }
 
-      possibleInputs = continuation switch
+      possibleSignals = transition switch
       {
-        HandlingActions action => [.. GetHandlingPossibleInputs(action)],
+        HandlingActions action => [.. GetHandlingPossibleSignals(action)],
         _ => []
       };
     }
   }
 
-  static IEnumerable<HandlingInput> GetHandlingPossibleInputs(HandlingActions action) =>
+  static IEnumerable<HandlingSignal> GetHandlingPossibleSignals(HandlingActions action) =>
     action switch
     {
       HandlingActions.Handling => [.. Enum.GetValues<Inbox.HandlingStates>()],
@@ -36,3 +36,4 @@ partial class InboundTests
       _ => throw new InvalidOperationException($"Invalid handling action {action}"),
     };
 }
+

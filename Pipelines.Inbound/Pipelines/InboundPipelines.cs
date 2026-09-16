@@ -6,7 +6,7 @@ partial class InboundFuncs
   // internal static Func<string, InboundPipelineConfig, string?>? GetInboundPipeline(PipelineTypes pipelineType) =>
   //   pipelineType switch
   //   {
-  //     PipelineTypes.Capturing => GetCapturingContinuation,
+  //     PipelineTypes.Capturing => GetCapturingTransition,
   //     PipelineTypes.Redirecting => GetRedirectingAction,
   //     PipelineTypes.Handling => GetHandlingAction,
   //     PipelineTypes.DeadLettering => GetDeadLetteringAction,

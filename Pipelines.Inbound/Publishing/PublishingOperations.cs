@@ -29,17 +29,18 @@ partial class InboundFuncs
       _ => throw new InvalidOperationException($"Unknown publishing action: {action}")
     };
 
-  internal static ValueTask<(TData, PublishingInput, Exception?)> ExecutePublishingOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(PublishingOperation<TServices, TData> operation, TServices services, TData data, CancellationToken ct = default)
+  internal static ValueTask<(TData, PublishingSignal, Exception?)> ExecutePublishingOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(PublishingOperation<TServices, TData> operation, TServices services, TData data, CancellationToken ct = default)
     where TServices : IPublishingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
     where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
     => operation switch
     {
-      { Mapping: not null } => operation.Mapping(services, data, ct).FromResult<TData, DeadLetter.MappingStates, PublishingInput>(static state => state),
-      { Publishing: not null } => operation.Publishing(services, data, ct).FromResult<TData, DeadLetterEnvelope.PublishingStates, PublishingInput>(static state => state),
-      { Producing: not null } => operation.Producing(services, data, ct).FromResult<TData, DeadLetterEnvelope.ProducingStates, PublishingInput>(static state => state),
-      { Scheduling: not null } => operation.Scheduling(services, data, ct).FromResult<TData, DeadLetter.SchedulingStates, PublishingInput>(static state => state),
-      { Abandoning: not null } => operation.Abandoning(services, data, ct).FromResult<TData, DeadLetter.AbandoningStates, PublishingInput>(static state => state),
-      { Closing: not null } => operation.Closing(services, data, ct).FromResult<TData, DeadLetter.ClosingStates, PublishingInput>(static state => state),
+      { Mapping: not null } => operation.Mapping(services, data, ct).FromResult<TData, DeadLetter.MappingStates, PublishingSignal>(static state => state),
+      { Publishing: not null } => operation.Publishing(services, data, ct).FromResult<TData, DeadLetterEnvelope.PublishingStates, PublishingSignal>(static state => state),
+      { Producing: not null } => operation.Producing(services, data, ct).FromResult<TData, DeadLetterEnvelope.ProducingStates, PublishingSignal>(static state => state),
+      { Scheduling: not null } => operation.Scheduling(services, data, ct).FromResult<TData, DeadLetter.SchedulingStates, PublishingSignal>(static state => state),
+      { Abandoning: not null } => operation.Abandoning(services, data, ct).FromResult<TData, DeadLetter.AbandoningStates, PublishingSignal>(static state => state),
+      { Closing: not null } => operation.Closing(services, data, ct).FromResult<TData, DeadLetter.ClosingStates, PublishingSignal>(static state => state),
       _ => throw new InvalidOperationException("Unknown publishing operation.")
     };
 }
+

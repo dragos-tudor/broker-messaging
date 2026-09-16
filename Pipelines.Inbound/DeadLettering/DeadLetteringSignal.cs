@@ -1,14 +1,14 @@
-using Inbox = Operations.Inbound.Inbox;
+using Operations.Inbound.Inbox;
 using DeadLetter = Operations.Inbound.DeadLetter;
 
 namespace Pipelines.Inbound;
 
 internal enum DeadLetteringEntry { Start }
 
-internal readonly union DeadLetteringInput(
+internal readonly union DeadLetteringSignal(
   DeadLetteringEntry,
-  Inbox.ConvertingStates,
+  ConvertingStates,
   DeadLetter.InsertingStates,
-  Inbox.AbandoningStates,
-  Inbox.ClosingStates
+  AbandoningStates,
+  ClosingStates
 );

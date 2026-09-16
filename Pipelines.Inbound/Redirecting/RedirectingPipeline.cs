@@ -5,9 +5,9 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static RedirectingContinuation GetRedirectingContinuation(
-    RedirectingInput input,
-    InboundPipelineConfig _) => input switch
+  internal static RedirectingTransition GetRedirectingTransition(
+    RedirectingSignal signal,
+    InboundPipelineConfig _) => signal switch
   {
     RedirectingEntry.Start => RedirectingActions.Converting,
 
@@ -24,3 +24,4 @@ partial class InboundFuncs
     _ => TerminalActions.Unknown
   };
 }
+

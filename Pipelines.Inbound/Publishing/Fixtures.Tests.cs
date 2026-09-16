@@ -5,19 +5,19 @@ namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunPublishingPipeline(PublishingInput[] path, PublishingContinuation end, InboundPipelineConfig config = default)
+  static void RunPublishingPipeline(PublishingSignal[] path, PublishingTransition end, InboundPipelineConfig config = default)
   {
-    PublishingInput[] possibleInputs = [PublishingEntry.Start];
-    foreach (var input in path)
+    PublishingSignal[] possibleSignals = [PublishingEntry.Start];
+    foreach (var signal in path)
     {
-      possibleInputs.ShouldContain(input);
-      var continuation = GetPublishingContinuation(input, config);
-      if (path[^1].Value == input.Value) { continuation.ShouldBe(end); return; }
-      possibleInputs = continuation switch { PublishingActions action => [.. GetPublishingPossibleInputs(action)], _ => [] };
+      possibleSignals.ShouldContain(signal);
+      var transition = GetPublishingTransition(signal, config);
+      if (path[^1].Value == signal.Value) { transition.ShouldBe(end); return; }
+      possibleSignals = transition switch { PublishingActions action => [.. GetPublishingPossibleSignals(action)], _ => [] };
     }
   }
 
-  static IEnumerable<PublishingInput> GetPublishingPossibleInputs(PublishingActions action) => action switch
+  static IEnumerable<PublishingSignal> GetPublishingPossibleSignals(PublishingActions action) => action switch
   {
     PublishingActions.Mapping => [.. Enum.GetValues<DeadLetter.MappingStates>()],
     PublishingActions.Publishing => [.. Enum.GetValues<DeadLetterEnvelope.PublishingStates>()],
@@ -28,3 +28,4 @@ partial class InboundTests
     _ => throw new InvalidOperationException($"Invalid publishing action {action}")
   };
 }
+

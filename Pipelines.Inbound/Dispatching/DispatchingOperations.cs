@@ -25,15 +25,16 @@ partial class InboundFuncs
       _ => throw new InvalidOperationException($"Unknown dispatching action: {action}")
     };
 
-  internal static ValueTask<(TData, DispatchingInput, Exception?)> ExecuteDispatchingOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(DispatchingOperation<TServices, TData> operation, TServices services, TData data, CancellationToken ct = default)
+  internal static ValueTask<(TData, DispatchingSignal, Exception?)> ExecuteDispatchingOperation<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(DispatchingOperation<TServices, TData> operation, TServices services, TData data, CancellationToken ct = default)
     where TServices : IDispatchingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
     where TData : IDispatchingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
     => operation switch
     {
-      { Dispatching: not null } => operation.Dispatching(services, data, ct).FromResult<TData, DeadLetterEnvelope.DispatchingStates, DispatchingInput>(static state => state),
-      { Scheduling: not null } => operation.Scheduling(services, data, ct).FromResult<TData, DeadLetter.SchedulingStates, DispatchingInput>(static state => state),
-      { Abandoning: not null } => operation.Abandoning(services, data, ct).FromResult<TData, DeadLetter.AbandoningStates, DispatchingInput>(static state => state),
-      { Closing: not null } => operation.Closing(services, data, ct).FromResult<TData, DeadLetter.ClosingStates, DispatchingInput>(static state => state),
+      { Dispatching: not null } => operation.Dispatching(services, data, ct).FromResult<TData, DeadLetterEnvelope.DispatchingStates, DispatchingSignal>(static state => state),
+      { Scheduling: not null } => operation.Scheduling(services, data, ct).FromResult<TData, DeadLetter.SchedulingStates, DispatchingSignal>(static state => state),
+      { Abandoning: not null } => operation.Abandoning(services, data, ct).FromResult<TData, DeadLetter.AbandoningStates, DispatchingSignal>(static state => state),
+      { Closing: not null } => operation.Closing(services, data, ct).FromResult<TData, DeadLetter.ClosingStates, DispatchingSignal>(static state => state),
       _ => throw new InvalidOperationException("Unknown dispatching operation.")
     };
 }
+
