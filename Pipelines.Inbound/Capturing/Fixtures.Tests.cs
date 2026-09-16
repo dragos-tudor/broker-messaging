@@ -7,7 +7,10 @@ namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunCapturingPipeline(CapturingSignal[] path, CapturingTransition end, InboundPipelineConfig config = default)
+  static void RunCapturingPipeline(CapturingSignal[] path, CapturingTransition end) =>
+    RunCapturingPipeline(path, end, new InboundPipelineConfig());
+
+  static void RunCapturingPipeline(CapturingSignal[] path, CapturingTransition end, InboundPipelineConfig config)
   {
     CapturingSignal[] possibleSignals = [CapturingEntry.Start];
     foreach (var signal in path)

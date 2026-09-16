@@ -4,7 +4,10 @@ namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunHandlingPipeline(HandlingSignal[] path, HandlingTransition end, InboundPipelineConfig config = default)
+  static void RunHandlingPipeline(HandlingSignal[] path, HandlingTransition end) =>
+    RunHandlingPipeline(path, end, new InboundPipelineConfig());
+
+  static void RunHandlingPipeline(HandlingSignal[] path, HandlingTransition end, InboundPipelineConfig config)
   {
     HandlingSignal[] possibleSignals = [HandlingEntry.Start];
     foreach (var signal in path)

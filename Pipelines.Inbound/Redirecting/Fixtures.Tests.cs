@@ -5,7 +5,10 @@ namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunRedirectingPipeline(RedirectingSignal[] path, RedirectingTransition end, InboundPipelineConfig config = default)
+  static void RunRedirectingPipeline(RedirectingSignal[] path, RedirectingTransition end) =>
+    RunRedirectingPipeline(path, end, new InboundPipelineConfig());
+
+  static void RunRedirectingPipeline(RedirectingSignal[] path, RedirectingTransition end, InboundPipelineConfig config)
   {
     RedirectingSignal[] possibleSignals = [RedirectingEntry.Start];
     foreach (var signal in path)

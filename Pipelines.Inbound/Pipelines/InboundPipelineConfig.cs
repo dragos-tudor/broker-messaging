@@ -1,7 +1,7 @@
 
 namespace Pipelines.Inbound;
 
-public readonly ref struct InboundPipelineConfig
+public record InboundPipelineConfig
 {
   public bool HandleAfterCapture { get; init; }
   public bool UseBrokerPublisher { get; init; }

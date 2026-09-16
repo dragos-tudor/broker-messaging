@@ -5,7 +5,10 @@ namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunDispatchingPipeline(DispatchingSignal[] path, DispatchingTransition end, InboundPipelineConfig config = default)
+  static void RunDispatchingPipeline(DispatchingSignal[] path, DispatchingTransition end) =>
+    RunDispatchingPipeline(path, end, new InboundPipelineConfig());
+
+  static void RunDispatchingPipeline(DispatchingSignal[] path, DispatchingTransition end, InboundPipelineConfig config)
   {
     DispatchingSignal[] possibleSignals = [DispatchingEntry.Start];
     foreach (var signal in path)

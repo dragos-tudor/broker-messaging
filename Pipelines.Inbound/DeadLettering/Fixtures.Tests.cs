@@ -5,10 +5,13 @@ namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
+  static void RunDeadLetteringPipeline(DeadLetteringSignal[] path, DeadLetteringTransition end) =>
+    RunDeadLetteringPipeline(path, end, new InboundPipelineConfig());
+
   static void RunDeadLetteringPipeline(
     DeadLetteringSignal[] path,
     DeadLetteringTransition end,
-    InboundPipelineConfig config = default)
+    InboundPipelineConfig config)
   {
     DeadLetteringSignal[] possibleSignals = [DeadLetteringEntry.Start];
     foreach (var signal in path)

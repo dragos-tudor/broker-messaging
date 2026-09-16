@@ -5,7 +5,10 @@ namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunPublishingPipeline(PublishingSignal[] path, PublishingTransition end, InboundPipelineConfig config = default)
+  static void RunPublishingPipeline(PublishingSignal[] path, PublishingTransition end) =>
+    RunPublishingPipeline(path, end, new InboundPipelineConfig());
+
+  static void RunPublishingPipeline(PublishingSignal[] path, PublishingTransition end, InboundPipelineConfig config)
   {
     PublishingSignal[] possibleSignals = [PublishingEntry.Start];
     foreach (var signal in path)

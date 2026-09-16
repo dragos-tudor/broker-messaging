@@ -5,6 +5,9 @@ namespace Pipelines.Outbound;
 
 partial class OutboundTests
 {
+  static void RunPublishingPipeline(PublishingSignal[] path, PublishingTransition end) =>
+    RunPublishingPipeline(path, end, new OutboundPipelineConfig());
+
   static void RunPublishingPipeline(PublishingSignal[] path, PublishingTransition end, OutboundPipelineConfig config = default)
   {
     PublishingSignal[] possibleSignals = [PublishingEntry.Start];
