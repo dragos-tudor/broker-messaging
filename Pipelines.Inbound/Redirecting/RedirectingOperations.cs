@@ -7,7 +7,7 @@ partial class InboundFuncs
 {
   internal static ValueTask<(TData, RedirectingSignal, Exception?)>
     ExecuteRedirectingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      RedirectingActions transition,
+      RedirectingTransition transition,
       TServices services,
       TData data,
       CancellationToken ct = default)
