@@ -2,10 +2,12 @@
 ## Design [v1]
 
 ## Main Flows
+
 - inbound: consume and handle broker messages.
 - outbound: publish broker messages.
 
 ## Transport
+
 - transport structures:
   - envelope [`IEnvelope`].
   - dead letter envelope [`IDeadLetterEnvelope`].
@@ -18,7 +20,8 @@
   - envelope wrapper [`Envelope`].
   - dead letter envelope wrapper [`DeadLetterEnvelope`].
 
-### Transport.Envelope:
+### Transport.Envelope
+
 - envelopes are created by:
   - inbound pipeline wrapping and mapping broker specific messages.
   - outbound pipeline mapping outbox messages.
@@ -35,6 +38,7 @@
 - envelopes are transient transport structures and are never persisted directly by the core pipeline.
 
 ### Transport.DeadLetterEnvelope
+
 - dead letter envelopes are created by the inbound pipeline:
   - converting invalid envelopes.
   - mapping invalid inbox messages.
@@ -47,12 +51,14 @@
 - dead letter envelopes are transient transport structures and are never persisted directly by the core pipeline.
 
 ## Persistence
+
 - persistence structures:
   - inbox message [`IInboxMessage`].
   - dead letter message [`IDeadLetterMessage`].
   - outbox message [`IOutboxMessage`].
 
 ### Persistence.InboxMessage
+
 - inbox messages are created by the inbound pipeline mapping envelopes.
 - inbox message class has 2 open generics `<TKey, TPayload>`.
   - `TKey` the inbox message type mapped from envelope `TKey`.
@@ -65,6 +71,7 @@
  - data annotations.
 
 ### Persistence.DeadLetterMessage
+
 - dead letter messages are created by the inbound pipeline converting invalid inbox messages.
 - dead letter message class has 2 open generics `<TKey, TPayload>`:
   - `TKey` the dead letter message type mapped from inbox message `TKey`.
@@ -72,6 +79,7 @@
 - dead letter message statuses are: Processing, Published, Abandoned.
 
 ### Persistence.OutboxMessage
+
 - outbox messages are created by the user to publish them to brokers.
 - outbox message class has 2 open generics `<TKey, TPayload>`:
   - `TKey` the outbox message type should be the same as the inbox message `TKey`.
@@ -83,6 +91,7 @@
  - data annotations.
 
 ## Operations
+
 - transport operations process transient transport structures and return explicit operation states.
 - persistence operations process persistent structures and return explicit operation
 states.
@@ -138,6 +147,7 @@ states.
 - dispatching — processes the asynchronous broker produce result.
 
 ### Operations Design Rules
+
 - each operation has one-task responsibility [eg. capture an envelope, map a dead-letter message, validate an envelope, insert an inbox message].
 - each operation is independent of the others.
 - each operation uses specialized interfaces for services and data based on composition root pattern.
@@ -183,6 +193,16 @@ Pipelines define semantic processing flow by mapping operation outcomes to the n
 - each pipeline must define its entry action by mapping it to the first action. Subsequent mappings are driven by operation outcomes.
 
 ## Design Vocabulary
-- transport & persistence:
+- structures:
   - converting: transform structures from the same type group [eg. envelope -> dead letter envelope].
   - mapping: transform structures from different type groups [eg. envelope -> inbox message].
+- structures:
+  - failure reason:
+    - keep verifying, mapping, validating, handling, transacting errors for envelopes and inbox/outbox messages.
+  - last error:
+    - keep [repeatable] scheduled operations errors. sometimes could be the same as failure reason.
+- operations:
+  - verifying: performs lightweight envelope verification.
+  - validating: performs heavyweight inbox and outbox messages validations [data annotations and specialized functions].
+
+-

@@ -62,9 +62,10 @@
   - handling job: runs the inbound router for failed inbox messages.
   - dead lettering job: runs the inbound router for abandoned inbox messages.
   - publishing job: runs the inbound router for failed dead letter messages.
-  - publishing job: runs the inbound router for enqueued dead letter messages.
+  - dispatching channels: runs the inbound router for producer ack results.
 - outbound runners:
   - publishing job: runs the outbound router for failed outbox messages.
+  - dispatching channels: runs the outbound router for producer ack results.
 
 ## Libraries
 - broker-agnostic client messaging library at the core.
@@ -85,7 +86,7 @@
 - system layer: reliability.* and observability.* projects.
 
 ### Specialized Libraries
-- foundation layer: kafka.* projects.
+- foundation layer: eg. kafka.* projects.
 
 ## Golden rules
 - all projects on a layer may reference only projects from the layer immediately below.
@@ -96,9 +97,9 @@
 ## Packages
 - meta-projects refer top-level projects and contain no implementation.
 - meta-projects are packed as NuGet package.
-- meta-projects are composition/packaging boundaries
+- meta-projects are composition/packaging boundaries.
 - messaging.core package packs all core project assemblies.
-- messaging.kafka package packs all kafka package assemblies.
+- messaging.kafka package packs all kafka project assemblies.
 
 ## Main Patterns
 - transactional inbox pattern for inbound messages.
