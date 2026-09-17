@@ -28,7 +28,7 @@ partial class InboundTests
       ConfirmingStates.Success
     ];
     var config = new InboundPipelineConfig() { HandleAfterCapture = true };
-    RunCapturingPipeline(path, PipelineTypes.Handling, config);
+    RunCapturingPipeline(path, InboundPipelineTypes.Handling, config);
   }
 
   [TestMethod]
@@ -66,7 +66,7 @@ partial class InboundTests
       CapturingEntry.Start, CapturingStates.Success,
       VerifyingStates.InvalidConfirmableError
     ];
-    RunCapturingPipeline(path, PipelineTypes.Redirecting);
+    RunCapturingPipeline(path, InboundPipelineTypes.Redirecting);
   }
 
   [TestMethod]
@@ -86,7 +86,7 @@ partial class InboundTests
       CapturingEntry.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Error
     ];
-    RunCapturingPipeline(path, PipelineTypes.Redirecting);
+    RunCapturingPipeline(path, InboundPipelineTypes.Redirecting);
   }
 
   [TestMethod]
@@ -97,7 +97,7 @@ partial class InboundTests
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.InvalidError
     ];
-    RunCapturingPipeline(path, PipelineTypes.Redirecting);
+    RunCapturingPipeline(path, InboundPipelineTypes.Redirecting);
   }
 
   [TestMethod]
@@ -108,7 +108,7 @@ partial class InboundTests
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Error
     ];
-    RunCapturingPipeline(path, PipelineTypes.Redirecting);
+    RunCapturingPipeline(path, InboundPipelineTypes.Redirecting);
   }
 
   [TestMethod]

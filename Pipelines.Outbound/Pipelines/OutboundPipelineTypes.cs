@@ -1,7 +1,7 @@
 
 namespace Pipelines.Outbound;
 
-internal enum PipelinesTypes
+internal enum OutboundPipelinesTypes
 {
   Persisting,
   Publishing,

@@ -16,7 +16,7 @@ partial class OutboundFuncs
     ValidatingStates.Error => TerminalActions.Exit,
 
     TransactingStates.Success => config.PublishAfterPersist?
-      PipelinesTypes.Publishing:
+      OutboundPipelinesTypes.Publishing:
       TerminalActions.Exit,
     TransactingStates.Error => TerminalActions.Exit,
 

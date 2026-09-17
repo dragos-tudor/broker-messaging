@@ -14,7 +14,7 @@ partial class InboundTests
       DeadLetter.InsertingStates.Success,
       ClosingStates.Success
     ];
-    RunDeadLetteringPipeline(path, PipelineTypes.Publishing);
+    RunDeadLetteringPipeline(path, InboundPipelineTypes.Publishing);
   }
 
   [TestMethod]
@@ -26,7 +26,7 @@ partial class InboundTests
       DeadLetter.InsertingStates.Idempotent,
       ClosingStates.Success
     ];
-    RunDeadLetteringPipeline(path, PipelineTypes.Publishing);
+    RunDeadLetteringPipeline(path, InboundPipelineTypes.Publishing);
   }
 
   [TestMethod]

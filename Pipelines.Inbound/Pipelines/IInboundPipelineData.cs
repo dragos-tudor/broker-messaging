@@ -3,7 +3,7 @@ using Operations.Inbound.DeadLetterEnvelope;
 
 namespace Pipelines.Inbound;
 
-public interface IPipelineData<TKey, TValue, TMetadata, TConfirmation, TPayload> :
+public interface IInboundPipelineData<TKey, TValue, TMetadata, TConfirmation, TPayload> :
   ICapturingData<TKey, TValue, TMetadata, TConfirmation, TPayload>,
   IRedirectingData<TKey, TValue, TMetadata, TConfirmation, TPayload>,
   IHandlingData<TKey, TPayload>,
@@ -11,8 +11,8 @@ public interface IPipelineData<TKey, TValue, TMetadata, TConfirmation, TPayload>
   IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload>,
   IDispatchingData<TKey, TValue, TMetadata, TConfirmation, TPayload>;
 
-public class PipelineData<TKey, TValue, TMetadata, TConfirmation, TPayload> :
-  IPipelineData<TKey, TValue, TMetadata, TConfirmation, TPayload>
+public class InboundPipelineData<TKey, TValue, TMetadata, TConfirmation, TPayload> :
+  IInboundPipelineData<TKey, TValue, TMetadata, TConfirmation, TPayload>
 {
   public IDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation>? DeadLetterEnvelope { get; set; }
   public IDeadLetterMessage<TKey, TPayload>? DeadLetterMessage { get; set; }

@@ -22,7 +22,7 @@ partial class InboundFuncs
     AbandoningStates.Success => TerminalActions.Exit,
     AbandoningStates.Error => TerminalActions.Exit,
 
-    ClosingStates.Success => PipelineTypes.Publishing,
+    ClosingStates.Success => InboundPipelineTypes.Publishing,
     ClosingStates.Error => TerminalActions.Exit,
 
     _ => TerminalActions.Unknown

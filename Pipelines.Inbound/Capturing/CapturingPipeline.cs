@@ -17,22 +17,22 @@ partial class InboundFuncs
 
       VerifyingStates.Success => CapturingActions.Mapping,
       VerifyingStates.InvalidError => TerminalActions.Unrecoverable,
-      VerifyingStates.InvalidConfirmableError => PipelineTypes.Redirecting,
+      VerifyingStates.InvalidConfirmableError => InboundPipelineTypes.Redirecting,
       VerifyingStates.Error => TerminalActions.Unrecoverable,
 
       MappingStates.Success => CapturingActions.Validating,
-      MappingStates.Error => PipelineTypes.Redirecting,
+      MappingStates.Error => InboundPipelineTypes.Redirecting,
 
       ValidatingStates.Success => CapturingActions.Inserting,
-      ValidatingStates.InvalidError => PipelineTypes.Redirecting,
-      ValidatingStates.Error => PipelineTypes.Redirecting,
+      ValidatingStates.InvalidError => InboundPipelineTypes.Redirecting,
+      ValidatingStates.Error => InboundPipelineTypes.Redirecting,
 
       InsertingStates.Success => CapturingActions.Confirming,
       InsertingStates.Idempotent => CapturingActions.ConfirmingFinal,
       InsertingStates.Error => TerminalActions.Exit,
 
       ConfirmingStates.Success => config.HandleAfterCapture ?
-        PipelineTypes.Handling :
+        InboundPipelineTypes.Handling :
         TerminalActions.Exit,
       ConfirmingStates.Error => TerminalActions.Exit,
 
