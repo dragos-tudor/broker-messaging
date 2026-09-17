@@ -39,6 +39,8 @@
 - prefer named functions over inline lambda expressions:
   - prefer: `integers.Select(Increment)`.
   - avoid: `integers.Select(n => n + 1)`.
+- prefer using pattern matching over clasic switch statements.
+- prefer to use regular using declarations instead of aliases.
 - inject dependencies explicitly through function parameters, service structures/interfaces, or delegates.
 - use:
   - Result pattern for expected/domain failures.
@@ -52,18 +54,25 @@
 - keep test files adjacent to the code they test (e.g., Verifying.Tests.cs next to Verifying.cs).
 
 ### Testing Execution
-- commands may run in a non-interactive process inside the Podman dev container.
-- persistent MSBuild servers can occasionally fail because their IPC endpoint is unavailable or inaccessible.
-- if dotnet build/test reports “MSBuild server unavailable” and then hangs during fallback, interrupt the command and rerun with --disable-build-servers. This is an environment issue, not necessarily a project or SDK issue.
-- this repository uses Microsoft.Testing.Platform via global.json.
-- if restore or build fails during parallel MSBuild traversal, use:
-  dotnet restore <project>.csproj --disable-parallel
-  dotnet build <project>.csproj --no-restore --disable-build-servers -m:1 -p:BuildInParallel=false
-- run tests normally with:
-  dotnet test --project <project>.csproj
-- in restricted environments where dotnet test fails with an IPC or named-pipe permission error, run the generated test module directly after building:
-  dotnet artifacts/bin/<Project>/debug_linux-x64/<Project>.dll --no-progress
+- this repository uses Microsoft.Testing.Platform via `global.json`.
 - test execution must report total, failed, succeeded, and skipped test counts.
+- coding-agent commands may execute inside an additional restricted Linux sandbox within the Podman dev container.
+  - the sandbox may deny Unix-domain-socket operations used by .NET/MSBuild IPC.
+  - this affects both:
+    - MSBuild Server communication.
+    - MSBuild parallel worker nodes [`-m` / node reuse].
+  - these failures are execution-environment restrictions and do not by themselves indicate a repository or .NET SDK problem.
+- when running through the restricted coding-agent environment:
+  - restore without parallel MSBuild workers when necessary:
+    ```dotnet restore <project>.csproj --disable-parallel```
+  - build without MSBuild Server or parallel worker nodes:
+    ```dotnet build <project>.csproj --no-restore --disable-build-servers -m:1 -p:BuildInParallel=false```
+  - run tests without implicitly restoring or building:
+    ```dotnet test --no-restore --no-build --project <project>.csproj```
+  - if test execution fails because the restricted environment prevents required IPC,
+    build first and execute the generated test module directly:
+    ```dotnet artifacts/bin/<Project>/debug_linux-x64/<Project>.dll --no-progress```
+
 
 ### Names
 - use naming styles for methods:
