@@ -6,8 +6,10 @@ global using NSubstitute;
 namespace Routing.Inbound;
 
 [TestClass]
-public partial class RoutingTests
+public partial class InboundTests
 {
   [TestMethod]
-  public void TestFake() {}
+  public void TestFake()
+  {
+  }
 }
