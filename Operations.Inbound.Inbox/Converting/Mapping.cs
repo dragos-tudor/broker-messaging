@@ -3,10 +3,10 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  internal static DeadLetterMessage<TKey, TPayload> FromInboxMessage<TKey, TPayload>(
+  internal static IDeadLetterMessage<TKey, TPayload> FromInboxMessage<TKey, TPayload>(
     IInboxMessage<TKey, TPayload> message,
     DateTime createdAt) =>
-    new (){
+    new DeadLetterMessage<TKey, TPayload>(){
       MessageId = message.MessageId,
       MessageKey = message.MessageKey,
       TransportMessageId = message.TransportMessageId,
@@ -18,6 +18,6 @@ partial class InboxFuncs
       Version = message.Version,
       Metadata = message.Metadata,
       CorrelationId = message.CorrelationId,
-      FailureReason = TruncateDeadLetterMessageFailureReason(message.FailureReason ?? "Unknow failure reason")
+      FailureReason = TruncateDeadLetterMessageFailureReason(message.FailureReason ?? "Unknown failure reason")
     };
 }

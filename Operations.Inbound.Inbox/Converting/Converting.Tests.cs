@@ -12,6 +12,7 @@ public partial class InboxTests
     var (data, state, exception) = await InboxFuncs.ConvertInboxMessage<IConvertingServices, InboxData, string, string>(services, inputData);
 
     data.DeadLetterMessage.ShouldNotBeNull();
+    data.DeadLetterMessage!.FailureReason.ShouldBe(inputData.InboxMessage!.FailureReason);
     state.ShouldBe(ConvertingStates.Success);
     exception.ShouldBeNull();
   }

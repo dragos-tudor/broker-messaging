@@ -13,7 +13,7 @@ partial class OutboxFuncs
     var message = RequireOutboxMessage(data.OutboxMessage);
     var lastError = message.LastError;
     var status = OutboxMessageStatus.Abandoned;
-    var @params = new AbandoningUpdate(status, lastError, null);
+    var @params = new AbandoningUpdate(status, lastError);
 
     await services.UpdateOutboxMessageAsync(message, @params, ct);
 

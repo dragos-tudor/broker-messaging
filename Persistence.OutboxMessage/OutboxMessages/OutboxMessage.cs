@@ -12,7 +12,6 @@ public interface IOutboxMessage<TKey, TPayload>
   string Type { get; init; }
   int? Version { get; init; }
   string? Metadata { get; init; }
-  string? FailureReason { get; set; }
   Guid? CorrelationId { get; init; }
   int? RetryCount { get; set; }
   DateTimeOffset? NextAttemptAt { get; set; }
@@ -32,7 +31,6 @@ public record OutboxMessage<TKey, TPayload>: IOutboxMessage<TKey, TPayload>
   public int? Version { get; init; } = 1;
   [MaxLength(MetadataMaxLength)]
   public string? Metadata { get; init; }
-  public string? FailureReason { get; set; }
   public Guid? CorrelationId { get; init; }
   public int? RetryCount { get; set; }
   public DateTimeOffset? NextAttemptAt { get; set; }

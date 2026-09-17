@@ -11,6 +11,6 @@ public interface IDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation>
   string Type { get; init; }
   TMetadata Metadata { get; }
   string Queue { get; init; }
-  string? FailureReason { get; set; }
+  string FailureReason { get; init; }
   TConfirmation? Confirmation { get; }
 }

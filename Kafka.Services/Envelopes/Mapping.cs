@@ -16,10 +16,11 @@ partial class ServicesFuncs
       GetKafkaHeaderSchemaType(envelope.Metadata) ?? typeof(TPayload).Name,
       GetKafkaHeaderCorrelationId(envelope.Metadata),
       GetKafkaHeaderSchemaVersion(envelope.Metadata),
-      TrySerializeTopicPartitionOffset(envelope.Confirmation));
+      TrySerializeTopicPartitionOffset(envelope.Confirmation),
+      envelope.FailureReason);
 
   public static Envelope<TKey, TValue> FromOutboxMessage<TKey, TValue, TPayload>(
-    OutboxMessage<TKey, TPayload> message,
+    IOutboxMessage<TKey, TPayload> message,
     TValue value,
     string queueName)
   =>

@@ -18,6 +18,7 @@ public partial class EnvelopeTests
 
     data.ShouldBeSameAs(inputData);
     data.DeadLetterEnvelope.ShouldBeSameAs(deadLetter);
+    services.Received(1).FromEnvelope(envelope, "invalid message", Arg.Any<DateTime>());
     state.ShouldBe(ConvertingStates.Success);
     exception.ShouldBeNull();
   }

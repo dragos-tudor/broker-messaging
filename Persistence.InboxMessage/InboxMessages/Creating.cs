@@ -12,7 +12,8 @@ public static partial class InboxMessageFuncs
     string type,
     Guid? correlationId,
     int? version,
-    string? metadata) =>
+    string? metadata,
+    string? failureReason) =>
     new()
     {
       MessageId = messageId,
@@ -23,6 +24,7 @@ public static partial class InboxMessageFuncs
       CorrelationId = correlationId,
       Type = type,
       Version = version,
-      Metadata = metadata
+      Metadata = metadata,
+      FailureReason = failureReason
     };
 }

@@ -14,5 +14,5 @@ public class DeadLetterEnvelope<TKey, TValue> :
   public Headers Metadata { get => Message.Headers; }
   public TopicPartitionOffset? Confirmation { get; init; }
   public required string Queue { get; init; }
-  public string? FailureReason { get; set; }
+  public required string FailureReason { get; init; }
 }

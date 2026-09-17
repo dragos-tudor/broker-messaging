@@ -19,6 +19,7 @@ partial class ServicesFuncs
           failureReason),
         date),
       envelope.Type,
+      failureReason,
       queueName);
 
   public static DeadLetterEnvelope<TKey, TValue?> ToDeadLetterEnvelope<TKey, TValue, TPayload>(
@@ -40,6 +41,7 @@ partial class ServicesFuncs
         ),
         date),
       message.Type,
+      message.FailureReason,
       queueName
     );
 

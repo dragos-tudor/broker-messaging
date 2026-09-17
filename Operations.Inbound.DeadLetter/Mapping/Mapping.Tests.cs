@@ -14,6 +14,7 @@ public partial class DeadLetterTests
     var (data, state, exception) = await DeadLetterFuncs.MapDeadLetterMessage<IMappingServices<string, byte[], object, string, string>, DeadLetterData, string, byte[], object, string, string>(services, inputData);
 
     data.DeadLetterEnvelope.ShouldBeSameAs(envelope);
+    services.Received(1).FromDeadLetterMessage(message, Arg.Any<DateTime>());
     state.ShouldBe(MappingStates.Success);
     exception.ShouldBeNull();
   }
