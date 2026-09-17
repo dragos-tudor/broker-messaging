@@ -192,6 +192,15 @@ Pipelines define semantic processing flow by mapping operation outcomes to the n
 - pipeline and operation identifiers are unique within their owning component; exact outcome-state names remain source-code implementation details.\
 - each pipeline must define its entry action by mapping it to the first action. Subsequent mappings are driven by operation outcomes.
 
+### Exception propagation
+- each [almost] pipeline segment owns its specific error-propagation rules.
+- operations success paths skip propagation entirely.
+- propagation functions handle only error outcomes.
+- router calls only the propagation function required by the current pipeline segment.
+- structures mappers/converters transfer existing FailureReason themselves.
+- `OutboxMessage` no longer carries FailureReason.
+
+
 ## Design Vocabulary
 - structures:
   - converting: transform structures from the same type group [eg. envelope -> dead letter envelope].
