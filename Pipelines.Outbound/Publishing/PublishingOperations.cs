@@ -5,7 +5,7 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static ValueTask<(TData, PublishingSignal, Exception?)>
+  internal static Task<(TData, PublishingSignal, Exception?)>
     ExecutePublishingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
       PublishingTransition transition,
       TServices services,
@@ -15,8 +15,8 @@ partial class OutboundFuncs
     where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
       transition switch
       {
-        PublishingActions.Mapping => MapOutboxMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data, ct).FromResult<TData, MappingStates, PublishingSignal>(static state => state),
-        PublishingActions.Producing => ProduceEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data, ct).FromResult<TData, ProducingStates, PublishingSignal>(static state => state),
+        PublishingActions.Mapping => MapOutboxMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data).FromResult<TData, MappingStates, PublishingSignal>(static state => state),
+        PublishingActions.Producing => ProduceEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data).FromResult<TData, ProducingStates, PublishingSignal>(static state => state),
         PublishingActions.Publishing => PublishEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(services, data, ct).FromResult<TData, PublishingStates, PublishingSignal>(static state => state),
         PublishingActions.Scheduling => ScheduleOutboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, SchedulingStates, PublishingSignal>(static state => state),
         PublishingActions.Abandoning => AbandonOutboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, AbandoningStates, PublishingSignal>(static state => state),

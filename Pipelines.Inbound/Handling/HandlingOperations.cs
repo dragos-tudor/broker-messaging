@@ -4,7 +4,7 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static ValueTask<(TData, HandlingSignal, Exception?)>
+  internal static Task<(TData, HandlingSignal, Exception?)>
     ExecuteHandlingOperationAsync<TServices, TData, TKey, TPayload, TSession>(
       HandlingTransition transition,
       TServices services,

@@ -3,13 +3,13 @@ namespace Operations.Outbound.Outbox;
 public partial class OutboxTests
 {
   [TestMethod]
-  public async Task validate_outbox_message__message_is_valid__returns_success()
+  public void validate_outbox_message__message_is_valid__returns_success()
   {
     var services = Substitute.For<IValidatingServices<string, string>>();
     var message = new OutboxMessage<string, string> { MessageId = Guid.NewGuid(), MessageKey = "key", Payload = "payload", Type = "type", CreatedAt = DateTime.UtcNow };
     var inputData = new OutboxData { OutboxMessage = message };
 
-    var (data, state, exception) = await OutboxFuncs.ValidateOutboxMessage<IValidatingServices<string, string>, OutboxData, string, string>(services, inputData);
+    var (data, state, exception) = OutboxFuncs.ValidateOutboxMessage<IValidatingServices<string, string>, OutboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
     state.ShouldBe(ValidatingStates.Success);
@@ -17,12 +17,12 @@ public partial class OutboxTests
   }
 
   [TestMethod]
-  public async Task validate_outbox_message__message_missing__returns_error()
+  public void validate_outbox_message__message_missing__returns_error()
   {
     var services = Substitute.For<IValidatingServices<string, string>>();
     var inputData = new OutboxData();
 
-    var (data, state, exception) = await OutboxFuncs.ValidateOutboxMessage<IValidatingServices<string, string>, OutboxData, string, string>(services, inputData);
+    var (data, state, exception) = OutboxFuncs.ValidateOutboxMessage<IValidatingServices<string, string>, OutboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
     state.ShouldBe(ValidatingStates.Error);
@@ -30,13 +30,13 @@ public partial class OutboxTests
   }
 
   [TestMethod]
-  public async Task validate_outbox_message__message_is_invalid__returns_invalid_error()
+  public void validate_outbox_message__message_is_invalid__returns_invalid_error()
   {
     var services = Substitute.For<IValidatingServices<string, string>>();
     var message = new OutboxMessage<string, string> { MessageId = Guid.Empty, MessageKey = "key", Payload = "payload", Type = "type", CreatedAt = DateTime.UtcNow };
     var inputData = new OutboxData { OutboxMessage = message };
 
-    var (data, state, exception) = await OutboxFuncs.ValidateOutboxMessage<IValidatingServices<string, string>, OutboxData, string, string>(services, inputData);
+    var (data, state, exception) = OutboxFuncs.ValidateOutboxMessage<IValidatingServices<string, string>, OutboxData, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
     state.ShouldBe(ValidatingStates.InvalidError);

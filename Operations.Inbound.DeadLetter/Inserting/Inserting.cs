@@ -3,7 +3,7 @@ namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  static async ValueTask<(TData, InsertingStates, Exception?)> InsertDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>(
+  static async Task<(TData, InsertingStates, Exception?)> InsertDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -23,7 +23,7 @@ partial class DeadLetterFuncs
   where TData : IInsertingData<TKey, TPayload> =>
     (data, InsertingStates.Error, exception);
 
-  internal static ValueTask<(TData, InsertingStates, Exception?)> InsertDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
+  internal static Task<(TData, InsertingStates, Exception?)> InsertDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

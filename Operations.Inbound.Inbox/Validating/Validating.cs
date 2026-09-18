@@ -24,10 +24,9 @@ partial class InboxFuncs
   where TData : IValidatingData<TKey, TPayload> =>
     (data, ValidatingStates.Error, exception);
 
-  internal static ValueTask<(TData, ValidatingStates, Exception?)> ValidateInboxMessage<TServices, TData, TKey, TPayload>(
+  internal static (TData, ValidatingStates, Exception?) ValidateInboxMessage<TServices, TData, TKey, TPayload>(
     TServices services,
-    TData data,
-    CancellationToken ct = default)
+    TData data)
   where TServices : IValidatingServices
   where TData : IValidatingData<TKey, TPayload> =>
     TryCatch(

@@ -4,7 +4,7 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static ValueTask<(TData, PersistingSignal, Exception?)>
+  internal static Task<(TData, PersistingSignal, Exception?)>
     ExecutePersistingOperationAsync<TServices, TData, TKey, TPayload, TSession>(
       PersistingTransition transition,
       TServices services,

@@ -28,10 +28,9 @@ partial class EnvelopeFuncs
   where TData : IVerifyingData<TKey, TValue, TMetadata, TConfirmation> =>
     (data, VerifyingStates.Error, exception);
 
-  internal static ValueTask<(TData, VerifyingStates, Exception?)> VerifyEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
+  internal static (TData, VerifyingStates, Exception?) VerifyEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
     TServices services,
-    TData data,
-    CancellationToken ct = default)
+    TData data)
   where TServices : IVerifyingServices<TKey, TValue, TMetadata, TConfirmation>
   where TData : IVerifyingData<TKey, TValue, TMetadata, TConfirmation> =>
     TryCatch(

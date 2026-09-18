@@ -22,10 +22,9 @@ partial class EnvelopeFuncs
   where TData : IDispatchingData =>
     (data, DispatchingStates.Error, exception);
 
-  internal static ValueTask<(TData, DispatchingStates, Exception?)> DispatchEnvelope<TServices, TData>(
+  internal static (TData, DispatchingStates, Exception?) DispatchEnvelope<TServices, TData>(
     TServices services,
-    TData data,
-    CancellationToken _ = default)
+    TData data)
   where TServices : IDispatchingServices
   where TData : IDispatchingData =>
     TryCatch(

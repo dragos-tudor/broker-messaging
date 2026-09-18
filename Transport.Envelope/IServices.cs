@@ -2,7 +2,7 @@
 namespace Transport.Envelope;
 
 public interface IEnvelopeConfirmationService<TKey, TValue, TMetadata, TConfirmation> {
-  ValueTask ConfirmEnvelope(
+  Task ConfirmEnvelope(
     IEnvelope<TKey, TValue, TMetadata, TConfirmation> envelope,
     CancellationToken cancellationToken = default);
 }
@@ -20,5 +20,5 @@ public interface IEnvelopePublisherService<TKey, TValue, TMetadata, TConfirmatio
 }
 
 public interface IEnvelopeReaderService<TKey, TValue, TMetadata, TConfirmation> {
-  ValueTask<IEnvelope<TKey, TValue, TMetadata, TConfirmation>> ReadEnvelope(CancellationToken ct = default);
+  Task<IEnvelope<TKey, TValue, TMetadata, TConfirmation>> ReadEnvelope(CancellationToken ct = default);
 }

@@ -5,7 +5,7 @@ public partial class EnvelopeTests
   [TestMethod]
   [DataRow(true, ProducingStates.Enqueue)]
   [DataRow(false, ProducingStates.NotEnqueue)]
-  public async Task produce_envelope__broker_enqueue_result_varies__returns_matching_state(
+  public void produce_envelope__broker_enqueue_result_varies__returns_matching_state(
     bool isEnqueued,
     Enum expectedState)
   {
@@ -17,7 +17,7 @@ public partial class EnvelopeTests
       .Returns(isEnqueued);
     var inputData = new EnvelopeData { Envelope = envelope, OutboxMessage = message };
 
-    var (data, state, exception) = await EnvelopeFuncs.ProduceEnvelope<
+    var (data, state, exception) = EnvelopeFuncs.ProduceEnvelope<
       IProducingServices<string, byte[], object, string, string>, EnvelopeData,
       string, byte[], object, string, string>(services, inputData);
 
@@ -28,7 +28,7 @@ public partial class EnvelopeTests
   }
 
   [TestMethod]
-  public async Task produce_envelope__broker_throws__returns_error_with_exception()
+  public void produce_envelope__broker_throws__returns_error_with_exception()
   {
     var services = Substitute.For<IProducingServices<string, byte[], object, string, string>>();
     var expectedException = new InvalidOperationException("produce failed");
@@ -39,7 +39,7 @@ public partial class EnvelopeTests
       OutboxMessage = Substitute.For<IOutboxMessage<string, string>>()
     };
 
-    var (data, state, exception) = await EnvelopeFuncs.ProduceEnvelope<
+    var (data, state, exception) = EnvelopeFuncs.ProduceEnvelope<
       IProducingServices<string, byte[], object, string, string>, EnvelopeData,
       string, byte[], object, string, string>(services, inputData);
 

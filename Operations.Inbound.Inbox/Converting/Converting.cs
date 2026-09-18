@@ -23,10 +23,9 @@ partial class InboxFuncs
   where TData : IConvertingData<TKey, TPayload> =>
     (data, ConvertingStates.Error, exception);
 
-  internal static ValueTask<(TData, ConvertingStates, Exception?)> ConvertInboxMessage<TServices, TData, TKey, TPayload>(
+  internal static (TData, ConvertingStates, Exception?) ConvertInboxMessage<TServices, TData, TKey, TPayload>(
     TServices services,
-    TData data,
-    CancellationToken ct = default)
+    TData data)
   where TServices : IConvertingServices
   where TData : IConvertingData<TKey, TPayload> =>
     TryCatch(

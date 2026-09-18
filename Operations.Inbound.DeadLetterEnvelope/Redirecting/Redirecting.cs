@@ -3,7 +3,7 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  static async ValueTask<(TData, RedirectingStates, Exception?)> RedirectDeadLetterEnvelopeSuccessAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
+  static async Task<(TData, RedirectingStates, Exception?)> RedirectDeadLetterEnvelopeSuccessAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -22,7 +22,7 @@ partial class DeadLetterEnvelopeFuncs
   where TData : IRedirectingData<TKey, TValue, TMetadata, TConfirmation> =>
     (data, RedirectingStates.Error, exception);
 
-  internal static ValueTask<(TData, RedirectingStates, Exception?)> RedirectDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
+  internal static Task<(TData, RedirectingStates, Exception?)> RedirectDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
     TServices services,
     TData data,
     CancellationToken ct = default)

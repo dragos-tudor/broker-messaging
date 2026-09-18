@@ -3,22 +3,22 @@ namespace Foundation.Extensions;
 
 partial class ExtensionsFuncs
 {
-  internal static ValueTask<(TData, TState, Exception?)> TryCatch<TServices, TData, TState>(
+  internal static (TData, TState, Exception?) TryCatch<TServices, TData, TState>(
     TServices services,
     TData data,
     Func<TServices, TData, (TData, TState, Exception?)> onSuccess,
     Func<TData, Exception, (TData, TState, Exception?)> onError)
   {
     try
-    { return new (onSuccess(services, data)); }
+    { return onSuccess(services, data); }
     catch (Exception exception)
-    { return new (onError(data, exception)); }
+    { return onError(data, exception); }
   }
 
-  internal static async ValueTask<(TData, TState, Exception?)> TryCatch<TServices, TData, TState>(
+  internal static async Task<(TData, TState, Exception?)> TryCatch<TServices, TData, TState>(
     TServices services,
     TData data,
-    Func<TServices, TData, CancellationToken, ValueTask<(TData, TState, Exception?)>> onSuccess,
+    Func<TServices, TData, CancellationToken, Task<(TData, TState, Exception?)>> onSuccess,
     Func<TData, Exception, (TData, TState, Exception?)> onError,
     CancellationToken ct = default)
   {

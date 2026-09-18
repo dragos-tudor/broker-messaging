@@ -24,7 +24,7 @@ partial class OutboxFuncs
   where TData : IValidatingData<TKey, TPayload> =>
     (data, ValidatingStates.Error, exception);
 
-  internal static ValueTask<(TData, ValidatingStates, Exception?)> ValidateOutboxMessage<TServices, TData, TKey, TPayload>(
+  internal static (TData, ValidatingStates, Exception?) ValidateOutboxMessage<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken _ = default)

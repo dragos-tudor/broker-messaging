@@ -3,7 +3,7 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static async ValueTask<(TData, ClosingStates, Exception?)> CloseOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
+  static async Task<(TData, ClosingStates, Exception?)> CloseOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -24,7 +24,7 @@ partial class OutboxFuncs
   where TData : IClosingData<TKey, TPayload> =>
     (data, ClosingStates.Error, exception);
 
-  internal static ValueTask<(TData, ClosingStates, Exception?)> CloseOutboxMessageAsync<TServices, TData, TKey, TPayload>(
+  internal static Task<(TData, ClosingStates, Exception?)> CloseOutboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

@@ -9,7 +9,7 @@ partial class InboundFuncs
       TData data,
       TSignal signal,
       Func<TSignal, InboundPipelineConfig, TTransition> pipeline,
-      Func<TTransition, TServices, TData, CancellationToken, ValueTask<(TData, TSignal, Exception?)>> executeOperation,
+      Func<TTransition, TServices, TData, CancellationToken, Task<(TData, TSignal, Exception?)>> executeOperation,
       Func<TData, TSignal, Exception?, string?> propagateException,
       Func<TSignal, bool> canFastRetry,
       CancellationToken ct = default)

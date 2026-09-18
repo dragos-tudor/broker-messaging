@@ -31,10 +31,9 @@ partial class EnvelopeFuncs
   where TData : IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
     (data, ProducingStates.Error, exception);
 
-  internal static ValueTask<(TData, ProducingStates, Exception?)> ProduceEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  internal static (TData, ProducingStates, Exception?) ProduceEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
-    TData data,
-    CancellationToken ct = default)
+    TData data)
   where TServices : IProducingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
   where TData : IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
     TryCatch(

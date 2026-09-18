@@ -23,10 +23,9 @@ partial class EnvelopeFuncs
   where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
     (data, MappingStates.Error, exception);
 
-  internal static ValueTask<(TData, MappingStates, Exception?)> MapEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  internal static (TData, MappingStates, Exception?) MapEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
-    TData data,
-    CancellationToken ct = default)
+    TData data)
   where TServices : IMappingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
   where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
   =>

@@ -3,7 +3,7 @@ namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  internal static async ValueTask<(TData, SchedulingStates, Exception?)> ScheduleDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>(
+  internal static async Task<(TData, SchedulingStates, Exception?)> ScheduleDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct)
@@ -32,7 +32,7 @@ partial class DeadLetterFuncs
   where TData : ISchedulingData<TKey, TPayload> =>
     (data, SchedulingStates.Error, exception);
 
-  internal static async ValueTask<(TData, SchedulingStates, Exception?)> ScheduleDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
+  internal static async Task<(TData, SchedulingStates, Exception?)> ScheduleDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct)

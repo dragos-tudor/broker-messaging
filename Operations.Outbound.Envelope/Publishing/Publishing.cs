@@ -3,7 +3,7 @@ namespace Operations.Outbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static async ValueTask<(TData, PublishingStates, Exception?)> PublishEnvelopeSuccessAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
+  static async Task<(TData, PublishingStates, Exception?)> PublishEnvelopeSuccessAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -22,7 +22,7 @@ partial class EnvelopeFuncs
   where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation> =>
     (data, PublishingStates.Error, exception);
 
-  internal static ValueTask<(TData, PublishingStates, Exception?)> PublishEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
+  internal static Task<(TData, PublishingStates, Exception?)> PublishEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
     TServices services,
     TData data,
     CancellationToken ct = default)

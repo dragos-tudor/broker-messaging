@@ -3,13 +3,13 @@ namespace Reliability.Resiliency;
 
 partial class ResiliencyFuncs
 {
-  internal static async ValueTask<(TData, TSignal, Exception?)>
+  internal static async Task<(TData, TSignal, Exception?)>
     ExecuteWithFastRetryAsync<TServices, TData, TSignal, TTransition>(
       TServices services,
       TData data,
       TTransition transition,
       Func<TTransition, TServices, TData, CancellationToken,
-        ValueTask<(TData, TSignal, Exception?)>> executeOperation,
+        Task<(TData, TSignal, Exception?)>> executeOperation,
       Func<TSignal, bool> canFastRetry,
       Func<TimeSpan, CancellationToken, Task<bool>> delayRetryExecution,
       CancellationToken ct = default)

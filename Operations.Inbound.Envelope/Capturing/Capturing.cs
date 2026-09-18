@@ -3,7 +3,7 @@ namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static async ValueTask<(TData, CapturingStates, Exception?)> CaptureEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
+  static async Task<(TData, CapturingStates, Exception?)> CaptureEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -23,7 +23,7 @@ partial class EnvelopeFuncs
   where TData : ICapturingData<TKey, TValue, TMetadata, TConfirmation>
     => (data, CapturingStates.Error, exception);
 
-  internal static ValueTask<(TData, CapturingStates, Exception?)> CaptureEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
+  internal static Task<(TData, CapturingStates, Exception?)> CaptureEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
     TServices services,
     TData data,
     CancellationToken ct = default)

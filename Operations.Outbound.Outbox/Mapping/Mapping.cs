@@ -3,10 +3,9 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static ValueTask<(TData, MappingStates, Exception?)> MapOutboxMessageSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  static (TData, MappingStates, Exception?) MapOutboxMessageSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
-    TData data,
-    CancellationToken ct = default)
+    TData data)
   where TServices : IMappingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
   where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
   {
@@ -15,7 +14,7 @@ partial class OutboxFuncs
     var envelope = services.FromOutboxMessage(outboxMessage, outboxMessage.CreatedAt);
     SetEnvelope(data, envelope);
 
-    return new ((data, MappingStates.Success, null));
+    return (data, MappingStates.Success, null);
   }
 
   static (TData, MappingStates, Exception?) MapOutboxMessageError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
@@ -24,17 +23,15 @@ partial class OutboxFuncs
   where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
     (data, MappingStates.Error, exception);
 
-  internal static ValueTask<(TData, MappingStates, Exception?)> MapOutboxMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  internal static (TData, MappingStates, Exception?) MapOutboxMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
-    TData data,
-    CancellationToken ct = default)
+    TData data)
   where TServices : IMappingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
   where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
     TryCatch(
       services,
       data,
       MapOutboxMessageSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
-      MapOutboxMessageError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
-      ct
+      MapOutboxMessageError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>
     );
 }

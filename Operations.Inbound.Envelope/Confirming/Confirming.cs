@@ -3,7 +3,7 @@ namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static async ValueTask<(TData, ConfirmingStates, Exception?)> ConfirmEnvelopeSuccess<TService, TData, TKey, TValue, TMetadata, TConfirmation>(
+  static async Task<(TData, ConfirmingStates, Exception?)> ConfirmEnvelopeSuccess<TService, TData, TKey, TValue, TMetadata, TConfirmation>(
     TService services,
     TData data,
     CancellationToken ct = default)
@@ -22,7 +22,7 @@ partial class EnvelopeFuncs
   where TData : IConfirmingData<TKey, TValue, TMetadata, TConfirmation> =>
     (data, ConfirmingStates.Error, exception);
 
-  internal static ValueTask<(TData, ConfirmingStates, Exception?)> ConfirmEnvelope<TService, TData, TKey, TValue, TMetadata, TConfirmation>(
+  internal static Task<(TData, ConfirmingStates, Exception?)> ConfirmEnvelope<TService, TData, TKey, TValue, TMetadata, TConfirmation>(
     TService services,
     TData data,
     CancellationToken ct = default)
@@ -35,7 +35,7 @@ partial class EnvelopeFuncs
       ConfirmEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation>,
       ct);
 
-  internal static async ValueTask<(TData, ConfirmingFinalStates, Exception?)> ConfirmFinalEnvelope<TService, TData, TKey, TValue, TMetadata, TConfirmation>(
+  internal static async Task<(TData, ConfirmingFinalStates, Exception?)> ConfirmFinalEnvelope<TService, TData, TKey, TValue, TMetadata, TConfirmation>(
     TService services,
     TData data,
     CancellationToken ct = default)

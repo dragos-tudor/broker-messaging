@@ -10,7 +10,7 @@ public partial class EnvelopeTests
     var envelope = Substitute.For<IEnvelope<string, byte[], object, string>>();
     var inputData = new EnvelopeData();
     services.ReadEnvelope(Arg.Any<CancellationToken>())
-      .Returns(new ValueTask<IEnvelope<string, byte[], object, string>>(envelope));
+      .Returns(Task.FromResult(envelope));
 
     var (data, state, exception) = await EnvelopeFuncs.CaptureEnvelope<
       ICapturingServices<string, byte[], object, string>, EnvelopeData,
@@ -28,7 +28,7 @@ public partial class EnvelopeTests
     var services = Substitute.For<ICapturingServices<string, byte[], object, string>>();
     var inputData = new EnvelopeData();
     services.ReadEnvelope(Arg.Any<CancellationToken>())
-      .Returns(new ValueTask<IEnvelope<string, byte[], object, string>>(result: null!));
+      .Returns(Task.FromResult<IEnvelope<string, byte[], object, string>>(result: null!));
 
     var (data, state, exception) = await EnvelopeFuncs.CaptureEnvelope<
       ICapturingServices<string, byte[], object, string>, EnvelopeData,

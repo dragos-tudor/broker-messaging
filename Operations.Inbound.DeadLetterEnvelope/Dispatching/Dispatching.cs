@@ -22,10 +22,9 @@ partial class DeadLetterEnvelopeFuncs
   where TData : IDispatchingData =>
     (data, DispatchingStates.Error, exception);
 
-  internal static ValueTask<(TData, DispatchingStates, Exception?)> DispatchDeadLetterEnvelope<TServices, TData>(
+  internal static (TData, DispatchingStates, Exception?) DispatchDeadLetterEnvelope<TServices, TData>(
     TServices services,
-    TData data,
-    CancellationToken ct = default)
+    TData data)
   where TServices : IDispatchingServices
   where TData : IDispatchingData =>
     TryCatch(

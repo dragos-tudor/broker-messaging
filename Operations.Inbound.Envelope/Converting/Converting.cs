@@ -24,10 +24,9 @@ partial class EnvelopeFuncs
   where TData : IConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
     (data, ConvertingStates.Error, exception);
 
-  internal static ValueTask<(TData, ConvertingStates, Exception?)> ConvertEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  internal static (TData, ConvertingStates, Exception?) ConvertEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
     TServices services,
-    TData data,
-    CancellationToken ct = default)
+    TData data)
   where TServices : IConvertingServices<TKey, TValue, TMetadata, TConfirmation>
   where TData : IConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
     TryCatch(

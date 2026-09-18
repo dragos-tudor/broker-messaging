@@ -3,7 +3,7 @@ namespace Operations.Inbound.DeadLetter;
 public partial class DeadLetterTests
 {
   [TestMethod]
-  public async Task map_dead_letter_message__mapper_returns_envelope__returns_success_and_sets_data()
+  public void map_dead_letter_message__mapper_returns_envelope__returns_success_and_sets_data()
   {
     var services = Substitute.For<IMappingServices<string, byte[], object, string, string>>();
     var message = Substitute.For<IDeadLetterMessage<string, string>>();
@@ -11,7 +11,7 @@ public partial class DeadLetterTests
     services.FromDeadLetterMessage(message, Arg.Any<DateTime>()).Returns(envelope);
     var inputData = new DeadLetterData { DeadLetterMessage = message };
 
-    var (data, state, exception) = await DeadLetterFuncs.MapDeadLetterMessage<IMappingServices<string, byte[], object, string, string>, DeadLetterData, string, byte[], object, string, string>(services, inputData);
+    var (data, state, exception) = DeadLetterFuncs.MapDeadLetterMessage<IMappingServices<string, byte[], object, string, string>, DeadLetterData, string, byte[], object, string, string>(services, inputData);
 
     data.DeadLetterEnvelope.ShouldBeSameAs(envelope);
     services.Received(1).FromDeadLetterMessage(message, Arg.Any<DateTime>());
@@ -20,12 +20,12 @@ public partial class DeadLetterTests
   }
 
   [TestMethod]
-  public async Task map_dead_letter_message__message_missing__returns_error()
+  public void map_dead_letter_message__message_missing__returns_error()
   {
     var services = Substitute.For<IMappingServices<string, byte[], object, string, string>>();
     var inputData = new DeadLetterData();
 
-    var (data, state, exception) = await DeadLetterFuncs.MapDeadLetterMessage<IMappingServices<string, byte[], object, string, string>, DeadLetterData, string, byte[], object, string, string>(services, inputData);
+    var (data, state, exception) = DeadLetterFuncs.MapDeadLetterMessage<IMappingServices<string, byte[], object, string, string>, DeadLetterData, string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
     state.ShouldBe(MappingStates.Error);
@@ -33,14 +33,14 @@ public partial class DeadLetterTests
   }
 
   [TestMethod]
-  public async Task map_dead_letter_message__mapper_throws__returns_error_with_exception()
+  public void map_dead_letter_message__mapper_throws__returns_error_with_exception()
   {
     var services = Substitute.For<IMappingServices<string, byte[], object, string, string>>();
     var expectedException = new InvalidOperationException("mapping failed");
     services.FromDeadLetterMessage(Arg.Any<IDeadLetterMessage<string, string>>(), Arg.Any<DateTime>()).Throws(expectedException);
     var inputData = new DeadLetterData { DeadLetterMessage = Substitute.For<IDeadLetterMessage<string, string>>() };
 
-    var (data, state, exception) = await DeadLetterFuncs.MapDeadLetterMessage<IMappingServices<string, byte[], object, string, string>, DeadLetterData, string, byte[], object, string, string>(services, inputData);
+    var (data, state, exception) = DeadLetterFuncs.MapDeadLetterMessage<IMappingServices<string, byte[], object, string, string>, DeadLetterData, string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
     state.ShouldBe(MappingStates.Error);

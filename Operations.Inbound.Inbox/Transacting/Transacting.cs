@@ -3,7 +3,7 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async ValueTask<(TData, TransactingStates, Exception?)> TransactInboxMessageSuccessAsync<TServices, TData, TKey, TPayload, TSession>(
+  static async Task<(TData, TransactingStates, Exception?)> TransactInboxMessageSuccessAsync<TServices, TData, TKey, TPayload, TSession>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -37,7 +37,7 @@ partial class InboxFuncs
   where TData : ITransactingData<TKey, TPayload> =>
     (data, TransactingStates.Error, exception);
 
-  internal static ValueTask<(TData, TransactingStates, Exception?)> TransactInboxMessageAsync<TServices, TData, TKey, TPayload, TSession>(
+  internal static Task<(TData, TransactingStates, Exception?)> TransactInboxMessageAsync<TServices, TData, TKey, TPayload, TSession>(
     TServices services,
     TData data,
     CancellationToken ct = default)

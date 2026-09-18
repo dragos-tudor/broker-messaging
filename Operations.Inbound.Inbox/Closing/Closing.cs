@@ -3,7 +3,7 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  internal static async ValueTask<(TData, ClosingStates, Exception?)> CloseInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
+  internal static async Task<(TData, ClosingStates, Exception?)> CloseInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)
@@ -24,7 +24,7 @@ partial class InboxFuncs
   where TData : IClosingData<TKey, TPayload> =>
     (data, ClosingStates.Error, exception);
 
-  internal static ValueTask<(TData, ClosingStates, Exception?)> CloseInboxMessageAsync<TServices, TData, TKey, TPayload>(
+  internal static Task<(TData, ClosingStates, Exception?)> CloseInboxMessageAsync<TServices, TData, TKey, TPayload>(
     TServices services,
     TData data,
     CancellationToken ct = default)

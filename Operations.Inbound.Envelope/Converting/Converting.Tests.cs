@@ -4,7 +4,7 @@ namespace Operations.Inbound.Envelope;
 public partial class EnvelopeTests
 {
   [TestMethod]
-  public async Task convert_envelope__mapper_returns_dead_letter_envelope__returns_success()
+  public void convert_envelope__mapper_returns_dead_letter_envelope__returns_success()
   {
     var services = Substitute.For<IConvertingServices<string, byte[], object, string>>();
     var envelope = Substitute.For<IEnvelope<string, byte[], object, string>>();
@@ -14,7 +14,7 @@ public partial class EnvelopeTests
     services.FromEnvelope(envelope, "invalid message", Arg.Any<DateTime>()).Returns(deadLetter);
     var inputData = new EnvelopeData { Envelope = envelope };
 
-    var (data, state, exception) = await EnvelopeFuncs.ConvertEnvelope<IConvertingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string, string>(services, inputData);
+    var (data, state, exception) = EnvelopeFuncs.ConvertEnvelope<IConvertingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
     data.DeadLetterEnvelope.ShouldBeSameAs(deadLetter);
@@ -24,7 +24,7 @@ public partial class EnvelopeTests
   }
 
   [TestMethod]
-  public async Task convert_envelope__inbox_message_failure_prefered_over_envelope_failure__returns_success()
+  public void convert_envelope__inbox_message_failure_prefered_over_envelope_failure__returns_success()
   {
     var services = Substitute.For<IConvertingServices<string, byte[], object, string>>();
     var envelope = Substitute.For<IEnvelope<string, byte[], object, string>>();
@@ -36,7 +36,7 @@ public partial class EnvelopeTests
     services.FromEnvelope(envelope, "inbox invalid message", Arg.Any<DateTime>()).Returns(deadLetter);
     var inputData = new EnvelopeData { Envelope = envelope, InboxMessage = inboxMessage };
 
-    var (data, state, exception) = await EnvelopeFuncs.ConvertEnvelope<IConvertingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string, string>(services, inputData);
+    var (data, state, exception) = EnvelopeFuncs.ConvertEnvelope<IConvertingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
     data.DeadLetterEnvelope.ShouldBeSameAs(deadLetter);
@@ -45,14 +45,14 @@ public partial class EnvelopeTests
   }
 
   [TestMethod]
-  public async Task convert_envelope__envelope_failure_reason_missing__returns_error()
+  public void convert_envelope__envelope_failure_reason_missing__returns_error()
   {
     var services = Substitute.For<IConvertingServices<string, byte[], object, string>>();
     var envelope = Substitute.For<IEnvelope<string, byte[], object, string>>();
     envelope.FailureReason.Returns((string?)default);
     var inputData = new EnvelopeData { Envelope = envelope };
 
-    var (data, state, exception) = await EnvelopeFuncs.ConvertEnvelope<IConvertingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string, string>(services, inputData);
+    var (data, state, exception) = EnvelopeFuncs.ConvertEnvelope<IConvertingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
     state.ShouldBe(ConvertingStates.Error);
