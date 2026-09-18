@@ -21,7 +21,7 @@ partial class InboundFuncs
           TData,
           InboundPipelineTypes,
           CancellationToken,
-          Task<(TData, InboundRoutingTransition)>> pipelineExecutor,
+          Task<(TData, InboundRoutingTransition)>> routePipeline,
         CancellationToken ct = default)
     where TServices : IInboundRoutingServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
     where TData : IInboundRunningData<TKey, TValue, TMetadata, TConfirmation, TPayload>
@@ -30,7 +30,7 @@ partial class InboundFuncs
     while (!ct.IsCancellationRequested)
     {
       var (nextData, transition) =
-        await pipelineExecutor(services, data, pipelineType, ct);
+        await routePipeline(services, data, pipelineType, ct);
 
       if (transition is TerminalActions terminalAction)
         return terminalAction;
