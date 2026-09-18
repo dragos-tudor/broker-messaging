@@ -35,5 +35,6 @@ partial class InboundFuncs
           HandlingEntry.Start,
           GetHandlingTransition,
           ExecuteHandlingOperationAsync<TServices, TData, TKey, TPayload, TSession>,
+          PropagateHandlingException<TData, TKey, TPayload>,
           ct);
 }

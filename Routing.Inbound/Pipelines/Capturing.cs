@@ -35,5 +35,6 @@ partial class InboundFuncs
           CapturingEntry.Start,
           GetCapturingTransition,
           ExecuteCapturingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
+          PropagateCapturingException<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           ct);
 }

@@ -35,5 +35,6 @@ partial class InboundFuncs
           RedirectingEntry.Start,
           GetRedirectingTransition,
           ExecuteRedirectingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
+          static (data, signal, exception) => default,
           ct);
 }

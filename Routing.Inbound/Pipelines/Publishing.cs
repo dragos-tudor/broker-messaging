@@ -35,5 +35,6 @@ partial class InboundFuncs
           PublishingEntry.Start,
           GetPublishingTransition,
           ExecutePublishingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
+          PropagatePublishingException<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           ct);
 }

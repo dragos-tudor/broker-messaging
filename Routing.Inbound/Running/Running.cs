@@ -9,7 +9,8 @@ partial class InboundFuncs
       TData data,
       TSignal signal,
       Func<TSignal, InboundPipelineConfig, TTransition> pipeline,
-      Func<TTransition, TServices, TData, CancellationToken, ValueTask<(TData, TSignal, Exception?)>> operationExecutor,
+      Func<TTransition, TServices, TData, CancellationToken, ValueTask<(TData, TSignal, Exception?)>> executeOperation,
+      Func<TData, TSignal, Exception?, string?> propagateException,
       CancellationToken ct = default)
     where TServices : IInboundRunningServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
     where TData : IInboundRunningData<TKey, TValue, TMetadata, TConfirmation, TPayload>
@@ -26,7 +27,9 @@ partial class InboundFuncs
       if (transition is TerminalActions terminalAction)
         return (data, terminalAction);
 
-      var (nextData, nextSignal, exception) = await operationExecutor(transition, services, data, ct);
+      var (nextData, nextSignal, exception) = await executeOperation(transition, services, data, ct);
+      propagateException(nextData, nextSignal, exception);
+
       services.InstrumentOperation(nextData, nextSignal, exception);
 
       data = nextData;

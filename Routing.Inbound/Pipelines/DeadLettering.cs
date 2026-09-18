@@ -35,5 +35,6 @@ partial class InboundFuncs
           DeadLetteringEntry.Start,
           GetDeadLetteringTransition,
           ExecuteDeadLetteringOperationAsync<TServices, TData, TKey, TPayload>,
+          PropagateDeadLetteringException<TData, TKey, TPayload>,
           ct);
 }
