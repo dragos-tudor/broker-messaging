@@ -1,6 +1,6 @@
 namespace Reliability.Resiliency;
 
-public record RetryPlanOptions
+public record FastRetryOptions
 {
   public int MaxRetryAttempts { get; init; } = 5;
   public TimeSpan RetryBaseDelay { get; init; } = TimeSpan.FromSeconds(1);

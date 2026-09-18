@@ -1,9 +1,9 @@
 
 namespace Reliability.Resiliency;
 
-public interface IRetryPlanOptionsReaderService
+public interface IFastRetryOptionsService
 {
-  RetryPlanOptions GetRetryPlanOptions();
+  FastRetryOptions GetFastRetryOptions();
 }
 
 
