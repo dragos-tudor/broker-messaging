@@ -17,7 +17,7 @@ public interface IInboxMessageInsertService<TKey, TPayload>
   );
 }
 
-public interface IInboxRetryOptionsReaderService {
+public interface IInboxRetryOptionsService {
   InboxRetryOptions GetInboxRetryOptions();
 }
 

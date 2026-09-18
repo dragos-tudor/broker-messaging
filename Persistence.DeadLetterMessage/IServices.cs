@@ -8,7 +8,7 @@ public interface IDeadLetterMessageInsertService<TKey, TPayload>
     CancellationToken ct = default);
 }
 
-public interface IDeadLetterRetryOptionsReaderService {
+public interface IDeadLetterRetryOptionsService {
   DeadLetterRetryOptions GetDeadLetterRetryOptions();
 }
 
