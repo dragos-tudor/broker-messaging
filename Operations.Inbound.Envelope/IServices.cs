@@ -17,4 +17,6 @@ public interface IEnvelopeMapperService<TKey, TValue, TMetadata, TConfirmation, 
     InboxMessageStatus status = InboxMessageStatus.Processing);
 }
 
-public interface IUtcDateService { DateTime GetUtcDateTime(); }
+public interface IUtcDateService {
+  DateTime GetUtcDateTime();
+}

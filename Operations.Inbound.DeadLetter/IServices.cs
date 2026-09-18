@@ -7,4 +7,6 @@ public interface IDeadLetterMessageMapperService<TKey, TValue, TMetadata, TConfi
     DateTime currentDate);
 }
 
-public interface IUtcDateService { DateTime GetUtcDateTime(); }
+public interface IUtcDateService {
+  DateTime GetUtcDateTime();
+}

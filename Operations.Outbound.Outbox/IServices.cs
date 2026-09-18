@@ -8,4 +8,6 @@ public interface IOutboxMessageMapperService<TKey, TValue, TMetadata, TConfirmat
     DateTime currentDate);
 }
 
-public interface IUtcDateService { DateTime GetUtcDateTime(); }
+public interface IUtcDateService {
+  DateTime GetUtcDateTime();
+}
