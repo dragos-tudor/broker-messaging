@@ -1,8 +1,10 @@
 <Solution>
-  <!-- Messaging.Kafka projects -->
+  <!-- Messaging.Kafka: : Foundation projects [Foundation Layer] -->
   <Project Path="Kafka.Clients/Kafka.Clients.csproj" />
   <Project Path="Kafka.Envelopes/Kafka.Envelopes.csproj" />
   <Project Path="Kafka.Messages/Kafka.Messages.csproj" />
+
+  <!-- Messaging.Kafka: : Services project [Composition Layer] -->
   <Project Path="Kafka.Services/Kafka.Services.csproj" />
 
   <!-- Messaging package: Metadata project -->

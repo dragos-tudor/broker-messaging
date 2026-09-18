@@ -1,14 +1,15 @@
 <Solution>
   <!-- Messaging.Core: System -->
   <Project Path="Observability.Instrumentation/Observability.Instrumentation.csproj" />
+  <Project Path="Reliability.Resiliency/Reliability.Resiliency.csproj" />
 
   <!-- Messaging.Core: Foundation projects [Foundation Layer] -->
   <Project Path="Persistence.InboxMessage/Persistence.InboxMessage.csproj" />
   <Project Path="Persistence.OutboxMessage/Persistence.OutboxMessage.csproj" />
   <Project Path="Persistence.DeadLetterMessage/Persistence.DeadLetterMessage.csproj" />
-  <Project Path="Reliability.Resiliency/Reliability.Resiliency.csproj" />
   <Project Path="Transport.Envelope/Transport.Envelope.csproj" />
   <Project Path="Transport.DeadLetterEnvelope/Transport.DeadLetterEnvelope.csproj" />
+  <Project Path="Foundation.Extensions/Foundation.Extensions.csproj" />
 
   <!-- Messaging.Core: Operations projects [Operations Layer] -->
   <Project Path="Operations.Inbound.Envelope/Operations.Inbound.Envelope.csproj" />
@@ -25,7 +26,6 @@
   <!-- Messaging.Core: Routing projects [Routing Layer] -->
   <Project Path="Routing.Inbound/Routing.Inbound.csproj" />
   <Project Path="Routing.Outbound/Routing.Outbound.csproj" />
-  <Project Path="Foundation.Extensions/Foundation.Extensions.csproj" />
 
   <!-- Messaging package: Metadata project -->
   <Project Path="Messaging.Core/Messaging.Core.csproj" />
