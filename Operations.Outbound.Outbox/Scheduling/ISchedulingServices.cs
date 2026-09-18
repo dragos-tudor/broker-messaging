@@ -2,6 +2,6 @@
 namespace Operations.Outbound.Outbox;
 
 public interface ISchedulingServices<TKey, TPayload>:
-  IOutboxMessageOptionsReaderService,
+  IOutboxRetryOptionsReaderService,
   IOutboxMessageUpdateService<TKey, TPayload>,
   IUtcDateService;

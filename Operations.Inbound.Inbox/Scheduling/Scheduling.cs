@@ -11,7 +11,7 @@ partial class InboxFuncs
   where TData : ISchedulingData<TKey, TPayload>
   {
     var message = RequireInboxMessage(data.InboxMessage);
-    var options = services.GetInboxMessageOptions();
+    var options = services.GetInboxRetryOptions();
 
     var nextRetryCount = IncrementInboxRetryCount(message.RetryCount);
     var nextAttemptAt = CalculateNextAttemptAt(nextRetryCount, services.GetUtcDateTime(), options);

@@ -2,7 +2,7 @@ namespace Persistence.DeadLetterMessage;
 
 partial class DeadLetterMessageFuncs
 {
-  public static DeadLetterMessageOptions CreateDeadLetterMessageOptions(
+  public static DeadLetterRetryOptions CreateDeadLetterRetryOptions(
     int maxRetryAttempts = 5,
     TimeSpan? retryBaseDelay = default,
     double retryBackoffFactor = 2d,

@@ -1,12 +1,12 @@
 
-namespace Persistence.DeadLetterMessage;
+namespace Persistence.OutboxMessage;
 
-partial class DeadLetterMessageFuncs
+partial class OutboxMessageFuncs
 {
   internal static DateTime CalculateNextAttemptAt(
     int retryCount,
     DateTime date,
-    DeadLetterMessageOptions options) =>
+    OutboxRetryOptions options) =>
       date +
       CalculateNextRetryInterval(
         CalculateRetryInterval(
@@ -16,18 +16,18 @@ partial class DeadLetterMessageFuncs
 
   internal static TimeSpan CalculateNextRetryInterval(
     TimeSpan retryInterval,
-    DeadLetterMessageOptions options) =>
+    OutboxRetryOptions options) =>
       retryInterval > options.MaxRetryDelay?
         options.MaxRetryDelay:
         retryInterval;
 
   static double CalculateRetryFactor(
     int retryCount,
-    DeadLetterMessageOptions options) =>
+    OutboxRetryOptions options) =>
       Math.Pow(options.RetryBackoffFactor, retryCount);
 
   static TimeSpan CalculateRetryInterval(
     double retryFactor,
-    DeadLetterMessageOptions options) =>
+    OutboxRetryOptions options) =>
       options.RetryBaseDelay * retryFactor;
 }

@@ -1,8 +1,8 @@
-namespace Persistence.InboxMessage;
+namespace Persistence.OutboxMessage;
 
-partial class InboxMessageFuncs
+partial class OutboxMessageFuncs
 {
-  public static InboxMessageOptions CreateInboxMessageOptions(
+  public static OutboxRetryOptions CreateOutboxRetryOptions(
     int maxRetryAttempts = 5,
     TimeSpan? retryBaseDelay = default,
     double retryBackoffFactor = 2d,

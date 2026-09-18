@@ -1,7 +1,7 @@
 
-namespace Persistence.DeadLetterMessage;
+namespace Persistence.InboxMessage;
 
-public record DeadLetterMessageOptions
+public record InboxRetryOptions
 {
   public int MaxRetryAttempts { get; init; } = 5;
   public TimeSpan RetryBaseDelay { get; init; } = TimeSpan.FromSeconds(1);

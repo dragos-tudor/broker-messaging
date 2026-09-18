@@ -5,7 +5,7 @@ partial class InboxMessageFuncs
 {
   internal static InboxMessageStatus GetInboxMessageStatus(
     int retryCount,
-    InboxMessageOptions options) =>
+    InboxRetryOptions options) =>
       retryCount <= options.MaxRetryAttempts?
         InboxMessageStatus.Processing:
         InboxMessageStatus.DeadLettering;

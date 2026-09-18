@@ -1,7 +1,7 @@
 
 namespace Persistence.OutboxMessage;
 
-public record OutboxMessageOptions
+public record OutboxRetryOptions
 {
   public int MaxRetryAttempts { get; init; }
   public TimeSpan RetryBaseDelay { get; init; }

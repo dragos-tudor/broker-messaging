@@ -5,7 +5,7 @@ partial class DeadLetterMessageFuncs
 {
   internal static DeadLetterMessageStatus GetDeadLetterMessageStatus(
     int retryCount,
-    DeadLetterMessageOptions options) =>
+    DeadLetterRetryOptions options) =>
       retryCount <= options.MaxRetryAttempts?
         DeadLetterMessageStatus.Processing:
         DeadLetterMessageStatus.Abandoned;

@@ -8,8 +8,8 @@ public interface IDeadLetterMessageInsertService<TKey, TPayload>
     CancellationToken ct = default);
 }
 
-public interface IDeadLetterMessageOptionsReaderService {
-  DeadLetterMessageOptions GetDeadLetterMessageOptions();
+public interface IDeadLetterRetryOptionsReaderService {
+  DeadLetterRetryOptions GetDeadLetterRetryOptions();
 }
 
 public interface IDeadLetterMessageUpdateService<TKey, TPayload>

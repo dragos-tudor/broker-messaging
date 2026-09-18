@@ -9,7 +9,7 @@ public partial class InboxTests
   {
     var services = Substitute.For<ISchedulingServices<string, string>>();
     var inputData = new InboxData { InboxMessage = InboxData.CreateMessage() };
-    services.GetInboxMessageOptions().Returns(CreateInboxMessageOptions(maxRetries));
+    services.GetInboxRetryOptions().Returns(CreateInboxRetryOptions(maxRetries));
     services.GetUtcDateTime().Returns(DateTime.UtcNow);
     services.UpdateInboxMessageAsync(Arg.Any<IInboxMessage<string, string>>(), Arg.Any<SchedulingUpdate>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
 

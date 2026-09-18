@@ -9,8 +9,8 @@ public interface IOutboxMessageInsertSessionService<TKey, TPayload, TSession>
     CancellationToken ct = default);
 }
 
-public interface IOutboxMessageOptionsReaderService {
-  OutboxMessageOptions GetOutboxMessageOptions();
+public interface IOutboxRetryOptionsReaderService {
+  OutboxRetryOptions GetOutboxRetryOptions();
 }
 
 public interface IOutboxMessageUpdateService<TKey, TPayload>

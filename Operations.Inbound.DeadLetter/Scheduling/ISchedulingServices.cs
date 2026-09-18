@@ -2,6 +2,6 @@
 namespace Operations.Inbound.DeadLetter;
 
 public interface ISchedulingServices<TKey, TPayload>:
-  IDeadLetterMessageOptionsReaderService,
+  IDeadLetterRetryOptionsReaderService,
   IDeadLetterMessageUpdateService<TKey, TPayload>,
   IUtcDateService;

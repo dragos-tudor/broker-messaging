@@ -11,7 +11,7 @@ partial class DeadLetterFuncs
   where TData : ISchedulingData<TKey, TPayload>
   {
     var message = RequireDeadLetterMessage(data.DeadLetterMessage);
-    var options = services.GetDeadLetterMessageOptions();
+    var options = services.GetDeadLetterRetryOptions();
 
     var nextRetryCount = IncrementDeadLetterRetryCount(message.RetryCount);
     var nextAttemptAt = CalculateNextAttemptAt(nextRetryCount, services.GetUtcDateTime(), options);

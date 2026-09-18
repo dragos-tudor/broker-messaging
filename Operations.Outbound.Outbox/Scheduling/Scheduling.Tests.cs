@@ -9,7 +9,7 @@ public partial class OutboxTests
   {
     var services = Substitute.For<ISchedulingServices<string, string>>();
     var inputData = new OutboxData { OutboxMessage = Substitute.For<IOutboxMessage<string, string>>() };
-    services.GetOutboxMessageOptions().Returns(CreateOutboxMessageOptions(maxRetries));
+    services.GetOutboxRetryOptions().Returns(CreateOutboxRetryOptions(maxRetries));
     services.GetUtcDateTime().Returns(DateTime.UtcNow);
     services.UpdateOutboxMessageAsync(Arg.Any<IOutboxMessage<string, string>>(), Arg.Any<SchedulingUpdate>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
 
@@ -25,7 +25,7 @@ public partial class OutboxTests
   {
     var services = Substitute.For<ISchedulingServices<string, string>>();
     var expectedException = new InvalidOperationException("schedule failed");
-    services.GetOutboxMessageOptions().Returns(CreateOutboxMessageOptions());
+    services.GetOutboxRetryOptions().Returns(CreateOutboxRetryOptions());
     services.GetUtcDateTime().Returns(DateTime.UtcNow);
     services.UpdateOutboxMessageAsync(Arg.Any<IOutboxMessage<string, string>>(), Arg.Any<SchedulingUpdate>(), Arg.Any<CancellationToken>()).ThrowsAsync(expectedException);
     var inputData = new OutboxData { OutboxMessage = Substitute.For<IOutboxMessage<string, string>>() };

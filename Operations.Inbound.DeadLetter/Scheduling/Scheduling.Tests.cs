@@ -9,7 +9,7 @@ public partial class DeadLetterTests
   {
     var services = Substitute.For<ISchedulingServices<string, string>>();
     var inputData = new DeadLetterData { DeadLetterMessage = Substitute.For<IDeadLetterMessage<string, string>>() };
-    services.GetDeadLetterMessageOptions().Returns(CreateDeadLetterMessageOptions(maxRetries));
+    services.GetDeadLetterRetryOptions().Returns(CreateDeadLetterRetryOptions(maxRetries));
     services.GetUtcDateTime().Returns(DateTime.UtcNow);
     services.UpdateDeadLetterMessageAsync(Arg.Any<IDeadLetterMessage<string, string>>(), Arg.Any<SchedulingUpdate>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
 
@@ -25,7 +25,7 @@ public partial class DeadLetterTests
   {
     var services = Substitute.For<ISchedulingServices<string, string>>();
     var expectedException = new InvalidOperationException("schedule failed");
-    services.GetDeadLetterMessageOptions().Returns(CreateDeadLetterMessageOptions());
+    services.GetDeadLetterRetryOptions().Returns(CreateDeadLetterRetryOptions());
     services.GetUtcDateTime().Returns(DateTime.UtcNow);
     services.UpdateDeadLetterMessageAsync(Arg.Any<IDeadLetterMessage<string, string>>(), Arg.Any<SchedulingUpdate>(), Arg.Any<CancellationToken>()).ThrowsAsync(expectedException);
     var inputData = new DeadLetterData { DeadLetterMessage = Substitute.For<IDeadLetterMessage<string, string>>() };

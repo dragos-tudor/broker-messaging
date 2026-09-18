@@ -11,7 +11,7 @@ partial class OutboxFuncs
   where TData : ISchedulingData<TKey, TPayload>
   {
     var message = RequireOutboxMessage(data.OutboxMessage);
-    var options = services.GetOutboxMessageOptions();
+    var options = services.GetOutboxRetryOptions();
 
     var nextRetryCount = IncrementOutboxRetryCount(message.RetryCount);
     var nextAttemptAt = CalculateNextAttemptAt(nextRetryCount, services.GetUtcDateTime(), options);

@@ -5,7 +5,7 @@ partial class OutboxMessageFuncs
 {
   internal static OutboxMessageStatus GetOutboxMessageStatus(
     int retryCount,
-    OutboxMessageOptions options) =>
+    OutboxRetryOptions options) =>
       retryCount <= options.MaxRetryAttempts?
         OutboxMessageStatus.Processing:
         OutboxMessageStatus.Abandoned;
