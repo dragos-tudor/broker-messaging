@@ -1,12 +1,12 @@
-using static Persistence.DeadLetterMessage.FieldConstraints;
+using static Transport.DeadLetterEnvelope.FieldConstraints;
 
-namespace Persistence.DeadLetterMessage;
+namespace Transport.DeadLetterEnvelope;
 
-partial class DeadLetterMessageFuncs
+partial class DeadLetterEnvelopeFuncs
 {
   const string TruncationSuffix = " …[truncated]";
 
-  internal static string TruncateDeadLetterMessageFailureReason(string failureReason) =>
+  public static string TruncateDeadLetterEnvelopeFailureReason(string failureReason) =>
     failureReason.Length <= FailureReasonMaxLength?
       failureReason:
       string.Concat(

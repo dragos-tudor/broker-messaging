@@ -18,6 +18,6 @@ partial class InboxFuncs
       Version = message.Version,
       Metadata = message.Metadata,
       CorrelationId = message.CorrelationId,
-      FailureReason = TruncateDeadLetterMessageFailureReason(message.FailureReason ?? "Unknown failure reason")
+      FailureReason = message.FailureReason ?? "Unknown failure reason"
     };
 }

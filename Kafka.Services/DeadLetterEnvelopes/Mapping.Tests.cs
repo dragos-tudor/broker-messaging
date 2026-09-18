@@ -1,4 +1,3 @@
-using Persistence.DeadLetterMessage;
 
 namespace Kafka.Services;
 
@@ -18,7 +17,7 @@ public partial class ServicesTests
       TransportMessageId = "transport"
     };
 
-    var envelope = ServicesFuncs.ToDeadLetterEnvelope<string, byte[], string>(message, (byte[]?)null, DateTime.UtcNow, "orders-dlq");
+    var envelope = ToDeadLetterEnvelope<string, byte[], string>(message, null, DateTime.UtcNow, "orders-dlq");
 
     envelope.FailureReason.ShouldBe("invalid payload");
   }

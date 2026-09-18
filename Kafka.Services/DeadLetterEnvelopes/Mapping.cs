@@ -1,3 +1,4 @@
+using static Transport.DeadLetterEnvelope.DeadLetterEnvelopeFuncs;
 
 namespace Kafka.Services;
 
@@ -16,7 +17,7 @@ partial class ServicesFuncs
         SetKafkaDeadLetterMessageHeaders(
           CopyKafkaHeaders(envelope.Metadata),
           envelope.Confirmation,
-          failureReason),
+          TruncateDeadLetterEnvelopeFailureReason(failureReason)),
         date),
       envelope.Type,
       failureReason,
@@ -37,7 +38,7 @@ partial class ServicesFuncs
           SetKafkaHeaderMessageId(message.MessageId).
           SetKafkaHeaderSchemaType(message.Type),
           DeserializeTopicPartitionOffset(message.Metadata),
-          message.FailureReason
+          TruncateDeadLetterEnvelopeFailureReason(message.FailureReason)
         ),
         date),
       message.Type,

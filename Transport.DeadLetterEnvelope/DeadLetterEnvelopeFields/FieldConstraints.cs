@@ -1,5 +1,5 @@
 
-namespace Persistence.DeadLetterMessage;
+namespace Transport.DeadLetterEnvelope;
 
 static class FieldConstraints
 {
