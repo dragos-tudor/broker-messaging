@@ -36,5 +36,6 @@ partial class InboundFuncs
           GetHandlingTransition,
           ExecuteHandlingOperationAsync<TServices, TData, TKey, TPayload, TSession>,
           PropagateHandlingException<TData, TKey, TPayload>,
+          CanFastRetryHandling,
           ct);
 }

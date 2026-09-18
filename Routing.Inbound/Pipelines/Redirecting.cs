@@ -36,5 +36,6 @@ partial class InboundFuncs
           GetRedirectingTransition,
           ExecuteRedirectingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           static (data, signal, exception) => default,
+          CanFastRetryRedirecting,
           ct);
 }

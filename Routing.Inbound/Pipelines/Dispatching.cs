@@ -36,5 +36,6 @@ partial class InboundFuncs
           GetDispatchingTransition,
           ExecuteDispatchingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           PropagateDispatchingException<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
+          CanFastRetryDispatching,
           ct);
 }

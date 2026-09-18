@@ -4,5 +4,6 @@ namespace Routing.Inbound;
 public interface IInboundRunningServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>:
   IInboundPipelineConfigService,
   IInboundPipelineServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>,
-  IInstrumentiomServices
+  IInstrumentiomServices,
+  IFastRetryOptionsService
   where TSession: IDisposable;

@@ -3,7 +3,9 @@ global using System;
 global using System.Threading;
 global using System.Threading.Tasks;
 global using Pipelines.Inbound;
+global using Reliability.Resiliency;
 global using static Pipelines.Inbound.InboundFuncs;
+global using static Reliability.Resiliency.ResiliencyFuncs;
 global using static Routing.Inbound.InboundFuncs;
 
 namespace Routing.Inbound;

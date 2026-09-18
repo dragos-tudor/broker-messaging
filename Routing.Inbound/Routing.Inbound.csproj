@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../Pipelines.Inbound/Pipelines.Inbound.csproj" />
+    <ProjectReference Include="../Reliability.Resiliency/Reliability.Resiliency.csproj" />
   </ItemGroup>
 
 </Project>
