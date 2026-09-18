@@ -6,11 +6,11 @@ public class Envelope<TKey, TValue> :
 {
   internal Message<TKey, TValue> Message { get; init; } = default!;
   public string? TransportMessageId { get; init; }
-  public TKey Key { get => Message.Key; }
-  public TValue Value { get => Message.Value; }
-  public DateTime CreatedAt { get => Message.Timestamp.UtcDateTime; }
+  public TKey Key => Message.Key;
+  public TValue Value => Message.Value;
+  public DateTime CreatedAt => Message.Timestamp.UtcDateTime;
   public required string Type { get; init; }
-  public Headers Metadata { get => Message.Headers; }
+  public Headers Metadata => Message.Headers;
   public required string Queue { get; init; }
   public TopicPartitionOffset? Confirmation { get; init; }
   public string? FailureReason { get; set; }

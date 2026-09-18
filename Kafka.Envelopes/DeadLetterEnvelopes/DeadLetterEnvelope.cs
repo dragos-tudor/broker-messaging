@@ -6,12 +6,12 @@ public class DeadLetterEnvelope<TKey, TValue> :
 {
   internal Message<TKey, TValue> Message { get; init; } = default!;
   public string? OriginalTransportMessageId { get; init; }
-  public TKey Key { get => Message.Key; }
-  public TValue Value { get => Message.Value; }
+  public TKey Key => Message.Key;
+  public TValue Value => Message.Value;
   public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
   public DateTime OriginatedAt { get; init; }
   public required string Type { get; init; }
-  public Headers Metadata { get => Message.Headers; }
+  public Headers Metadata => Message.Headers;
   public TopicPartitionOffset? Confirmation { get; init; }
   public required string Queue { get; init; }
   public required string FailureReason { get; init; }
