@@ -49,6 +49,9 @@
   - `TConfirmation` the originated envelope `Confirmation`.
 - `Type` the originated envelope `Type`.
 - dead letter envelopes are transient transport structures and are never persisted directly by the core pipeline.
+- dead letter envelopes failure reasons:
+  - the internal persistence system could store unlimited failure reason size.
+  - the broker message header should keep the truncated failure reason.
 
 ## Persistence
 
@@ -199,7 +202,6 @@ Pipelines define semantic processing flow by mapping operation outcomes to the n
 - router calls only the propagation function required by the current pipeline segment.
 - structures mappers/converters transfer existing FailureReason themselves.
 - `OutboxMessage` no longer carries FailureReason.
-
 
 ## Design Vocabulary
 - structures:
