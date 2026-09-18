@@ -17,7 +17,7 @@ partial class OutboundFuncs
       {
         PublishingActions.Mapping => MapOutboxMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data, ct).FromResult<TData, MappingStates, PublishingSignal>(static state => state),
         PublishingActions.Producing => ProduceEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data, ct).FromResult<TData, ProducingStates, PublishingSignal>(static state => state),
-        PublishingActions.Publishing => PublishEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data, ct).FromResult<TData, PublishingStates, PublishingSignal>(static state => state),
+        PublishingActions.Publishing => PublishEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(services, data, ct).FromResult<TData, PublishingStates, PublishingSignal>(static state => state),
         PublishingActions.Scheduling => ScheduleOutboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, SchedulingStates, PublishingSignal>(static state => state),
         PublishingActions.Abandoning => AbandonOutboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, AbandoningStates, PublishingSignal>(static state => state),
         PublishingActions.Closing => CloseOutboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, ClosingStates, PublishingSignal>(static state => state),

@@ -4,10 +4,11 @@ namespace Pipelines.Inbound;
 
 public static partial class InboundFuncs
 {
-  internal static string? PropagateDeadLetteringException<TKey, TPayload>(
-    IDeadLetteringData<TKey, TPayload> data,
+  internal static string? PropagateDeadLetteringException<TData, TKey, TPayload>(
+    TData data,
     DeadLetteringSignal signal,
     Exception? exception)
+  where TData: IDeadLetteringData<TKey, TPayload>
   {
     if (exception is null) return default;
     if (exception is OperationCanceledException) return default;

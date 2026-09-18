@@ -1,5 +1,4 @@
 using Operations.Inbound.Inbox;
-using Persistence.InboxMessage;
 
 namespace Pipelines.Inbound;
 
@@ -12,7 +11,8 @@ public partial class InboundTests
     var data = new InboundPipelineData<string, byte[], object, string, string> { InboxMessage = message };
     HandlingSignal signal = HandlingStates.Error;
 
-    InboundFuncs.PropagateHandlingException(data, signal, new InvalidOperationException("handler failed"));
+    PropagateHandlingException<IInboundPipelineData<string, byte[], object, string, string>, string, string>
+      (data, signal, new InvalidOperationException("handler failed"));
 
     message.LastError.ShouldBe("handler failed");
     message.FailureReason.ShouldBe("existing reason");
@@ -25,7 +25,8 @@ public partial class InboundTests
     var data = new InboundPipelineData<string, byte[], object, string, string> { InboxMessage = message };
     HandlingSignal signal = HandlingStates.DomainError;
 
-    InboundFuncs.PropagateHandlingException(data, signal, new InvalidOperationException("business rejected"));
+    PropagateHandlingException<IInboundPipelineData<string, byte[], object, string, string>, string, string>
+      (data, signal, new InvalidOperationException("business rejected"));
 
     message.FailureReason.ShouldBe("business rejected");
     message.LastError.ShouldBe("existing error");
@@ -38,7 +39,8 @@ public partial class InboundTests
     var data = new InboundPipelineData<string, byte[], object, string, string> { InboxMessage = message };
     HandlingSignal signal = TransactingStates.Error;
 
-    InboundFuncs.PropagateHandlingException(data, signal, new InvalidOperationException("transaction failed"));
+    PropagateHandlingException<IInboundPipelineData<string, byte[], object, string, string>, string, string>
+      (data, signal, new InvalidOperationException("transaction failed"));
 
     message.LastError.ShouldBe("transaction failed");
     message.FailureReason.ShouldBe("existing reason");
@@ -51,7 +53,8 @@ public partial class InboundTests
     var data = new InboundPipelineData<string, byte[], object, string, string> { InboxMessage = message };
     HandlingSignal signal = SchedulingStates.Error;
 
-    InboundFuncs.PropagateHandlingException(data, signal, new InvalidOperationException("schedule update failed"));
+    PropagateHandlingException<IInboundPipelineData<string, byte[], object, string, string>, string, string>
+      (data, signal, new InvalidOperationException("schedule update failed"));
 
     message.LastError.ShouldBe("existing error");
   }

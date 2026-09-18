@@ -1,5 +1,4 @@
 using Operations.Inbound.DeadLetterEnvelope;
-using Persistence.DeadLetterMessage;
 
 namespace Pipelines.Inbound;
 
@@ -16,7 +15,8 @@ public partial class InboundTests
     var data = new InboundPipelineData<string, byte[], object, string, string> { DeadLetterMessage = message };
     DispatchingSignal signal = DispatchingStates.NotAck;
 
-    InboundFuncs.PropagateDispatchingException(data, signal, null);
+    PropagateDispatchingException<IInboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+      (data, signal, null);
 
     message.LastError.ShouldBe("Broker message was not acknowledged");
   }
@@ -32,7 +32,8 @@ public partial class InboundTests
     var data = new InboundPipelineData<string, byte[], object, string, string> { DeadLetterMessage = message };
     DispatchingSignal signal = DispatchingStates.NotAck;
 
-    InboundFuncs.PropagateDispatchingException(data, signal, new InvalidOperationException("broker rejected"));
+    PropagateDispatchingException<IInboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+      (data, signal, new InvalidOperationException("broker rejected"));
 
     message.LastError.ShouldBe("broker rejected");
   }

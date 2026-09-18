@@ -1,24 +1,24 @@
-using DeadLetter = Operations.Inbound.DeadLetter;
+using Operations.Inbound.DeadLetter;
 using Operations.Inbound.DeadLetterEnvelope;
 
 namespace Pipelines.Inbound;
 
 public static partial class InboundFuncs
 {
-  internal static string? PropagatePublishingException<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
+  internal static string? PropagatePublishingException<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TData data,
     PublishingSignal signal,
     Exception? exception)
+  where TData: IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
   {
     if (exception is null) return default;
     if (exception is OperationCanceledException) return default;
-    var message = ((DeadLetter.IDeadLetterMessageProp<TKey, TPayload>)data).DeadLetterMessage;
 
     return signal switch
     {
-      DeadLetter.MappingStates.Error
+      MappingStates.Error
       or PublishingStates.Error
-      or ProducingStates.Error => message?.LastError = exception.Message,
+      or ProducingStates.Error => data.DeadLetterMessage?.LastError = exception.Message,
       _ => default
     };
   }

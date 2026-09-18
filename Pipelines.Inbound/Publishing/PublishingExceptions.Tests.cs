@@ -1,8 +1,6 @@
-using Operations.Inbound.DeadLetter;
+
 using Operations.Inbound.DeadLetterEnvelope;
-using Persistence.DeadLetterMessage;
-using NSubstitute;
-using DeadLetter = Operations.Inbound.DeadLetter;
+using Operations.Inbound.DeadLetter;
 
 namespace Pipelines.Inbound;
 
@@ -19,7 +17,8 @@ public partial class InboundTests
     var data = new InboundPipelineData<string, byte[], object, string, string> { DeadLetterMessage = message };
     PublishingSignal signal = PublishingStates.Error;
 
-    InboundFuncs.PropagatePublishingException(data, signal, new InvalidOperationException("publish failed"));
+    PropagatePublishingException<IInboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+      (data, signal, new InvalidOperationException("publish failed"));
 
     message.LastError.ShouldBe("publish failed");
     message.FailureReason.ShouldBe("reason");
@@ -34,9 +33,10 @@ public partial class InboundTests
       Type = "type", FailureReason = "reason", TransportMessageId = "transport", LastError = "existing error"
     };
     var data = new InboundPipelineData<string, byte[], object, string, string> { DeadLetterMessage = message };
-    PublishingSignal signal = DeadLetter.SchedulingStates.Error;
+    PublishingSignal signal = SchedulingStates.Error;
 
-    InboundFuncs.PropagatePublishingException(data, signal, new InvalidOperationException("schedule failed"));
+    PropagatePublishingException<IInboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+      (data, signal, new InvalidOperationException("schedule failed"));
 
     message.LastError.ShouldBe("existing error");
   }

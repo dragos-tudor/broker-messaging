@@ -16,7 +16,8 @@ public partial class InboundTests
     var data = new InboundPipelineData<string, byte[], object, string, string> { InboxMessage = message };
     DeadLetteringSignal signal = ConvertingStates.Error;
 
-    InboundFuncs.PropagateDeadLetteringException(data, signal, new InvalidOperationException("conversion failed"));
+    PropagateDeadLetteringException<IInboundPipelineData<string, byte[], object, string, string>, string, string>
+      (data, signal, new InvalidOperationException("conversion failed"));
 
     message.LastError.ShouldBe("conversion failed");
     message.FailureReason.ShouldBe("reason");
@@ -33,7 +34,8 @@ public partial class InboundTests
     var data = new InboundPipelineData<string, byte[], object, string, string> { InboxMessage = message };
     DeadLetteringSignal signal = DeadLetter.InsertingStates.Error;
 
-    InboundFuncs.PropagateDeadLetteringException(data, signal, new InvalidOperationException("insert failed"));
+    PropagateDeadLetteringException<IInboundPipelineData<string, byte[], object, string, string>, string, string>
+      (data, signal, new InvalidOperationException("insert failed"));
 
     message.LastError.ShouldBe("existing error");
   }

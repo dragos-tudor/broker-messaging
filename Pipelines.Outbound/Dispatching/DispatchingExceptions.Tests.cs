@@ -1,5 +1,4 @@
 using Operations.Outbound.Envelope;
-using Persistence.OutboxMessage;
 
 namespace Pipelines.Outbound;
 
@@ -16,7 +15,8 @@ public partial class OutboundTests
     var data = new OutboundPipelineData<string, byte[], object, string, string> { OutboxMessage = message };
     DispatchingSignal signal = DispatchingStates.NotAck;
 
-    OutboundFuncs.PropagateDispatchingException(data, signal, null);
+    PropagateDispatchingException<IOutboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+      (data, signal, null);
 
     message.LastError.ShouldBe("Broker message was not acknowledged");
   }
@@ -32,7 +32,8 @@ public partial class OutboundTests
     var data = new OutboundPipelineData<string, byte[], object, string, string> { OutboxMessage = message };
     DispatchingSignal signal = DispatchingStates.NotAck;
 
-    OutboundFuncs.PropagateDispatchingException(data, signal, new InvalidOperationException("broker failure"));
+    PropagateDispatchingException<IOutboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+      (data, signal, new InvalidOperationException("broker failure"));
 
     message.LastError.ShouldBe("broker failure");
   }

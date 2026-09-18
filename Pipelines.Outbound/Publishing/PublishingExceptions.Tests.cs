@@ -1,6 +1,5 @@
 using Operations.Outbound.Outbox;
 using Operations.Outbound.Envelope;
-using Persistence.OutboxMessage;
 
 namespace Pipelines.Outbound;
 
@@ -17,7 +16,8 @@ public partial class OutboundTests
     var data = new OutboundPipelineData<string, byte[], object, string, string> { OutboxMessage = message };
     PublishingSignal signal = MappingStates.Error;
 
-    OutboundFuncs.PropagatePublishingException(data, signal, new InvalidOperationException("mapping failed"));
+    PropagatePublishingException<IOutboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+      (data, signal, new InvalidOperationException("mapping failed"));
 
     message.LastError.ShouldBe("mapping failed");
   }
@@ -40,7 +40,8 @@ public partial class OutboundTests
       _ => throw new ArgumentOutOfRangeException(nameof(state))
     };
 
-    OutboundFuncs.PropagatePublishingException(data, signal, new InvalidOperationException("broker failed"));
+    PropagatePublishingException<IOutboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+      (data, signal, new InvalidOperationException("broker failed"));
 
     message.LastError.ShouldBe("broker failed");
   }

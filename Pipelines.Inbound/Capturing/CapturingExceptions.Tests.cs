@@ -15,7 +15,8 @@ public partial class InboundTests
     };
     CapturingSignal signal = VerifyingStates.InvalidConfirmableError;
 
-    InboundFuncs.PropagateCapturingException(data, signal, new InvalidOperationException("invalid"));
+    PropagateCapturingException<IInboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+      (data, signal, new InvalidOperationException("invalid"));
 
     data.Envelope!.FailureReason.ShouldBe("invalid");
   }
@@ -28,7 +29,8 @@ public partial class InboundTests
     var data = new InboundPipelineData<string, byte[], object, string, string> { Envelope = envelope };
     CapturingSignal signal = VerifyingStates.Error;
 
-    InboundFuncs.PropagateCapturingException(data, signal, new OperationCanceledException());
+    PropagateCapturingException<IInboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+      (data, signal, new OperationCanceledException());
 
     envelope.FailureReason.ShouldBe("existing reason");
   }
@@ -36,7 +38,7 @@ public partial class InboundTests
   [TestMethod]
   public void capturing_exception__inbox_validation_error__sets_inbox_failure_reason()
   {
-    var message = new Persistence.InboxMessage.InboxMessage<string, string>
+    var message = new InboxMessage<string, string>
     {
       MessageId = Guid.NewGuid(), TransportMessageId = "transport", MessageKey = "key", Payload = "payload",
       CreatedAt = DateTime.UtcNow, Type = "type", FailureReason = "old reason", LastError = "old error"
@@ -44,7 +46,8 @@ public partial class InboundTests
     var data = new InboundPipelineData<string, byte[], object, string, string> { InboxMessage = message };
     CapturingSignal signal = ValidatingStates.InvalidError;
 
-    InboundFuncs.PropagateCapturingException(data, signal, new InvalidOperationException("validation failed"));
+    PropagateCapturingException<IInboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+      (data, signal, new InvalidOperationException("validation failed"));
 
     message.FailureReason.ShouldBe("validation failed");
     message.LastError.ShouldBe("old error");
@@ -57,7 +60,8 @@ public partial class InboundTests
     var data = new InboundPipelineData<string, byte[], object, string, string> { Envelope = envelope };
     CapturingSignal signal = VerifyingStates.Error;
 
-    InboundFuncs.PropagateCapturingException(data, signal, new InvalidOperationException("verification failed"));
+    PropagateCapturingException<IInboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+      (data, signal, new InvalidOperationException("verification failed"));
 
     envelope.FailureReason.ShouldBe("verification failed");
   }
@@ -65,7 +69,7 @@ public partial class InboundTests
   [TestMethod]
   public void capturing_exception__inbox_validation_error__sets_failure_without_envelope()
   {
-    var message = new Persistence.InboxMessage.InboxMessage<string, string>
+    var message = new InboxMessage<string, string>
     {
       MessageId = Guid.NewGuid(), TransportMessageId = "transport", MessageKey = "key", Payload = "payload",
       CreatedAt = DateTime.UtcNow, Type = "type", FailureReason = "old reason"
@@ -73,7 +77,8 @@ public partial class InboundTests
     var data = new InboundPipelineData<string, byte[], object, string, string> { InboxMessage = message };
     CapturingSignal signal = ValidatingStates.Error;
 
-    InboundFuncs.PropagateCapturingException(data, signal, new InvalidOperationException("validation failed"));
+    PropagateCapturingException<IInboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+      (data, signal, new InvalidOperationException("validation failed"));
 
     message.FailureReason.ShouldBe("validation failed");
   }

@@ -5,21 +5,20 @@ namespace Pipelines.Outbound;
 
 public static partial class OutboundFuncs
 {
-  internal static string? PropagatePublishingException<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
+  internal static string? PropagatePublishingException<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
+    TData data,
     PublishingSignal signal,
     Exception? exception)
+  where TData: IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
   {
     if (exception is null) return default;
     if (exception is OperationCanceledException) return default;
-
-    var outboxMessage = ((Operations.Outbound.Outbox.IOutboxMessageProp<TKey, TPayload>)data).OutboxMessage;
 
     return signal switch
     {
       MappingStates.Error
       or PublishingStates.Error
-      or ProducingStates.Error => outboxMessage?.LastError = exception.Message,
+      or ProducingStates.Error => data.OutboxMessage?.LastError = exception.Message,
       _ => default
     };
   }
