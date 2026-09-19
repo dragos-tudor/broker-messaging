@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="../Directory.Testing.props" />
+
   <PropertyGroup>
     <Description>Reliability resiliency project.</Description>
   </PropertyGroup>
