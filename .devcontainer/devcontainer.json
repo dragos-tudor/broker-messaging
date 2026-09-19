@@ -18,8 +18,9 @@
     "KAFKA_PASSWORD": "p@ssw0rd!",
     "CONTAINERS_REGISTRIES_CONF": "/workspaces/broker-messaging/.podman/registries.conf",
     "CONTAINERS_STORAGE_CONF": "/workspaces/broker-messaging/.podman/storage.conf",
-    "DOTNET_ROOT": "/root/.dotnet",   
-    "WORKSPACE_ROOT": "/workspaces/broker-messaging"
+    "DOTNET_ROOT": "/root/.dotnet",
+    "WORKSPACE_ROOT": "/workspaces/broker-messaging",
+    "CODEX_HOME": "/workspaces/broker-messaging/.codex"
 	},
 	"runArgs": [
 		"--name=broker-messaging",

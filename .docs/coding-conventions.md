@@ -50,8 +50,12 @@
 - use:
   - `MSTest` as testing framework.
   - `Shouldly` for assertions.
-  - `NSubstitute` for mocking.
+  - `NSubstitute` for mocking interfaces and delegates.
 - keep test files adjacent to the code they test (e.g., Verifying.Tests.cs next to Verifying.cs).
+- isolate fixtures into `Fixture.Tests.cs` files.
+- use `Using.Tests.cs` files per project for TESTS ONLY global usings [MsTest, NSubstitute, Shouldly].
+- use same namespace laso for tests and only one partial `Test` class per project.
+- mirror exactly how other projects implements the tests.
 
 ### Testing Execution
 - this repository uses Microsoft.Testing.Platform via `global.json`.

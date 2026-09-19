@@ -18,6 +18,9 @@ artifacts/
 # Test databases
 **/*.db
 
+# Codex root
+.codex/
+
 **/dynamic-hosts
 
 
