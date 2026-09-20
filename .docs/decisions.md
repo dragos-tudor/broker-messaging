@@ -77,7 +77,7 @@ This keeps failure behavior observable, testable, and reconstructable from persi
 
 `InboxMessage`, `DeadLetterMessage`, and `OutboxMessage` are also separate structures.
 
-They may contain similar data, but they represent different concepts with different lifecycles, invariants, operations, persistence requirements, and valid transitions.
+They may contain similar data, but they represent different concepts with different lifecycles, invariants, operations, persistence requirements, and valid decisions.
 
 A single generalized message structure would save types at the cost of merging concepts and allowing combinations of state that have no valid meaning.
 
@@ -91,7 +91,7 @@ Broker-facing structures and persisted messaging structures model different boun
 
 An envelope represents transport information and broker interaction. Inbox, outbox, and dead-letter messages represent durable processing state.
 
-The transition between them is explicit through mapping/conversion operations rather than being hidden by using one universal message model.
+The decision between them is explicit through mapping/conversion operations rather than being hidden by using one universal message model.
 
 This prevents persistence concerns from leaking into transports and transport concerns from defining the durable model.
 
@@ -191,7 +191,7 @@ Its responsibility is to answer:
 
 This separates execution from workflow topology.
 
-The resulting pipeline functions remain small, deterministic, and readable because they describe only transitions between operations, pipeline segments, and terminal outcomes.
+The resulting pipeline functions remain small, deterministic, and readable because they describe only decisions between operations, pipeline segments, and terminal outcomes.
 
 ---
 
@@ -201,7 +201,7 @@ The complete broker workflow is intentionally not represented as one giant pipel
 
 It is divided into segments such as capturing, redirecting, handling, dead-lettering, persisting, publishing, and dispatching where the flow naturally changes responsibility, data, or recovery semantics.
 
-These boundaries are not chosen per entity because it wouldn't be naturally. They represent meaningful transitions in the fluent processing lifecycle.
+These boundaries are not chosen per entity because it wouldn't be naturally. They represent meaningful decisions in the fluent processing lifecycle.
 
 A pipeline segment should therefore correspond to a coherent flow that can be understood independently while still composing naturally with the next segment.
 
@@ -211,9 +211,9 @@ A pipeline segment should therefore correspond to a coherent flow that can be un
 
 ## Pipeline topology is isolated for readability and exhaustive testing
 
-Transition selection is isolated from operation execution so that the workflow graph can be inspected and tested directly.
+Decision selection is isolated from operation execution so that the workflow graph can be inspected and tested directly.
 
-Because a pipeline transition is essentially a deterministic mapping from an operation outcome to the next step, every valid branch can be enumerated without executing brokers, databases, handlers, or resilience mechanisms.
+Because a pipeline decision is essentially a deterministic mapping from an operation outcome to the next step, every valid branch can be enumerated without executing brokers, databases, handlers, or resilience mechanisms.
 
 This makes pipeline tests tests of the actual workflow topology rather than indirect integration tests.
 
@@ -235,7 +235,7 @@ The type system should preserve these boundaries, even when doing so makes the R
 
 Short retries repeat the same operation and do not represent a new semantic step in the workflow.
 
-They therefore belong to Router/resilience execution rather than being modeled as pipeline transitions.
+They therefore belong to Router/resilience execution rather than being modeled as pipeline decisions.
 
 Only after retry finishes does the pipeline observe the final operation outcome.
 
@@ -260,7 +260,7 @@ Treating these as the same mechanism would mix execution resilience with durable
 
 ## Pipelines express the conceptual structure of the workflow
 
-Pipeline segmentation, operation names, states, actions, and transitions should make the messaging protocol visible in code.
+Pipeline segmentation, operation names, states, actions, and decisions should make the messaging protocol visible in code.
 
 The goal is not to construct the smallest possible state-machine implementation. The goal is for a reader to reconstruct the processing model directly from its structure.
 

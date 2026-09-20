@@ -209,8 +209,8 @@ Pipelines define semantic processing flow by mapping operation outcomes to the n
       - `PropagateXxxException`
       - `CanFastRetryXxx`
       - `RunFastRetryAsync` when applicable.
-  - `AdvanceXxxPipeline`: maps the current signal to the next transition
-  - `ExecuteXxxOperationAsync`: executes the operation represented by that transition
+  - `AdvanceXxxPipeline`: maps the current signal to the next decision
+  - `ExecuteXxxOperationAsync`: executes the operation represented by that decision
     and adapts the operation-specific state back to the pipeline signal.
   - `PropagateXxxException`: propagate pipeline exceptions throught data members [inbox, envelope, dead letter so].
   - `CanFastRetryXxx`: decide pipeline fast retry execution continuation.
@@ -236,7 +236,7 @@ Pipelines define semantic processing flow by mapping operation outcomes to the n
   - verifying: performs lightweight envelope verification.
   - validating: performs heavyweight inbox and outbox messages validations [data annotations and specialized functions].
 - operations/pipelines/routers naming:
-  - advance = decide the next transition inside a pipeline.
+  - advance = decide the next decision inside a pipeline.
   - execute = invoke one concrete operation.
   - run     = drive one pipeline execution flow.
   - route   = choose between pipelines.
