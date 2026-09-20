@@ -17,7 +17,7 @@ partial class InboundTests
     {
       possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");
 
-      var transition = GetCapturingTransition(signal, config);
+      var transition = AdvanceCapturingPipeline(signal, config);
       if (IsLastPathSignal(path, signal)) {
         transition.ShouldBe(end);
         return;

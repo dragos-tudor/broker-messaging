@@ -13,7 +13,7 @@ partial class OutboundTests
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal);
-      var transition = GetPersistingTransition(signal, config);
+      var transition = AdvancePersistingPipeline(signal, config);
       if (path[^1].Value == signal.Value) { transition.ShouldBe(end); return; }
       possibleSignals = transition switch { PersistingActions action => [.. GetPersistingPossibleSignals(action)], _ => [] };
     }

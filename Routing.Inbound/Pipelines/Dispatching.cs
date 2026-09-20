@@ -33,7 +33,7 @@ partial class InboundFuncs
           services,
           data,
           DispatchingEntry.Start,
-          GetDispatchingTransition,
+          AdvanceDispatchingPipeline,
           ExecuteDispatchingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           PropagateDispatchingException<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           CanFastRetryDispatching,

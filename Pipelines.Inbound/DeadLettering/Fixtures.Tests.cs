@@ -18,7 +18,7 @@ partial class InboundTests
     {
       possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");
 
-      var transition = GetDeadLetteringTransition(signal, config);
+      var transition = AdvanceDeadLetteringPipeline(signal, config);
       if (path[^1].Value == signal.Value)
       {
         transition.ShouldBe(end);

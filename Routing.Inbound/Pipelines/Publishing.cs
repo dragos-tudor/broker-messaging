@@ -33,7 +33,7 @@ partial class InboundFuncs
           services,
           data,
           PublishingEntry.Start,
-          GetPublishingTransition,
+          AdvancePublishingPipeline,
           ExecutePublishingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           PropagatePublishingException<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           CanFastRetryPublishing,

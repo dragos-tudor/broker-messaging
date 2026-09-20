@@ -4,7 +4,7 @@ namespace Routing.Inbound;
 partial class InboundFuncs
 {
   internal static Task<(TData, InboundRoutingTransition)>
-    RouteInboundPipelineExecutionAsync<
+    RouteInboundPipelineAsync<
       TServices,
       TData,
       TKey,

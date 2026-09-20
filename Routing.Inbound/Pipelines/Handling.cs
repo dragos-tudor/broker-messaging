@@ -33,7 +33,7 @@ partial class InboundFuncs
           services,
           data,
           HandlingEntry.Start,
-          GetHandlingTransition,
+          AdvanceHandlingPipeline,
           ExecuteHandlingOperationAsync<TServices, TData, TKey, TPayload, TSession>,
           PropagateHandlingException<TData, TKey, TPayload>,
           CanFastRetryHandling,

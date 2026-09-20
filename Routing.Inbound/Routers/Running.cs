@@ -8,7 +8,7 @@ partial class InboundFuncs
       TServices services,
       TData data,
       TSignal signal,
-      Func<TSignal, InboundPipelineConfig, TTransition> pipeline,
+      Func<TSignal, InboundPipelineConfig, TTransition> advancePipeline,
       Func<TTransition, TServices, TData, CancellationToken, Task<(TData, TSignal, Exception?)>> executeOperation,
       Func<TData, TSignal, Exception?, string?> propagateException,
       Func<TSignal, bool> canFastRetry,
@@ -20,7 +20,7 @@ partial class InboundFuncs
     var pipelineConfig = services.GetInboundPipelineConfig();
     while (!ct.IsCancellationRequested)
     {
-      var transition = pipeline(signal, pipelineConfig);
+      var transition = advancePipeline(signal, pipelineConfig);
       services.InstrumentPipeline(signal, transition);
 
       if (transition is InboundPipelineTypes pipelineType)
@@ -29,7 +29,7 @@ partial class InboundFuncs
         return (data, terminalAction);
 
       var (nextData, nextSignal, exception) = await
-        ExecuteWithFastRetryAsync(services, data, transition, executeOperation, canFastRetry, DelayRetryExecutionAsync, ct);
+        RunFastRetryAsync(services, data, transition, executeOperation, canFastRetry, DelayFastRetryAsync, ct);
       propagateException(nextData, nextSignal, exception);
 
       services.InstrumentOperation(nextData, nextSignal, exception);

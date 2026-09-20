@@ -4,7 +4,7 @@ namespace Routing.Inbound;
 partial class InboundFuncs
 {
   internal static async Task<TerminalActions>
-    RouteInboundPipelineAsync<
+    RouteInboundPipelinesAsync<
       TServices,
       TData,
       TKey,
@@ -23,7 +23,7 @@ partial class InboundFuncs
           CancellationToken,
           Task<(TData, InboundRoutingTransition)>> routePipeline,
         CancellationToken ct = default)
-    where TServices : IInboundRoutingServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
+    where TServices : IInboundRunningServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
     where TData : IInboundRunningData<TKey, TValue, TMetadata, TConfirmation, TPayload>
     where TSession : IDisposable
   {

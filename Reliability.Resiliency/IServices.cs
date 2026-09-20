@@ -1,9 +1,14 @@
 
 namespace Reliability.Resiliency;
 
-public interface IFastRetryOptionsService
+public interface IDistributedLockService
 {
-  FastRetryOptions GetFastRetryOptions();
+  Task<IAsyncDisposable?> TryAcquireLockAsync(string key, TimeSpan lockDuration, CancellationToken cancellationToken);
+}
+
+public interface IResiliencyInstrumentionServices
+{
+  void InstrumentJobException(string jobName, Exception exception);
 }
 
 

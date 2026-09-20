@@ -45,7 +45,7 @@ partial class ResiliencyTests
     return canRetry;
   }
 
-  static Func<TimeSpan, CancellationToken, Task<bool>> CreateDelayRetryExecution(bool result)
+  static Func<TimeSpan, CancellationToken, Task<bool>> CreateDelayFastRetry(bool result)
   {
     var delayRetryExecution = Substitute.For<Func<TimeSpan, CancellationToken, Task<bool>>>();
     delayRetryExecution(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())

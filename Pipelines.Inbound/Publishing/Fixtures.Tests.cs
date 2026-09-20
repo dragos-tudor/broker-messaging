@@ -14,7 +14,7 @@ partial class InboundTests
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal);
-      var transition = GetPublishingTransition(signal, config);
+      var transition = AdvancePublishingPipeline(signal, config);
       if (path[^1].Value == signal.Value) { transition.ShouldBe(end); return; }
       possibleSignals = transition switch { PublishingActions action => [.. GetPublishingPossibleSignals(action)], _ => [] };
     }

@@ -5,7 +5,7 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static PersistingTransition GetPersistingTransition(
+  internal static PersistingTransition AdvancePersistingPipeline(
     PersistingSignal signal,
     OutboundPipelineConfig config) => signal switch
   {

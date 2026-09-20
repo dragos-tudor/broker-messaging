@@ -33,7 +33,7 @@ partial class InboundFuncs
           services,
           data,
           RedirectingEntry.Start,
-          GetRedirectingTransition,
+          AdvanceRedirectingPipeline,
           ExecuteRedirectingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           static (data, signal, exception) => default,
           CanFastRetryRedirecting,

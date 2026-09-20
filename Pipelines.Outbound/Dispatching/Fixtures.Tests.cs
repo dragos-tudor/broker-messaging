@@ -14,7 +14,7 @@ partial class OutboundTests
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal);
-      var transition = GetDispatchingTransition(signal, config);
+      var transition = AdvanceDispatchingPipeline(signal, config);
       if (path[^1].Value == signal.Value) { transition.ShouldBe(end); return; }
       possibleSignals = transition switch { DispatchingActions action => [.. GetDispatchingPossibleSignals(action)], _ => [] };
     }

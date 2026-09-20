@@ -33,7 +33,7 @@ partial class InboundFuncs
           services,
           data,
           CapturingEntry.Start,
-          GetCapturingTransition,
+          AdvanceCapturingPipeline,
           ExecuteCapturingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           PropagateCapturingException<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           CanFastRetryCapturing,

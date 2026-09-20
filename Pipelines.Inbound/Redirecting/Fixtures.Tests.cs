@@ -14,7 +14,7 @@ partial class InboundTests
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal);
-      var transition = GetRedirectingTransition(signal, config);
+      var transition = AdvanceRedirectingPipeline(signal, config);
       if (path[^1].Value == signal.Value) { transition.ShouldBe(end); return; }
       possibleSignals = transition switch { RedirectingActions action => [.. GetRedirectingPossibleSignals(action)], _ => [] };
     }

@@ -6,37 +6,31 @@ partial class ResiliencyFuncs
   static readonly TimeSpan SafeClosingInterval = TimeSpan.FromSeconds(3);
 
   internal static async Task RunPeriodicJobAsync(
-      string jobName,
-      TimeSpan timerInterval,
-      TimeSpan lockInterval,
-      Func<CancellationToken, Task> work,
-      IPeriodicJobServices services,
-      CancellationToken ct = default)
+    string jobName,
+    TimeSpan timerInterval,
+    TimeSpan lockInterval,
+    Func<CancellationToken, Task> work,
+    IPeriodicJobServices services,
+    CancellationToken ct = default)
   {
     using var timer = new PeriodicTimer(timerInterval);
-
-    while (true)
+    while (!ct.IsCancellationRequested)
     {
       try
       {
         if(!await timer.WaitForNextTickAsync(ct))
           return;
 
-        using var cts = new CancellationTokenSource(
-          lockInterval - SafeClosingInterval);
+        var workTimeout = lockInterval - SafeClosingInterval;
 
-        using var lockCts =
-          CancellationTokenSource.CreateLinkedTokenSource(
-              ct,
-              cts.Token);
+        using var workCts = new CancellationTokenSource(workTimeout);
+        using var lockCts = CancellationTokenSource.
+          CreateLinkedTokenSource(ct, workCts.Token);
 
-        await using var handle =
-          await services.TryAcquireLockAsync(
-              jobName,
-              lockInterval,
-              lockCts.Token);
+        await using var exclusiveLockHandler = await services.
+          TryAcquireLockAsync(jobName, lockInterval, lockCts.Token);
 
-        if (handle is not null)
+        if (exclusiveLockHandler is not null)
           await work(lockCts.Token);
       }
       catch (OperationCanceledException) when (ct.IsCancellationRequested)
@@ -46,10 +40,7 @@ partial class ResiliencyFuncs
       catch (OperationCanceledException) { continue; }
       catch (Exception exception)
       {
-        LogPeriodicJobError(
-            services.GetLogger(),
-            jobName,
-            exception);
+        services.InstrumentJobException(jobName, exception);
       }
     }
   }

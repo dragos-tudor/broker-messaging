@@ -3,6 +3,6 @@ namespace Reliability.Resiliency;
 
 partial class ResiliencyFuncs
 {
-  static bool IsRetryExecutionExhausted(int retryCount, FastRetryOptions options) =>
+  static bool IsFastRetryExhausted(int retryCount, FastRetryOptions options) =>
     retryCount >= options.MaxRetryAttempts;
 }

@@ -33,7 +33,7 @@ partial class InboundFuncs
           services,
           data,
           DeadLetteringEntry.Start,
-          GetDeadLetteringTransition,
+          AdvanceDeadLetteringPipeline,
           ExecuteDeadLetteringOperationAsync<TServices, TData, TKey, TPayload>,
           PropagateDeadLetteringException<TData, TKey, TPayload>,
           CanFastRetryDeadLettering,

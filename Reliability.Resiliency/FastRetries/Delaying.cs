@@ -3,7 +3,7 @@ namespace Reliability.Resiliency;
 
 partial class ResiliencyFuncs
 {
-  internal static async Task<bool> DelayRetryExecutionAsync(
+  internal static async Task<bool> DelayFastRetryAsync(
     TimeSpan delay,
     CancellationToken ct = default)
   {

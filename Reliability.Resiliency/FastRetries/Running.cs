@@ -4,14 +4,14 @@ namespace Reliability.Resiliency;
 partial class ResiliencyFuncs
 {
   internal static async Task<(TData, TSignal, Exception?)>
-    ExecuteWithFastRetryAsync<TServices, TData, TSignal, TTransition>(
+    RunFastRetryAsync<TServices, TData, TSignal, TTransition>(
       TServices services,
       TData data,
       TTransition transition,
       Func<TTransition, TServices, TData, CancellationToken,
         Task<(TData, TSignal, Exception?)>> executeOperation,
       Func<TSignal, bool> canFastRetry,
-      Func<TimeSpan, CancellationToken, Task<bool>> delayRetryExecution,
+      Func<TimeSpan, CancellationToken, Task<bool>> delayFastRetry,
       CancellationToken ct = default)
     where TServices : IFastRetryOptionsService
     {
@@ -28,11 +28,11 @@ partial class ResiliencyFuncs
         if (!canFastRetry(nextSignal))
           return result;
 
-        if (IsRetryExecutionExhausted(retryCount, options))
+        if (IsFastRetryExhausted(retryCount, options))
           return result;
 
         var delay = CalculateNextAttemptDelay(++retryCount, options);
-        var isDelayed = await delayRetryExecution(delay, ct);
+        var isDelayed = await delayFastRetry(delay, ct);
         if (!isDelayed)
           return result;
 
