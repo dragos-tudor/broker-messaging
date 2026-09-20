@@ -7,23 +7,23 @@ namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunCapturingPipeline(CapturingSignal[] path, CapturingTransition end) =>
+  static void RunCapturingPipeline(CapturingSignal[] path, CapturingDecision end) =>
     RunCapturingPipeline(path, end, new InboundPipelineConfig());
 
-  static void RunCapturingPipeline(CapturingSignal[] path, CapturingTransition end, InboundPipelineConfig config)
+  static void RunCapturingPipeline(CapturingSignal[] path, CapturingDecision end, InboundPipelineConfig config)
   {
     CapturingSignal[] possibleSignals = [CapturingEntry.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");
 
-      var transition = AdvanceCapturingPipeline(signal, config);
+      var decision = AdvanceCapturingPipeline(signal, config);
       if (IsLastPathSignal(path, signal)) {
-        transition.ShouldBe(end);
+        decision.ShouldBe(end);
         return;
       }
 
-      possibleSignals = transition switch {
+      possibleSignals = decision switch {
         CapturingActions action => [.. GetCapturingPossibleSignals(action)],
         _ => []
       };

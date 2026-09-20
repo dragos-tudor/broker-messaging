@@ -5,7 +5,7 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static CapturingTransition AdvanceCapturingPipeline(
+  internal static CapturingDecision AdvanceCapturingPipeline(
     CapturingSignal signal,
     InboundPipelineConfig config) => signal switch
     {

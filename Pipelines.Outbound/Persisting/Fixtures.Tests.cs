@@ -4,18 +4,18 @@ namespace Pipelines.Outbound;
 
 partial class OutboundTests
 {
-  static void RunPersistingPipeline(PersistingSignal[] path, PersistingTransition end) =>
+  static void RunPersistingPipeline(PersistingSignal[] path, PersistingDecision end) =>
     RunPersistingPipeline(path, end, new OutboundPipelineConfig());
 
-  static void RunPersistingPipeline(PersistingSignal[] path, PersistingTransition end, OutboundPipelineConfig config)
+  static void RunPersistingPipeline(PersistingSignal[] path, PersistingDecision end, OutboundPipelineConfig config)
   {
     PersistingSignal[] possibleSignals = [PersistingEntry.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal);
-      var transition = AdvancePersistingPipeline(signal, config);
-      if (path[^1].Value == signal.Value) { transition.ShouldBe(end); return; }
-      possibleSignals = transition switch { PersistingActions action => [.. GetPersistingPossibleSignals(action)], _ => [] };
+      var decision = AdvancePersistingPipeline(signal, config);
+      if (path[^1].Value == signal.Value) { decision.ShouldBe(end); return; }
+      possibleSignals = decision switch { PersistingActions action => [.. GetPersistingPossibleSignals(action)], _ => [] };
     }
   }
 

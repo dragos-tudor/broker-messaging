@@ -1,7 +1,7 @@
 namespace Pipelines.Inbound;
 
-internal readonly union PublishingTransition(
-  PublishingActions,
+internal readonly union RedirectingDecision(
+  RedirectingActions,
   InboundPipelineTypes,
   TerminalActions
 );

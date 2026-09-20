@@ -30,12 +30,12 @@ partial class InboundTests
     return services;
   }
 
-  static Func<TestSignal, InboundPipelineConfig, object> CreatePipeline(params object[] transitions)
+  static Func<TestSignal, InboundPipelineConfig, object> CreatePipeline(params object[] decisions)
   {
     var pipeline = Substitute.For<Func<TestSignal, InboundPipelineConfig, object>>();
-    var transitionIndex = 0;
+    var decisionIndex = 0;
     pipeline(Arg.Any<TestSignal>(), Arg.Any<InboundPipelineConfig>())
-      .Returns(_ => transitions[transitionIndex++]);
+      .Returns(_ => decisions[decisionIndex++]);
     return pipeline;
   }
 

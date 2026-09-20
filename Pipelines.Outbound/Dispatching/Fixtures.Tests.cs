@@ -5,18 +5,18 @@ namespace Pipelines.Outbound;
 
 partial class OutboundTests
 {
-  static void RunDispatchingPipeline(DispatchingSignal[] path, DispatchingTransition end) =>
+  static void RunDispatchingPipeline(DispatchingSignal[] path, DispatchingDecision end) =>
     RunDispatchingPipeline(path, end, new OutboundPipelineConfig());
 
-  static void RunDispatchingPipeline(DispatchingSignal[] path, DispatchingTransition end, OutboundPipelineConfig config)
+  static void RunDispatchingPipeline(DispatchingSignal[] path, DispatchingDecision end, OutboundPipelineConfig config)
   {
     DispatchingSignal[] possibleSignals = [DispatchingEntry.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal);
-      var transition = AdvanceDispatchingPipeline(signal, config);
-      if (path[^1].Value == signal.Value) { transition.ShouldBe(end); return; }
-      possibleSignals = transition switch { DispatchingActions action => [.. GetDispatchingPossibleSignals(action)], _ => [] };
+      var decision = AdvanceDispatchingPipeline(signal, config);
+      if (path[^1].Value == signal.Value) { decision.ShouldBe(end); return; }
+      possibleSignals = decision switch { DispatchingActions action => [.. GetDispatchingPossibleSignals(action)], _ => [] };
     }
   }
 

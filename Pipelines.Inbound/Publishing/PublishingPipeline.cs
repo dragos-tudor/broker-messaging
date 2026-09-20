@@ -6,7 +6,7 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static PublishingTransition AdvancePublishingPipeline(
+  internal static PublishingDecision AdvancePublishingPipeline(
     PublishingSignal signal,
     InboundPipelineConfig config) => signal switch
   {

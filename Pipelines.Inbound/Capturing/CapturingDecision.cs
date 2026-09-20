@@ -1,7 +1,7 @@
 namespace Pipelines.Inbound;
 
-internal readonly union HandlingTransition(
-  HandlingActions,
+internal readonly union CapturingDecision(
+  CapturingActions,
   InboundPipelineTypes,
   TerminalActions
 );

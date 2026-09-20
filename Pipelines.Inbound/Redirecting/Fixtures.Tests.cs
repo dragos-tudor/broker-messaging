@@ -5,18 +5,18 @@ namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunRedirectingPipeline(RedirectingSignal[] path, RedirectingTransition end) =>
+  static void RunRedirectingPipeline(RedirectingSignal[] path, RedirectingDecision end) =>
     RunRedirectingPipeline(path, end, new InboundPipelineConfig());
 
-  static void RunRedirectingPipeline(RedirectingSignal[] path, RedirectingTransition end, InboundPipelineConfig config)
+  static void RunRedirectingPipeline(RedirectingSignal[] path, RedirectingDecision end, InboundPipelineConfig config)
   {
     RedirectingSignal[] possibleSignals = [RedirectingEntry.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal);
-      var transition = AdvanceRedirectingPipeline(signal, config);
-      if (path[^1].Value == signal.Value) { transition.ShouldBe(end); return; }
-      possibleSignals = transition switch { RedirectingActions action => [.. GetRedirectingPossibleSignals(action)], _ => [] };
+      var decision = AdvanceRedirectingPipeline(signal, config);
+      if (path[^1].Value == signal.Value) { decision.ShouldBe(end); return; }
+      possibleSignals = decision switch { RedirectingActions action => [.. GetRedirectingPossibleSignals(action)], _ => [] };
     }
   }
 

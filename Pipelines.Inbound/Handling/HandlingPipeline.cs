@@ -5,7 +5,7 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static HandlingTransition AdvanceHandlingPipeline(
+  internal static HandlingDecision AdvanceHandlingPipeline(
     HandlingSignal signal,
     InboundPipelineConfig _) => signal switch
   {

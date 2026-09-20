@@ -6,7 +6,7 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static DispatchingTransition AdvanceDispatchingPipeline(
+  internal static DispatchingDecision AdvanceDispatchingPipeline(
     DispatchingSignal signal,
     InboundPipelineConfig _) => signal switch
   {

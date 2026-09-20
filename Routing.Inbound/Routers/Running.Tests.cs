@@ -8,7 +8,7 @@ namespace Routing.Inbound;
 partial class InboundTests
 {
   [TestMethod]
-  public async Task run_inbound_pipeline__pipeline_transition__returns_pipeline_type_without_executing_operation()
+  public async Task run_inbound_pipeline__pipeline_decision__returns_pipeline_type_without_executing_operation()
   {
     var services = CreateServices();
     var data = new Data();
@@ -51,8 +51,8 @@ partial class InboundTests
     var services = CreateServices();
     var initialData = new Data();
     var updatedData = new Data();
-    var operationTransition = new object();
-    var pipeline = CreatePipeline(operationTransition, TerminalActions.Exit);
+    var operationDecision = new object();
+    var pipeline = CreatePipeline(operationDecision, TerminalActions.Exit);
     var executeOperation = CreateExecuteOperation((updatedData, TestSignal.Completed, null));
     var propagateException = CreatePropagateException();
     var canFastRetry = CreateCanFastRetry();
@@ -61,7 +61,7 @@ partial class InboundTests
       services, initialData, TestSignal.Initial, pipeline, executeOperation, propagateException, canFastRetry);
 
     result.ShouldBe((updatedData, TerminalActions.Exit));
-    executeOperation.Received(1).Invoke(operationTransition, services, initialData, CancellationToken.None);
+    executeOperation.Received(1).Invoke(operationDecision, services, initialData, CancellationToken.None);
     pipeline.Received(1).Invoke(TestSignal.Initial, Arg.Any<InboundPipelineConfig>());
     pipeline.Received(1).Invoke(TestSignal.Completed, Arg.Any<InboundPipelineConfig>());
     propagateException.Received(1).Invoke(updatedData, TestSignal.Completed, null);
@@ -75,8 +75,8 @@ partial class InboundTests
     var initialData = new Data();
     var retriedData = new Data();
     var completedData = new Data();
-    var operationTransition = new object();
-    var pipeline = CreatePipeline(operationTransition, TerminalActions.Exit);
+    var operationDecision = new object();
+    var pipeline = CreatePipeline(operationDecision, TerminalActions.Exit);
     var executeOperation = CreateExecuteOperation(
       (retriedData, TestSignal.Retry, null),
       (completedData, TestSignal.Completed, null));
@@ -87,8 +87,8 @@ partial class InboundTests
       services, initialData, TestSignal.Initial, pipeline, executeOperation, propagateException, canFastRetry);
 
     result.ShouldBe((completedData, TerminalActions.Exit));
-    executeOperation.Received(1).Invoke(operationTransition, services, initialData, CancellationToken.None);
-    executeOperation.Received(1).Invoke(operationTransition, services, retriedData, CancellationToken.None);
+    executeOperation.Received(1).Invoke(operationDecision, services, initialData, CancellationToken.None);
+    executeOperation.Received(1).Invoke(operationDecision, services, retriedData, CancellationToken.None);
     propagateException.Received(1).Invoke(completedData, TestSignal.Completed, null);
     services.Received(1).InstrumentOperation(completedData, TestSignal.Completed, null);
     pipeline.Received(1).Invoke(TestSignal.Completed, Arg.Any<InboundPipelineConfig>());
@@ -101,8 +101,8 @@ partial class InboundTests
     var initialData = new Data();
     var updatedData = new Data();
     var expectedException = new InvalidOperationException("operation failed");
-    var operationTransition = new object();
-    var pipeline = CreatePipeline(operationTransition, TerminalActions.Exit);
+    var operationDecision = new object();
+    var pipeline = CreatePipeline(operationDecision, TerminalActions.Exit);
     var executeOperation = CreateExecuteOperation((updatedData, TestSignal.Completed, expectedException));
     var propagateException = CreatePropagateException();
     var canFastRetry = CreateCanFastRetry();
@@ -144,11 +144,11 @@ partial class InboundTests
     var services = CreateServices();
     var initialData = new Data();
     var updatedData = new Data();
-    var operationTransition = new object();
-    var pipeline = CreatePipeline(operationTransition);
+    var operationDecision = new object();
+    var pipeline = CreatePipeline(operationDecision);
     using var cancellationSource = new CancellationTokenSource();
     var executeOperation = Substitute.For<Func<object, Services, Data, CancellationToken, Task<(Data, TestSignal, Exception?)>>>();
-    executeOperation(operationTransition, services, initialData, cancellationSource.Token)
+    executeOperation(operationDecision, services, initialData, cancellationSource.Token)
       .Returns(_ =>
       {
         cancellationSource.CancelAsync();
@@ -161,7 +161,7 @@ partial class InboundTests
       services, initialData, TestSignal.Initial, pipeline, executeOperation, propagateException, canFastRetry, cancellationSource.Token);
 
     result.ShouldBe((updatedData, TerminalActions.Exit));
-    executeOperation.Received(1).Invoke(operationTransition, services, initialData, cancellationSource.Token);
+    executeOperation.Received(1).Invoke(operationDecision, services, initialData, cancellationSource.Token);
     canFastRetry.DidNotReceive().Invoke(Arg.Any<TestSignal>());
     propagateException.Received(1).Invoke(updatedData, TestSignal.Retry, null);
     services.Received(1).InstrumentOperation(updatedData, TestSignal.Retry, null);

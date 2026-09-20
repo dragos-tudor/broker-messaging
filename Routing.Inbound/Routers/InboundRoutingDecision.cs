@@ -1,7 +1,7 @@
 
 namespace Routing.Inbound;
 
-internal readonly union InboundRoutingTransition(
+internal readonly union InboundRoutingDecision(
   InboundPipelineTypes,
   TerminalActions
 );

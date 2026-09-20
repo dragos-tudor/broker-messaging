@@ -1,6 +1,6 @@
 namespace Pipelines.Inbound;
 
-internal readonly union DeadLetteringTransition(
+internal readonly union DeadLetteringDecision(
   DeadLetteringActions,
   InboundPipelineTypes,
   TerminalActions

@@ -72,9 +72,9 @@ The result is closer to a visible state graph than to a hidden orchestration fra
 
 ### Routers and runners
 
-Pipelines describe possible transitions. **Routers** execute those transitions.
+Pipelines describe possible decisions. **Routers** execute those decisions.
 
-A router selects the current operation, executes it, interprets the result, and decides the next action.
+A router selects the pipeline, run it, interprets the result, and decides the next action.
 
 A **runner** sits outside the router and is responsible for restarting processing when longer recovery is required.
 
@@ -122,12 +122,12 @@ This allows the system to recover from duplicate delivery, retries, and restarts
 
 The project distinguishes between two kinds of retry behavior:
 
-1. **Immediate retry** for short-lived failures during active processing.
+1. **Fast retry** for short-lived failures during active processing.
 2. **Scheduled recovery** for failures that require persistence and a later attempt.
 
 This avoids turning every failure into the same retry loop.
 
-Immediate retry belongs close to execution. Scheduled recovery belongs to persisted message state.
+Fast retry belongs close to execution. Scheduled recovery belongs to persisted message state.
 
 ### Dead-letter processing
 

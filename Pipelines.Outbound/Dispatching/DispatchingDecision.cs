@@ -1,7 +1,7 @@
 namespace Pipelines.Outbound;
 
-internal readonly union PublishingTransition(
-  PublishingActions,
+internal readonly union DispatchingDecision(
+  DispatchingActions,
   OutboundPipelinesTypes,
   TerminalActions
 );

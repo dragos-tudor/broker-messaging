@@ -7,13 +7,13 @@ partial class OutboundFuncs
 {
   internal static Task<(TData, PublishingSignal, Exception?)>
     ExecutePublishingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      PublishingTransition transition,
+      PublishingDecision decision,
       TServices services,
       TData data,
       CancellationToken ct = default)
     where TServices : IPublishingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
     where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
-      transition switch
+      decision switch
       {
         PublishingActions.Mapping => MapOutboxMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data).FromResult<TData, MappingStates, PublishingSignal>(static state => state),
         PublishingActions.Producing => ProduceEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data).FromResult<TData, ProducingStates, PublishingSignal>(static state => state),
@@ -21,6 +21,6 @@ partial class OutboundFuncs
         PublishingActions.Scheduling => ScheduleOutboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, SchedulingStates, PublishingSignal>(static state => state),
         PublishingActions.Abandoning => AbandonOutboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, AbandoningStates, PublishingSignal>(static state => state),
         PublishingActions.Closing => CloseOutboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, ClosingStates, PublishingSignal>(static state => state),
-        _ => throw new InvalidOperationException($"Invalid execute operation transition {transition}")
+        _ => throw new InvalidOperationException($"Invalid execute operation decision {decision}")
       };
 }

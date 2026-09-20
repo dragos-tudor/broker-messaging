@@ -5,18 +5,18 @@ namespace Pipelines.Outbound;
 
 partial class OutboundTests
 {
-  static void RunPublishingPipeline(PublishingSignal[] path, PublishingTransition end) =>
+  static void RunPublishingPipeline(PublishingSignal[] path, PublishingDecision end) =>
     RunPublishingPipeline(path, end, new OutboundPipelineConfig());
 
-  static void RunPublishingPipeline(PublishingSignal[] path, PublishingTransition end, OutboundPipelineConfig config = default)
+  static void RunPublishingPipeline(PublishingSignal[] path, PublishingDecision end, OutboundPipelineConfig config = default)
   {
     PublishingSignal[] possibleSignals = [PublishingEntry.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal);
-      var transition = AdvancePublishingPipeline(signal, config);
-      if (path[^1].Value == signal.Value) { transition.ShouldBe(end); return; }
-      possibleSignals = transition switch { PublishingActions action => [.. GetPublishingPossibleSignals(action)], _ => [] };
+      var decision = AdvancePublishingPipeline(signal, config);
+      if (path[^1].Value == signal.Value) { decision.ShouldBe(end); return; }
+      possibleSignals = decision switch { PublishingActions action => [.. GetPublishingPossibleSignals(action)], _ => [] };
     }
   }
 

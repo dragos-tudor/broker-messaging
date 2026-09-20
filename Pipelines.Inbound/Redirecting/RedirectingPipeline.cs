@@ -5,7 +5,7 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static RedirectingTransition AdvanceRedirectingPipeline(
+  internal static RedirectingDecision AdvanceRedirectingPipeline(
     RedirectingSignal signal,
     InboundPipelineConfig _) => signal switch
   {

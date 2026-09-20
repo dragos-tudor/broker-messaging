@@ -5,12 +5,12 @@ namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunDeadLetteringPipeline(DeadLetteringSignal[] path, DeadLetteringTransition end) =>
+  static void RunDeadLetteringPipeline(DeadLetteringSignal[] path, DeadLetteringDecision end) =>
     RunDeadLetteringPipeline(path, end, new InboundPipelineConfig());
 
   static void RunDeadLetteringPipeline(
     DeadLetteringSignal[] path,
-    DeadLetteringTransition end,
+    DeadLetteringDecision end,
     InboundPipelineConfig config)
   {
     DeadLetteringSignal[] possibleSignals = [DeadLetteringEntry.Start];
@@ -18,14 +18,14 @@ partial class InboundTests
     {
       possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");
 
-      var transition = AdvanceDeadLetteringPipeline(signal, config);
+      var decision = AdvanceDeadLetteringPipeline(signal, config);
       if (path[^1].Value == signal.Value)
       {
-        transition.ShouldBe(end);
+        decision.ShouldBe(end);
         return;
       }
 
-      possibleSignals = transition switch
+      possibleSignals = decision switch
       {
         DeadLetteringActions action => [.. GetDeadLetteringPossibleSignals(action)],
         _ => []

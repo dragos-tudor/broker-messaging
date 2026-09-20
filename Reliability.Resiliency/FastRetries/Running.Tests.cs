@@ -14,11 +14,11 @@ partial class ResiliencyTests
     var delayFastRetry = CreateDelayFastRetry(true);
 
     var result = await RunFastRetryAsync(
-      services, "initial", "transition", executeOperation, canRetry, delayFastRetry);
+      services, "initial", "decision", executeOperation, canRetry, delayFastRetry);
 
     result.ShouldBe(("initial", RetrySignal.Completed, null));
     executeOperation.Received(1).Invoke(
-      "transition", services, "initial", CancellationToken.None);
+      "decision", services, "initial", CancellationToken.None);
     canRetry.Received(1).Invoke(RetrySignal.Completed);
     delayFastRetry.DidNotReceive().Invoke(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>());
   }
@@ -33,11 +33,11 @@ partial class ResiliencyTests
     var delayFastRetry = CreateDelayFastRetry(true);
 
     var result = await RunFastRetryAsync(
-      services, "initial", "transition", executeOperation, canRetry, delayFastRetry);
+      services, "initial", "decision", executeOperation, canRetry, delayFastRetry);
 
     result.ShouldBe(("initial", RetrySignal.Retry, null));
     executeOperation.Received(1).Invoke(
-      "transition", services, "initial", CancellationToken.None);
+      "decision", services, "initial", CancellationToken.None);
     canRetry.Received(1).Invoke(RetrySignal.Retry);
     delayFastRetry.DidNotReceive().Invoke(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>());
   }
@@ -52,11 +52,11 @@ partial class ResiliencyTests
     var delayFastRetry = CreateDelayFastRetry(false);
 
     var result = await RunFastRetryAsync(
-      services, "initial", "transition", executeOperation, canRetry, delayFastRetry);
+      services, "initial", "decision", executeOperation, canRetry, delayFastRetry);
 
     result.ShouldBe(("initial", RetrySignal.Retry, null));
     executeOperation.Received(1).Invoke(
-      "transition", services, "initial", CancellationToken.None);
+      "decision", services, "initial", CancellationToken.None);
     canRetry.Received(1).Invoke(RetrySignal.Retry);
     delayFastRetry.Received(1).Invoke(Arg.Any<TimeSpan>(), CancellationToken.None);
   }
@@ -72,13 +72,13 @@ partial class ResiliencyTests
     var delayFastRetry = CreateDelayFastRetry(true);
 
     var result = await RunFastRetryAsync(
-      services, "initial", "transition", executeOperation, canRetry, delayFastRetry);
+      services, "initial", "decision", executeOperation, canRetry, delayFastRetry);
 
     result.ShouldBe(("completed", RetrySignal.Completed, null));
     executeOperation.Received(1).Invoke(
-      "transition", services, "initial", CancellationToken.None);
+      "decision", services, "initial", CancellationToken.None);
     executeOperation.Received(1).Invoke(
-      "transition", services, "updated", CancellationToken.None);
+      "decision", services, "updated", CancellationToken.None);
     canRetry.Received(1).Invoke(RetrySignal.Retry);
     canRetry.Received(1).Invoke(RetrySignal.Completed);
     delayFastRetry.Received(1).Invoke(Arg.Any<TimeSpan>(), CancellationToken.None);
@@ -96,7 +96,7 @@ partial class ResiliencyTests
     var delayFastRetry = CreateDelayFastRetry(true);
 
     var result = await RunFastRetryAsync(
-      services, "initial", "transition", executeOperation, canRetry, delayFastRetry);
+      services, "initial", "decision", executeOperation, canRetry, delayFastRetry);
 
     result.ShouldBe(("attempt-3", RetrySignal.Retry, null));
     executeOperation.Received(3).Invoke(
@@ -119,7 +119,7 @@ partial class ResiliencyTests
     var result = await RunFastRetryAsync(
       services,
       "initial",
-      "transition",
+      "decision",
       executeOperation,
       canRetry,
       delayFastRetry,
@@ -127,7 +127,7 @@ partial class ResiliencyTests
 
     result.ShouldBe(("initial", RetrySignal.Retry, null));
     executeOperation.Received(1).Invoke(
-      "transition", services, "initial", cancellationSource.Token);
+      "decision", services, "initial", cancellationSource.Token);
     canRetry.DidNotReceive().Invoke(Arg.Any<RetrySignal>());
     delayFastRetry.DidNotReceive().Invoke(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>());
   }
@@ -145,14 +145,14 @@ partial class ResiliencyTests
       RunFastRetryAsync(
         services,
         "initial",
-        "transition",
+        "decision",
         executeOperation,
         canRetry,
         delayFastRetry));
 
     exception.ShouldBeSameAs(expectedException);
     executeOperation.Received(1).Invoke(
-      "transition", services, "initial", CancellationToken.None);
+      "decision", services, "initial", CancellationToken.None);
     canRetry.DidNotReceive().Invoke(Arg.Any<RetrySignal>());
     delayFastRetry.DidNotReceive().Invoke(Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>());
   }

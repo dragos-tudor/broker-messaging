@@ -3,7 +3,7 @@ namespace Routing.Inbound;
 
 partial class InboundFuncs
 {
-  internal static Task<(TData, InboundRoutingTransition)>
+  internal static Task<(TData, InboundRoutingDecision)>
     RunDispatchingPipelineAsync<
       TServices,
       TData,
@@ -29,7 +29,7 @@ partial class InboundFuncs
         TPayload,
         TSession,
         DispatchingSignal,
-        DispatchingTransition>(
+        DispatchingDecision>(
           services,
           data,
           DispatchingEntry.Start,
