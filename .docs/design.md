@@ -154,6 +154,9 @@ states.
 - each operation has one-task responsibility [eg. capture an envelope, map a dead-letter message, validate an envelope, insert an inbox message].
 - each operation is independent of the others.
 - each operation uses specialized interfaces for services and data based on composition root pattern.
+- 2 different type of operations:
+  - pure operations [verifying, mapping, validating, producing, dispatching].
+  - side-effect operations [capturing, inserting, transacting, publishing].
 - all operations have similar signature:
   - services, shared data, cancellation token as parameters.
   - (output data, state, exception?) as return type.
@@ -195,6 +198,23 @@ Pipelines define semantic processing flow by mapping operation outcomes to the n
 - pipeline and operation identifiers are unique within their owning component; exact outcome-state names remain source-code implementation details.\
 - each pipeline must define its entry action by mapping it to the first action. Subsequent mappings are driven by operation outcomes.
 
+## Routing
+- inbound workflow [same as outbound]:
+  - `RouteInboundPipelinesAsync`: routes across pipeline boundaries until a terminal action.
+  - `RouteInboundPipelineAsync`: routes one PipelineTypes value to the corresponding pipeline runner.
+  - `RunXxxPipelineAsync`: starts one concrete pipeline from its canonical entry.
+  - `RunInboundPipelineAsync`: generically drives one pipeline by repeatedly [Xxx mans pipeline segment]:
+      - `AdvanceXxxPipeline`
+      - `ExecuteXxxOperationAsync`
+      - `PropagateXxxException`
+      - `CanFastRetryXxx`
+      - `RunFastRetryAsync` when applicable.
+  - `AdvanceXxxPipeline`: maps the current signal to the next transition
+  - `ExecuteXxxOperationAsync`: executes the operation represented by that transition
+    and adapts the operation-specific state back to the pipeline signal.
+  - `PropagateXxxException`: propagate pipeline exceptions throught data members [inbox, envelope, dead letter so].
+  - `CanFastRetryXxx`: decide pipeline fast retry execution continuation.
+
 ### Exception propagation
 - each [almost] pipeline segment owns its specific error-propagation rules.
 - operations success paths skip propagation entirely.
@@ -215,5 +235,8 @@ Pipelines define semantic processing flow by mapping operation outcomes to the n
 - operations:
   - verifying: performs lightweight envelope verification.
   - validating: performs heavyweight inbox and outbox messages validations [data annotations and specialized functions].
-
--
+- operations/pipelines/routers naming:
+  - advance = decide the next transition inside a pipeline.
+  - execute = invoke one concrete operation.
+  - run     = drive one pipeline execution flow.
+  - route   = choose between pipelines.
