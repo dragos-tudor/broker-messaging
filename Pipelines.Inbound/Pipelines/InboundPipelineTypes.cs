@@ -1,7 +1,7 @@
 
 namespace Pipelines.Inbound;
 
-internal enum InboundPipelineTypes
+public enum InboundPipelineTypes
 {
   Capturing,
   Redirecting,
