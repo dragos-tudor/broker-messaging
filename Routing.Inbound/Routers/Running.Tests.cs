@@ -1,7 +1,7 @@
 #pragma warning disable CS4014
 
-using Services = Routing.Inbound.IInboundRunningServices<string, string, string, string, string, Routing.Inbound.TestSession>;
-using Data = Routing.Inbound.TestData;
+using Services = Routing.Inbound.IInboundRoutingServices<string, string, string, string, byte[], System.IDisposable>;
+using Data = Routing.Inbound.IInboundRoutingData<string, string, string, string, byte[]>;
 
 namespace Routing.Inbound;
 
@@ -11,13 +11,13 @@ partial class InboundTests
   public async Task run_inbound_pipeline__pipeline_decision__returns_pipeline_type_without_executing_operation()
   {
     var services = CreateServices();
-    var data = new Data();
+    var data = CreateData();
     var pipeline = CreatePipeline(InboundPipelineTypes.Capturing);
     var executeOperation = CreateExecuteOperation();
     var propagateException = CreatePropagateException();
     var canFastRetry = CreateCanFastRetry();
 
-    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, string, TestSession, TestSignal, object>(
+    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, byte[], IDisposable, TestSignal, object>(
       services, data, TestSignal.Initial, pipeline, executeOperation, propagateException, canFastRetry);
 
     result.ShouldBe((data, InboundPipelineTypes.Capturing));
@@ -31,13 +31,13 @@ partial class InboundTests
   public async Task run_inbound_pipeline__terminal_action__returns_without_executing_operation()
   {
     var services = CreateServices();
-    var data = new Data();
+    var data = CreateData();
     var pipeline = CreatePipeline(TerminalActions.Unrecoverable);
     var executeOperation = CreateExecuteOperation();
     var propagateException = CreatePropagateException();
     var canFastRetry = CreateCanFastRetry();
 
-    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, string, TestSession, TestSignal, object>(
+    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, byte[], IDisposable, TestSignal, object>(
       services, data, TestSignal.Initial, pipeline, executeOperation, propagateException, canFastRetry);
 
     result.ShouldBe((data, TerminalActions.Unrecoverable));
@@ -49,15 +49,15 @@ partial class InboundTests
   public async Task run_inbound_pipeline__operation_result__continues_with_updated_data_and_signal()
   {
     var services = CreateServices();
-    var initialData = new Data();
-    var updatedData = new Data();
+    var initialData = CreateData();
+    var updatedData = CreateData();
     var operationDecision = new object();
     var pipeline = CreatePipeline(operationDecision, TerminalActions.Exit);
     var executeOperation = CreateExecuteOperation((updatedData, TestSignal.Completed, null));
     var propagateException = CreatePropagateException();
     var canFastRetry = CreateCanFastRetry();
 
-    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, string, TestSession, TestSignal, object>(
+    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, byte[], IDisposable, TestSignal, object>(
       services, initialData, TestSignal.Initial, pipeline, executeOperation, propagateException, canFastRetry);
 
     result.ShouldBe((updatedData, TerminalActions.Exit));
@@ -72,9 +72,9 @@ partial class InboundTests
   public async Task run_inbound_pipeline__retry_then_success__returns_final_operation_result()
   {
     var services = CreateServices(new FastRetryOptions { RetryBaseDelay = TimeSpan.Zero });
-    var initialData = new Data();
-    var retriedData = new Data();
-    var completedData = new Data();
+    var initialData = CreateData();
+    var retriedData = CreateData();
+    var completedData = CreateData();
     var operationDecision = new object();
     var pipeline = CreatePipeline(operationDecision, TerminalActions.Exit);
     var executeOperation = CreateExecuteOperation(
@@ -83,7 +83,7 @@ partial class InboundTests
     var propagateException = CreatePropagateException();
     var canFastRetry = CreateCanFastRetry();
 
-    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, string, TestSession, TestSignal, object>(
+    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, byte[], IDisposable, TestSignal, object>(
       services, initialData, TestSignal.Initial, pipeline, executeOperation, propagateException, canFastRetry);
 
     result.ShouldBe((completedData, TerminalActions.Exit));
@@ -98,8 +98,8 @@ partial class InboundTests
   public async Task run_inbound_pipeline__operation_returns_exception__propagates_and_instruments_error()
   {
     var services = CreateServices();
-    var initialData = new Data();
-    var updatedData = new Data();
+    var initialData = CreateData();
+    var updatedData = CreateData();
     var expectedException = new InvalidOperationException("operation failed");
     var operationDecision = new object();
     var pipeline = CreatePipeline(operationDecision, TerminalActions.Exit);
@@ -107,7 +107,7 @@ partial class InboundTests
     var propagateException = CreatePropagateException();
     var canFastRetry = CreateCanFastRetry();
 
-    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, string, TestSession, TestSignal, object>(
+    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, byte[], IDisposable, TestSignal, object>(
       services, initialData, TestSignal.Initial, pipeline, executeOperation, propagateException, canFastRetry);
 
     result.ShouldBe((updatedData, TerminalActions.Exit));
@@ -119,7 +119,7 @@ partial class InboundTests
   public async Task run_inbound_pipeline__cancelled_before_start__returns_exit_without_callbacks()
   {
     var services = CreateServices();
-    var data = new Data();
+    var data = CreateData();
     var pipeline = CreatePipeline();
     var executeOperation = CreateExecuteOperation();
     var propagateException = CreatePropagateException();
@@ -128,7 +128,7 @@ partial class InboundTests
     await cancellationSource.CancelAsync();
     services.ClearReceivedCalls();
 
-    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, string, TestSession, TestSignal, object>(
+    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, byte[], IDisposable, TestSignal, object>(
       services, data, TestSignal.Initial, pipeline, executeOperation, propagateException, canFastRetry, cancellationSource.Token);
 
     result.ShouldBe((data, TerminalActions.Exit));
@@ -142,8 +142,8 @@ partial class InboundTests
   public async Task run_inbound_pipeline__cancelled_during_operation__returns_updated_data_and_exit()
   {
     var services = CreateServices();
-    var initialData = new Data();
-    var updatedData = new Data();
+    var initialData = CreateData();
+    var updatedData = CreateData();
     var operationDecision = new object();
     var pipeline = CreatePipeline(operationDecision);
     using var cancellationSource = new CancellationTokenSource();
@@ -157,7 +157,7 @@ partial class InboundTests
     var propagateException = CreatePropagateException();
     var canFastRetry = CreateCanFastRetry();
 
-    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, string, TestSession, TestSignal, object>(
+    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, byte[], IDisposable, TestSignal, object>(
       services, initialData, TestSignal.Initial, pipeline, executeOperation, propagateException, canFastRetry, cancellationSource.Token);
 
     result.ShouldBe((updatedData, TerminalActions.Exit));

@@ -13,8 +13,8 @@ partial class InboundFuncs
       Func<TData, TSignal, Exception?, string?> propagateException,
       Func<TSignal, bool> canFastRetry,
       CancellationToken ct = default)
-    where TServices : IInboundRunningServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
-    where TData : IInboundRunningData<TKey, TValue, TMetadata, TConfirmation, TPayload>
+    where TServices : IInboundRoutingServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
+    where TData : IInboundRoutingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
     where TSession : IDisposable
   {
     var pipelineConfig = services.GetInboundPipelineConfig();

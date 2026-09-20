@@ -1,17 +1,7 @@
-using Services = Routing.Inbound.IInboundRunningServices<string, string, string, string, string, Routing.Inbound.TestSession>;
-using Data = Routing.Inbound.TestData;
+using Services = Routing.Inbound.IInboundRoutingServices<string, string, string, string, byte[], System.IDisposable>;
+using Data = Routing.Inbound.IInboundRoutingData<string, string, string, string, byte[]>;
 
 namespace Routing.Inbound;
-
-public sealed class TestSession : IDisposable
-{
-  public void Dispose() { }
-}
-
-public sealed class TestData : InboundPipelineData<string, string, string, string, string>,
-  IInboundRunningData<string, string, string, string, string>
-{
-}
 
 partial class InboundTests
 {
@@ -21,6 +11,8 @@ partial class InboundTests
     Retry,
     Completed
   }
+
+  static Data CreateData() => Substitute.For<Data>();
 
   static Services CreateServices(FastRetryOptions? options = null)
   {
@@ -32,11 +24,11 @@ partial class InboundTests
 
   static Func<TestSignal, InboundPipelineConfig, object> CreatePipeline(params object[] decisions)
   {
-    var pipeline = Substitute.For<Func<TestSignal, InboundPipelineConfig, object>>();
+    var advancePipeline = Substitute.For<Func<TestSignal, InboundPipelineConfig, object>>();
     var decisionIndex = 0;
-    pipeline(Arg.Any<TestSignal>(), Arg.Any<InboundPipelineConfig>())
+    advancePipeline(Arg.Any<TestSignal>(), Arg.Any<InboundPipelineConfig>())
       .Returns(_ => decisions[decisionIndex++]);
-    return pipeline;
+    return advancePipeline;
   }
 
   static Func<object, Services, Data, CancellationToken, Task<(Data, TestSignal, Exception?)>>
@@ -44,8 +36,7 @@ partial class InboundTests
   {
     var executeOperation = Substitute.For<Func<object, Services, Data, CancellationToken, Task<(Data, TestSignal, Exception?)>>>();
     var resultIndex = 0;
-    executeOperation(
-      Arg.Any<object>(), Arg.Any<Services>(), Arg.Any<Data>(), Arg.Any<CancellationToken>())
+    executeOperation(Arg.Any<object>(), Arg.Any<Services>(), Arg.Any<Data>(), Arg.Any<CancellationToken>())
       .Returns(_ => Task.FromResult(results[resultIndex++]));
     return executeOperation;
   }

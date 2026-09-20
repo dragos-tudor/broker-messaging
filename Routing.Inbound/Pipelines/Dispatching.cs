@@ -16,8 +16,8 @@ partial class InboundFuncs
         TServices services,
         TData data,
         CancellationToken ct = default)
-    where TServices : IInboundRunningServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
-    where TData : IInboundRunningData<TKey, TValue, TMetadata, TConfirmation, TPayload>
+    where TServices : IInboundRoutingServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
+    where TData : IInboundRoutingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
     where TSession : IDisposable =>
       RunInboundPipelineAsync<
         TServices,

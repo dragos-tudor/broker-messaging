@@ -23,8 +23,8 @@ partial class InboundFuncs
           CancellationToken,
           Task<(TData, InboundRoutingDecision)>> routePipeline,
         CancellationToken ct = default)
-    where TServices : IInboundRunningServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
-    where TData : IInboundRunningData<TKey, TValue, TMetadata, TConfirmation, TPayload>
+    where TServices : IInboundRoutingServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
+    where TData : IInboundRoutingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
     where TSession : IDisposable
   {
     while (!ct.IsCancellationRequested)
