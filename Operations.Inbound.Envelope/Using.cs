@@ -5,12 +5,14 @@ global using System.Threading.Tasks;
 global using Persistence.InboxMessage;
 global using Transport.Envelope;
 global using Transport.DeadLetterEnvelope;
+global using Foundation.Extensions;
 global using static Persistence.InboxMessage.InboxMessageFuncs;
 global using static Transport.Envelope.EnvelopeFuncs;
 global using static Foundation.Extensions.ExtensionsFuncs;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Pipelines.Inbound")]
+[assembly: InternalsVisibleTo("Routing.Inbound")]
 
 namespace Operations.Inbound.Envelope;
 

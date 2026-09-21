@@ -6,7 +6,3 @@ public interface IDeadLetterMessageMapperService<TKey, TValue, TMetadata, TConfi
     IDeadLetterMessage<TKey, TPayload> deadLetterMessage,
     DateTime currentDate);
 }
-
-public interface IUtcDateService {
-  DateTime GetUtcDateTime();
-}

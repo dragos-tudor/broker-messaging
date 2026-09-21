@@ -8,6 +8,7 @@ global using static Foundation.Extensions.ExtensionsFuncs;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Pipelines.Outbound")]
+[assembly: InternalsVisibleTo("Routing.Outbound")]
 
 namespace Operations.Outbound.Envelope;
 

@@ -7,6 +7,7 @@ global using static Foundation.Extensions.ExtensionsFuncs;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Pipelines.Inbound")]
+[assembly: InternalsVisibleTo("Routing.Inbound")]
 
 namespace Operations.Inbound.DeadLetterEnvelope;
 

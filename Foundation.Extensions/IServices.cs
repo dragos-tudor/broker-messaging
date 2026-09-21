@@ -1,5 +1,5 @@
 
-namespace Operations.Inbound.Inbox;
+namespace Foundation.Extensions;
 
 public interface IUtcDateService {
   DateTime GetUtcDateTime();

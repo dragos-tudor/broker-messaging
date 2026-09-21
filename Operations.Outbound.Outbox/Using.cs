@@ -9,6 +9,7 @@ global using static Persistence.OutboxMessage.OutboxMessageFuncs;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Pipelines.Outbound")]
+[assembly: InternalsVisibleTo("Routing.Outbound")]
 
 namespace Operations.Outbound.Outbox;
 
