@@ -3,10 +3,8 @@ using DeadLetter = Operations.Inbound.DeadLetter;
 
 namespace Pipelines.Inbound;
 
-internal enum DeadLetteringEntry { Start }
-
 internal readonly union DeadLetteringSignal(
-  DeadLetteringEntry,
+  DeadLetteringEntries,
   ConvertingStates,
   DeadLetter.InsertingStates,
   AbandoningStates,

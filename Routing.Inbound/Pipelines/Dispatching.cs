@@ -32,7 +32,7 @@ partial class InboundFuncs
         DispatchingDecision>(
           services,
           data,
-          DispatchingEntry.Start,
+          DispatchingEntries.Start,
           AdvanceDispatchingPipeline,
           ExecuteDispatchingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           PropagateDispatchingException<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,

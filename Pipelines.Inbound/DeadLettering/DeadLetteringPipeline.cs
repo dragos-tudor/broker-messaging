@@ -10,7 +10,7 @@ partial class InboundFuncs
     DeadLetteringSignal signal,
     InboundPipelineConfig _) => signal switch
   {
-    DeadLetteringEntry.Start => DeadLetteringActions.Converting,
+    DeadLetteringEntries.Start => DeadLetteringActions.Converting,
 
     ConvertingStates.Success => DeadLetteringActions.Inserting,
     ConvertingStates.Error => DeadLetteringActions.Abandoning,

@@ -3,10 +3,8 @@ using Envelope = Operations.Outbound.Envelope;
 
 namespace Pipelines.Outbound;
 
-internal enum PublishingEntry { Start }
-
 internal readonly union PublishingSignal(
-  PublishingEntry,
+  PublishingEntries,
   Outbox.MappingStates,
   Envelope.PublishingStates,
   Envelope.ProducingStates,

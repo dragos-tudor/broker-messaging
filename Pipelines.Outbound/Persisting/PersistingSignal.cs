@@ -2,10 +2,8 @@ using Outbox = Operations.Outbound.Outbox;
 
 namespace Pipelines.Outbound;
 
-internal enum PersistingEntry { Start }
-
 internal readonly union PersistingSignal(
-  PersistingEntry,
+  PersistingEntries,
   Outbox.ValidatingStates,
   Outbox.TransactingStates
 );

@@ -32,7 +32,7 @@ partial class InboundFuncs
         DeadLetteringDecision>(
           services,
           data,
-          DeadLetteringEntry.Start,
+          DeadLetteringEntries.Start,
           AdvanceDeadLetteringPipeline,
           ExecuteDeadLetteringOperationAsync<TServices, TData, TKey, TPayload>,
           PropagateDeadLetteringException<TData, TKey, TPayload>,

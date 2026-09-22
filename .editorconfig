@@ -2,6 +2,7 @@
 dotnet_diagnostic.CA1707.severity = none # Naming: Identifiers should not contain underscores
 dotnet_diagnostic.CA2012.severity = none # CA2012: Use ValueTasks correctly
 dotnet_diagnostic.IDE1006.severity = none # Style: Naming rule violation
+dotnet_diagnostic.CS4014.severity = none # CS4014: Because this call is not awaited, execution of the current method continues before the call is completed
 
 [*.cs]
 dotnet_diagnostic.CA1040.severity = none # CA1040: Avoid empty interfaces
@@ -13,6 +14,8 @@ dotnet_diagnostic.CS8524.severity = none # CS8524: The switch expression does no
 # dotnet_diagnostic.CS1591.severity = none # Compiler Warning:message severity for generated code files
 dotnet_diagnostic.IDE0055.severity = none # IDE0055: Fix formatting
 dotnet_diagnostic.CA1815.severity = none # CA1815: Override equals and operator equals on value types
+dotnet_diagnostic.IDE0023.severity = none # IDE0023: Use block body for conversion operator
+dotnet_diagnostic.IDE0072.severity = none # IDE0072: Add missing cases
 
 dotnet_diagnostic.IDE0160.severity = none # Style: Convert to block scoped namespace
 dotnet_diagnostic.IDE0040.severity = none # Style: Add accessibility modifiers
@@ -35,3 +38,5 @@ dotnet_diagnostic.RS0027.severity = warning # PublicApiAnalyzers
 dotnet_diagnostic.RS0036.severity = warning # PublicApiAnalyzers
 dotnet_diagnostic.RS0037.severity = warning # PublicApiAnalyzers
 dotnet_diagnostic.RS0041.severity = warning # PublicApiAnalyzers
+
+

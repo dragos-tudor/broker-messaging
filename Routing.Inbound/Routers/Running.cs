@@ -15,24 +15,29 @@ partial class InboundFuncs
       CancellationToken ct = default)
     where TServices : IInboundRoutingServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
     where TData : IInboundRoutingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
+    where TSignal: struct
+    where TDecision: struct, IInboundDecision
     where TSession : IDisposable
   {
     var pipelineConfig = services.GetInboundPipelineConfig();
     while (!ct.IsCancellationRequested)
     {
       var decision = advancePipeline(signal, pipelineConfig);
-      services.InstrumentPipeline(signal, decision);
+      services.InstrumentPipeline(services, signal, decision);
 
-      if (decision is InboundPipelineTypes pipelineType)
+      var pipelineType = decision.GetPipelineType();
+      if (pipelineType != InboundPipelineTypes.None)
         return (data, pipelineType);
-      if (decision is TerminalActions terminalAction)
+
+      var terminalAction = decision.GetTerminalAction();
+      if (terminalAction != TerminalActions.None)
         return (data, terminalAction);
 
       var (nextData, nextSignal, exception) = await
         RunFastRetryAsync(services, data, decision, executeOperation, canFastRetry, DelayFastRetryAsync, ct);
       propagateException(nextData, nextSignal, exception);
 
-      services.InstrumentOperation(nextData, nextSignal, exception);
+      services.InstrumentOperation(services, nextData, nextSignal, exception);
 
       data = nextData;
       signal = nextSignal;

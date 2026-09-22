@@ -13,7 +13,7 @@ partial class InboundTests
     DeadLetteringDecision end,
     InboundPipelineConfig config)
   {
-    DeadLetteringSignal[] possibleSignals = [DeadLetteringEntry.Start];
+    DeadLetteringSignal[] possibleSignals = [DeadLetteringEntries.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");

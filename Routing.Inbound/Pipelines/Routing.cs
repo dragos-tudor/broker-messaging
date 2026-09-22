@@ -46,7 +46,6 @@ partial class InboundFuncs
           RunDispatchingPipelineAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>(
             services, data, ct),
 
-        _ => throw new InvalidOperationException(
-          $"Invalid inbound pipeline type {pipelineType}")
+        InboundPipelineTypes.None => Task.FromResult((data, (InboundRoutingDecision)TerminalActions.Unknown))
       };
 }

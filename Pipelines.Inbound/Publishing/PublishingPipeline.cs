@@ -10,7 +10,7 @@ partial class InboundFuncs
     PublishingSignal signal,
     InboundPipelineConfig config) => signal switch
   {
-    PublishingEntry.Start => PublishingActions.Mapping,
+    PublishingEntries.Start => PublishingActions.Mapping,
 
     MappingStates.Success => config.UseBrokerPublisher ?
       PublishingActions.Publishing:

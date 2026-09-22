@@ -10,7 +10,7 @@ partial class InboundTests
   public void happy_path__exit()
   {
     CapturingSignal[] path = [
-      CapturingEntry.Start, CapturingStates.Success,
+      CapturingEntries.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Success, InsertingStates.Success,
       ConfirmingStates.Success
@@ -22,7 +22,7 @@ partial class InboundTests
   public void happy_path_and_handle_after_capture__handling()
   {
     CapturingSignal[] path = [
-      CapturingEntry.Start, CapturingStates.Success,
+      CapturingEntries.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Success, InsertingStates.Success,
       ConfirmingStates.Success
@@ -35,7 +35,7 @@ partial class InboundTests
   public void not_captured__exit()
   {
     CapturingSignal[] path = [
-      CapturingEntry.Start, CapturingStates.NotCaptured
+      CapturingEntries.Start, CapturingStates.NotCaptured
     ];
     RunCapturingPipeline(path, TerminalActions.Exit);
   }
@@ -44,7 +44,7 @@ partial class InboundTests
   public void capturing_error__exit()
   {
     CapturingSignal[] path = [
-      CapturingEntry.Start, CapturingStates.Error
+      CapturingEntries.Start, CapturingStates.Error
     ];
     RunCapturingPipeline(path, TerminalActions.Exit);
   }
@@ -53,7 +53,7 @@ partial class InboundTests
   public void verifying_invalid__unrecoverable()
   {
     CapturingSignal[] path = [
-      CapturingEntry.Start, CapturingStates.Success,
+      CapturingEntries.Start, CapturingStates.Success,
       VerifyingStates.InvalidError
     ];
     RunCapturingPipeline(path, TerminalActions.Unrecoverable);
@@ -63,7 +63,7 @@ partial class InboundTests
   public void verifying_invalid_confirmable__redirecting()
   {
     CapturingSignal[] path = [
-      CapturingEntry.Start, CapturingStates.Success,
+      CapturingEntries.Start, CapturingStates.Success,
       VerifyingStates.InvalidConfirmableError
     ];
     RunCapturingPipeline(path, InboundPipelineTypes.Redirecting);
@@ -73,7 +73,7 @@ partial class InboundTests
   public void verifying_error__unrecoverable()
   {
     CapturingSignal[] path = [
-      CapturingEntry.Start, CapturingStates.Success,
+      CapturingEntries.Start, CapturingStates.Success,
       VerifyingStates.Error
     ];
     RunCapturingPipeline(path, TerminalActions.Unrecoverable);
@@ -83,7 +83,7 @@ partial class InboundTests
   public void mapping_error__redirecting()
   {
     CapturingSignal[] path = [
-      CapturingEntry.Start, CapturingStates.Success,
+      CapturingEntries.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Error
     ];
     RunCapturingPipeline(path, InboundPipelineTypes.Redirecting);
@@ -93,7 +93,7 @@ partial class InboundTests
   public void validating_invalid__redirecting()
   {
     CapturingSignal[] path = [
-      CapturingEntry.Start, CapturingStates.Success,
+      CapturingEntries.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.InvalidError
     ];
@@ -104,7 +104,7 @@ partial class InboundTests
   public void validating_error__redirecting()
   {
     CapturingSignal[] path = [
-      CapturingEntry.Start, CapturingStates.Success,
+      CapturingEntries.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Error
     ];
@@ -115,7 +115,7 @@ partial class InboundTests
   public void inserting_idempotent__confirm_final__exit()
   {
     CapturingSignal[] path = [
-      CapturingEntry.Start, CapturingStates.Success,
+      CapturingEntries.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Success, InsertingStates.Idempotent,
       ConfirmingFinalStates.Success
@@ -127,7 +127,7 @@ partial class InboundTests
   public void inserting_error__exit()
   {
     CapturingSignal[] path = [
-      CapturingEntry.Start, CapturingStates.Success,
+      CapturingEntries.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Success, InsertingStates.Error
     ];
@@ -138,7 +138,7 @@ partial class InboundTests
   public void confirming_error__exit()
   {
     CapturingSignal[] path = [
-      CapturingEntry.Start, CapturingStates.Success,
+      CapturingEntries.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Success, InsertingStates.Success,
       ConfirmingStates.Error
@@ -150,7 +150,7 @@ partial class InboundTests
   public void confirming_final_error__exit()
   {
     CapturingSignal[] path = [
-      CapturingEntry.Start, CapturingStates.Success,
+      CapturingEntries.Start, CapturingStates.Success,
       VerifyingStates.Success, MappingStates.Success,
       ValidatingStates.Success, InsertingStates.Idempotent,
       ConfirmingFinalStates.Error

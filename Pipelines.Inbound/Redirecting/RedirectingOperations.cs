@@ -18,6 +18,6 @@ partial class InboundFuncs
         RedirectingActions.Converting => ConvertEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data).FromResult<TData, ConvertingStates, RedirectingSignal>(static state => state),
         RedirectingActions.Redirecting => RedirectDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(services, data, ct).FromResult<TData, RedirectingStates, RedirectingSignal>(static state => state),
         RedirectingActions.ConfirmingFinal => ConfirmFinalEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(services, data, ct).FromResult<TData, ConfirmingFinalStates, RedirectingSignal>(static state => state),
-        _ => throw new InvalidOperationException($"Invalid execute operation decision {decision}")
+        _ => ToResult<TData, RedirectingSignal>(data, RedirectingEntries.End)
       };
 }

@@ -10,7 +10,7 @@ partial class InboundTests
 
   static void RunPublishingPipeline(PublishingSignal[] path, PublishingDecision end, InboundPipelineConfig config)
   {
-    PublishingSignal[] possibleSignals = [PublishingEntry.Start];
+    PublishingSignal[] possibleSignals = [PublishingEntries.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal);

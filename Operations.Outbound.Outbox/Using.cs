@@ -4,6 +4,7 @@ global using System.Threading;
 global using System.Threading.Tasks;
 global using Persistence.OutboxMessage;
 global using Transport.Envelope;
+global using Foundation.Extensions;
 global using static Foundation.Extensions.ExtensionsFuncs;
 global using static Persistence.OutboxMessage.OutboxMessageFuncs;
 using System.Runtime.CompilerServices;

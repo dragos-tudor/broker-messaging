@@ -11,7 +11,7 @@ public interface IDeadLetterEnvelopeMapperService<TKey, TValue, TMetadata, TConf
 
 public interface IEnvelopeMapperService<TKey, TValue, TMetadata, TConfirmation, TPayload>
 {
-  InboxMessage<TKey, TPayload> FromEnvelope(
+  IInboxMessage<TKey, TPayload> FromEnvelope(
     IEnvelope<TKey, TValue, TMetadata, TConfirmation> envelope,
     DateTime utcDateTime,
     InboxMessageStatus status = InboxMessageStatus.Processing);

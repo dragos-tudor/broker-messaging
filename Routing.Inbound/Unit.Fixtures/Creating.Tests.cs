@@ -5,13 +5,6 @@ namespace Routing.Inbound;
 
 partial class InboundTests
 {
-  public enum TestSignal
-  {
-    Initial,
-    Retry,
-    Completed
-  }
-
   static Data CreateData() => Substitute.For<Data>();
 
   static Services CreateServices(FastRetryOptions? options = null)
@@ -22,21 +15,21 @@ partial class InboundTests
     return services;
   }
 
-  static Func<TestSignal, InboundPipelineConfig, object> CreatePipeline(params object[] decisions)
+  static Func<TestSignal, InboundPipelineConfig, TestDecision> CreateAdvancePipeline(params TestDecision[] decisions)
   {
-    var advancePipeline = Substitute.For<Func<TestSignal, InboundPipelineConfig, object>>();
+    var advancePipeline = Substitute.For<Func<TestSignal, InboundPipelineConfig, TestDecision>>();
     var decisionIndex = 0;
     advancePipeline(Arg.Any<TestSignal>(), Arg.Any<InboundPipelineConfig>())
       .Returns(_ => decisions[decisionIndex++]);
     return advancePipeline;
   }
 
-  static Func<object, Services, Data, CancellationToken, Task<(Data, TestSignal, Exception?)>>
+  static Func<TestDecision, Services, Data, CancellationToken, Task<(Data, TestSignal, Exception?)>>
     CreateExecuteOperation(params (Data, TestSignal, Exception?)[] results)
   {
-    var executeOperation = Substitute.For<Func<object, Services, Data, CancellationToken, Task<(Data, TestSignal, Exception?)>>>();
+    var executeOperation = Substitute.For<Func<TestDecision, Services, Data, CancellationToken, Task<(Data, TestSignal, Exception?)>>>();
     var resultIndex = 0;
-    executeOperation(Arg.Any<object>(), Arg.Any<Services>(), Arg.Any<Data>(), Arg.Any<CancellationToken>())
+    executeOperation(Arg.Any<TestDecision>(), Arg.Any<Services>(), Arg.Any<Data>(), Arg.Any<CancellationToken>())
       .Returns(_ => Task.FromResult(results[resultIndex++]));
     return executeOperation;
   }
@@ -51,8 +44,8 @@ partial class InboundTests
   static Func<TestSignal, bool> CreateCanFastRetry()
   {
     var canFastRetry = Substitute.For<Func<TestSignal, bool>>();
-    canFastRetry(TestSignal.Retry).Returns(true);
-    canFastRetry(Arg.Is<TestSignal>(signal => signal != TestSignal.Retry)).Returns(false);
+    canFastRetry(Arg.Any<TestSignal>()).Returns(false);
+    canFastRetry(TestStates.Retry).Returns(true);
     return canFastRetry;
   }
 }

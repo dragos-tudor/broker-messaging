@@ -9,7 +9,7 @@ partial class OutboundTests
 
   static void RunPersistingPipeline(PersistingSignal[] path, PersistingDecision end, OutboundPipelineConfig config)
   {
-    PersistingSignal[] possibleSignals = [PersistingEntry.Start];
+    PersistingSignal[] possibleSignals = [PersistingEntries.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal);

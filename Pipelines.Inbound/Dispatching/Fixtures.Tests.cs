@@ -10,7 +10,7 @@ partial class InboundTests
 
   static void RunDispatchingPipeline(DispatchingSignal[] path, DispatchingDecision end, InboundPipelineConfig config)
   {
-    DispatchingSignal[] possibleSignals = [DispatchingEntry.Start];
+    DispatchingSignal[] possibleSignals = [DispatchingEntries.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal);

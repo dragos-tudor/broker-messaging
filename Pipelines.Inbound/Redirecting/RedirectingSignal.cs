@@ -3,10 +3,8 @@ using DeadLetterEnvelope = Operations.Inbound.DeadLetterEnvelope;
 
 namespace Pipelines.Inbound;
 
-internal enum RedirectingEntry { Start }
-
 internal readonly union RedirectingSignal(
-  RedirectingEntry,
+  RedirectingEntries,
   Envelope.ConvertingStates,
   DeadLetterEnvelope.RedirectingStates,
   Envelope.ConfirmingFinalStates

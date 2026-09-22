@@ -9,6 +9,8 @@
     <PackageReference Include="MsTest" PrivateAssets="all"/>
     <PackageReference Include="NSubstitute" PrivateAssets="all"/>
     <PackageReference Include="Shouldly" PrivateAssets="all"/>
+    <PackageReference Include="AutoFixture" PrivateAssets="all"/>
+    <PackageReference Include="AutoFixture.AutoNSubstitute" PrivateAssets="all"/>
   </ItemGroup>
 
   <Target Name="RemovePackOnlyItems" BeforeTargets="BeforeBuild" Condition="'$(PackOnly)' == 'true'">

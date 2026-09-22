@@ -4,25 +4,12 @@ namespace Routing.Inbound;
 partial class InboundFuncs
 {
   internal static async Task<TerminalActions>
-    RouteInboundPipelinesAsync<
-      TServices,
-      TData,
-      TKey,
-      TValue,
-      TMetadata,
-      TConfirmation,
-      TPayload,
-      TSession>(
-        TServices services,
-        TData data,
-        InboundPipelineTypes pipelineType,
-        Func<
-          TServices,
-          TData,
-          InboundPipelineTypes,
-          CancellationToken,
-          Task<(TData, InboundRoutingDecision)>> routePipeline,
-        CancellationToken ct = default)
+    RouteInboundPipelinesAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>(
+      TServices services,
+      TData data,
+      InboundPipelineTypes currentPipelineType,
+      Func<TServices, TData, InboundPipelineTypes, CancellationToken, Task<(TData, InboundRoutingDecision)>> routePipeline,
+      CancellationToken ct = default)
     where TServices : IInboundRoutingServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
     where TData : IInboundRoutingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
     where TSession : IDisposable
@@ -30,13 +17,15 @@ partial class InboundFuncs
     while (!ct.IsCancellationRequested)
     {
       var (nextData, decision) =
-        await routePipeline(services, data, pipelineType, ct);
+        await routePipeline(services, data, currentPipelineType, ct);
 
-      if (decision is TerminalActions terminalAction)
+      var terminalAction = decision.GetTerminalAction();
+      if (terminalAction != TerminalActions.None)
         return terminalAction;
 
-      if (decision is InboundPipelineTypes nextPipelineType)
-        pipelineType = nextPipelineType;
+      var pipelineType = decision.GetPipelineType();
+      if (pipelineType != InboundPipelineTypes.None)
+        currentPipelineType = pipelineType;
 
       data = nextData;
     }

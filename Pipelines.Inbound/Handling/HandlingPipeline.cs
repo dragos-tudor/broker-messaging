@@ -9,7 +9,7 @@ partial class InboundFuncs
     HandlingSignal signal,
     InboundPipelineConfig _) => signal switch
   {
-    HandlingEntry.Start => HandlingActions.Handling,
+    HandlingEntries.Start => HandlingActions.Handling,
 
     HandlingStates.Success => HandlingActions.Transacting,
     HandlingStates.DomainError => HandlingActions.Abandoning,

@@ -12,7 +12,7 @@ partial class InboundTests
 
   static void RunCapturingPipeline(CapturingSignal[] path, CapturingDecision end, InboundPipelineConfig config)
   {
-    CapturingSignal[] possibleSignals = [CapturingEntry.Start];
+    CapturingSignal[] possibleSignals = [CapturingEntries.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");

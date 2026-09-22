@@ -9,7 +9,7 @@ partial class InboundFuncs
     CapturingSignal signal,
     InboundPipelineConfig config) => signal switch
     {
-      CapturingEntry.Start => CapturingActions.Capturing,
+      CapturingEntries.Start => CapturingActions.Capturing,
 
       CapturingStates.Success => CapturingActions.Verifying,
       CapturingStates.NotCaptured => TerminalActions.Exit,

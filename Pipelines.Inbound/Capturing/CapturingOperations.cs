@@ -24,6 +24,6 @@ partial class InboundFuncs
         CapturingActions.Inserting => InsertInboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, InsertingStates, CapturingSignal>(static states => states),
         CapturingActions.Confirming => ConfirmEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(services, data, ct).FromResult<TData, ConfirmingStates, CapturingSignal>(static states => states),
         CapturingActions.ConfirmingFinal => ConfirmFinalEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(services, data, ct).FromResult<TData, ConfirmingFinalStates, CapturingSignal>(static states => states),
-        _ => throw new InvalidOperationException($"Invalid execute operation decision {decision}")
+        _ => ToResult<TData, CapturingSignal>(data, CapturingEntries.End)
       };
 }

@@ -32,7 +32,7 @@ partial class InboundFuncs
         RedirectingDecision>(
           services,
           data,
-          RedirectingEntry.Start,
+          RedirectingEntries.Start,
           AdvanceRedirectingPipeline,
           ExecuteRedirectingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           static (data, signal, exception) => default,

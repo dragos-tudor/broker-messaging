@@ -32,7 +32,7 @@ partial class InboundFuncs
         PublishingDecision>(
           services,
           data,
-          PublishingEntry.Start,
+          PublishingEntries.Start,
           AdvancePublishingPipeline,
           ExecutePublishingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           PropagatePublishingException<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,

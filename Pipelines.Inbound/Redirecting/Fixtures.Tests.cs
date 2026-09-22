@@ -10,7 +10,7 @@ partial class InboundTests
 
   static void RunRedirectingPipeline(RedirectingSignal[] path, RedirectingDecision end, InboundPipelineConfig config)
   {
-    RedirectingSignal[] possibleSignals = [RedirectingEntry.Start];
+    RedirectingSignal[] possibleSignals = [RedirectingEntries.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal);

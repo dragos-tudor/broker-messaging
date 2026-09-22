@@ -9,7 +9,7 @@ partial class InboundFuncs
     RedirectingSignal signal,
     InboundPipelineConfig _) => signal switch
   {
-    RedirectingEntry.Start => RedirectingActions.Converting,
+    RedirectingEntries.Start => RedirectingActions.Converting,
 
     ConvertingStates.Success => RedirectingActions.Redirecting,
     ConvertingStates.Invalid => RedirectingActions.ConfirmingFinal,

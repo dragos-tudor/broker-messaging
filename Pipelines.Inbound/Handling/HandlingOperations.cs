@@ -19,6 +19,6 @@ partial class InboundFuncs
         HandlingActions.Transacting => TransactInboxMessageAsync<TServices, TData, TKey, TPayload, TSession>(services, data, ct).FromResult<TData, TransactingStates, HandlingSignal>(static state => state),
         HandlingActions.Scheduling => ScheduleInboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, SchedulingStates, HandlingSignal>(static state => state),
         HandlingActions.Abandoning => AbandonInboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, AbandoningStates, HandlingSignal>(static state => state),
-        _ => throw new InvalidOperationException($"Invalid execute operation decision {decision}")
+        _ => ToResult<TData, HandlingSignal>(data, HandlingEntries.End)
       };
 }

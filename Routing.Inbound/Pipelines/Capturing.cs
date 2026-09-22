@@ -32,7 +32,7 @@ partial class InboundFuncs
         CapturingDecision>(
           services,
           data,
-          CapturingEntry.Start,
+          CapturingEntries.Start,
           AdvanceCapturingPipeline,
           ExecuteCapturingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
           PropagateCapturingException<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,

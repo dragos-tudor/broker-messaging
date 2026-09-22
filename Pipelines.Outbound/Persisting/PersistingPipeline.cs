@@ -9,14 +9,14 @@ partial class OutboundFuncs
     PersistingSignal signal,
     OutboundPipelineConfig config) => signal switch
   {
-    PersistingEntry.Start => PersistingActions.Validating,
+    PersistingEntries.Start => PersistingActions.Validating,
 
     ValidatingStates.Success => PersistingActions.Transacting,
     ValidatingStates.InvalidError => TerminalActions.Exit,
     ValidatingStates.Error => TerminalActions.Exit,
 
     TransactingStates.Success => config.PublishAfterPersist?
-      OutboundPipelinesTypes.Publishing:
+      OutboundPipelineTypes.Publishing:
       TerminalActions.Exit,
     TransactingStates.Error => TerminalActions.Exit,
 

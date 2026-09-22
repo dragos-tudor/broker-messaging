@@ -17,4 +17,7 @@ partial class OutboundFuncs
     var (data, state, exception) = result;
     return Task.FromResult((data, cast(state), exception));
   }
+
+  static Task<(TData, TSignal, Exception?)> ToResult<TData, TSignal>(TData data, TSignal signal) =>
+    Task.FromResult((data, signal, default(Exception?)));
 }

@@ -32,7 +32,7 @@ partial class InboundFuncs
         HandlingDecision>(
           services,
           data,
-          HandlingEntry.Start,
+          HandlingEntries.Start,
           AdvanceHandlingPipeline,
           ExecuteHandlingOperationAsync<TServices, TData, TKey, TPayload, TSession>,
           PropagateHandlingException<TData, TKey, TPayload>,

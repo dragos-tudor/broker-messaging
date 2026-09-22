@@ -3,6 +3,9 @@ namespace Routing.Inbound;
 
 public interface IRoutingInboundInstrumentionServices
 {
-  void InstrumentPipeline<TSignal, TDecision>(TSignal signal, TDecision decision);
-  void InstrumentOperation<TData, TState>(TData data, TState state, Exception? exception);
+  void InstrumentPipeline<TServices, TSignal, TDecision>(TServices services, TSignal signal, TDecision decision)
+    where TSignal: struct
+    where TDecision: struct;
+  void InstrumentOperation<TServices, TData, TSignal>(TServices services, TData data, TSignal signal, Exception? exception)
+    where TSignal: struct;
 }

@@ -19,6 +19,6 @@ partial class InboundFuncs
         DeadLetteringActions.Inserting => InsertDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, DeadLetter.InsertingStates, DeadLetteringSignal>(static state => state),
         DeadLetteringActions.Abandoning => AbandonInboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, AbandoningStates, DeadLetteringSignal>(static state => state),
         DeadLetteringActions.Closing => CloseInboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, ClosingStates, DeadLetteringSignal>(static state => state),
-        _ => throw new InvalidOperationException($"Invalid execute operation decision {decision}")
+        _ => ToResult<TData, DeadLetteringSignal>(data, DeadLetteringEntries.End)
       };
 }

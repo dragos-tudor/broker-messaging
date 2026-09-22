@@ -1,8 +1,9 @@
 
 namespace Pipelines.Outbound;
 
-public enum OutboundPipelinesTypes
+public enum OutboundPipelineTypes
 {
+  None = 0,
   Persisting,
   Publishing,
   Dispatching

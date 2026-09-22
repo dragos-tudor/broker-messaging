@@ -19,6 +19,6 @@ partial class InboundFuncs
         DispatchingActions.Scheduling => ScheduleDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, SchedulingStates, DispatchingSignal>(static state => state),
         DispatchingActions.Abandoning => AbandonDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, AbandoningStates, DispatchingSignal>(static state => state),
         DispatchingActions.Closing => CloseDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, ClosingStates, DispatchingSignal>(static state => state),
-        _ => throw new InvalidOperationException($"Invalid execute operation decision {decision}")
+        _ => ToResult<TData, DispatchingSignal>(data, DispatchingEntries.End)
       };
   }

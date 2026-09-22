@@ -9,7 +9,7 @@ partial class InboundTests
 
   static void RunHandlingPipeline(HandlingSignal[] path, HandlingDecision end, InboundPipelineConfig config)
   {
-    HandlingSignal[] possibleSignals = [HandlingEntry.Start];
+    HandlingSignal[] possibleSignals = [HandlingEntries.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");

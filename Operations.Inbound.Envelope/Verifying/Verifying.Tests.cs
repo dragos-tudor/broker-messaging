@@ -25,7 +25,7 @@ public partial class EnvelopeTests
   }
 
   [TestMethod]
-  public void verify_envelope__invalid_confirmable_envelope__returns_confirmable_error()
+  public void verify_envelope__confirmable_invalid_envelope__returns_invalid_error()
   {
     var services = Substitute.For<IVerifyingServices<string, byte[], object, string>>();
     var envelope = Substitute.For<IEnvelope<string, byte[], object, string>>();
@@ -38,12 +38,12 @@ public partial class EnvelopeTests
       string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(VerifyingStates.InvalidConfirmableError);
+    state.ShouldBe(VerifyingStates.InvalidError);
     exception.ShouldNotBeNull();
   }
 
   [TestMethod]
-  public void verify_envelope__invalid_non_confirmable_envelope__returns_invalid_error()
+  public void verify_envelope__non_confirmable_invalid_envelope__returns_confirmable_error()
   {
     var services = Substitute.For<IVerifyingServices<string, byte[], object, string>>();
     var envelope = Substitute.For<IEnvelope<string, byte[], object, string>>();
@@ -56,7 +56,7 @@ public partial class EnvelopeTests
       string, byte[], object, string>(services, inputData);
 
     data.ShouldBeSameAs(inputData);
-    state.ShouldBe(VerifyingStates.InvalidError);
+    state.ShouldBe(VerifyingStates.InvalidConfirmableError);
     exception.ShouldNotBeNull();
   }
 

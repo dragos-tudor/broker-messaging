@@ -10,7 +10,7 @@ partial class OutboundFuncs
     DispatchingSignal signal,
     OutboundPipelineConfig _) => signal switch
   {
-    DispatchingEntry.Start => DispatchingActions.Dispatching,
+    DispatchingEntries.Start => DispatchingActions.Dispatching,
 
     DispatchingStates.Ack => DispatchingActions.Closing,
     DispatchingStates.NotAck => DispatchingActions.Scheduling,

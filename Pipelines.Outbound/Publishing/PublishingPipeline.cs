@@ -10,7 +10,7 @@ partial class OutboundFuncs
     PublishingSignal signal,
     OutboundPipelineConfig config) => signal switch
   {
-    PublishingEntry.Start => PublishingActions.Mapping,
+    PublishingEntries.Start => PublishingActions.Mapping,
 
     MappingStates.Success => config.UseBrokerPublisher?
       PublishingActions.Publishing:
