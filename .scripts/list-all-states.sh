@@ -1,7 +1,11 @@
 
-./list-states.sh $WORKSPACE_ROOT/Operations.Inbound.DeadLetter
-./list-states.sh $WORKSPACE_ROOT/Operations.Inbound.DeadLetterEnvelope
-./list-states.sh $WORKSPACE_ROOT/Operations.Inbound.Envelope
-./list-states.sh $WORKSPACE_ROOT/Operations.Inbound.Inbox
-./list-states.sh $WORKSPACE_ROOT/Operations.Outbound.Envelope
-./list-states.sh $WORKSPACE_ROOT/Operations.Outbound.Outbox
+for project in \
+  Operations.Inbound.DeadLetter \
+  Operations.Inbound.DeadLetterEnvelope \
+  Operations.Inbound.Envelope \
+  Operations.Inbound.Inbox \
+  Operations.Outbound.Envelope \
+  Operations.Outbound.Outbox
+do
+  $WORKSPACE_ROOT/.scripts/list-states.sh $WORKSPACE_ROOT/$project
+done

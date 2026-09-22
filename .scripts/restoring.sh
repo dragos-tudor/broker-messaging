@@ -1,3 +1,9 @@
 set -e
 
-cd $WORKSPACE_ROOT && dotnet restore broker-messaging-inboxoutbox.slnx
+cd $WORKSPACE_ROOT
+for SOLUTION in \
+  messaging.core.slnx \
+  messaging.kafka.slnx
+do
+  dotnet restore $SOLUTION
+done
