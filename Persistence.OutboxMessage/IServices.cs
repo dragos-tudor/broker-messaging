@@ -15,10 +15,9 @@ public interface IOutboxRetryOptionsService {
 
 public interface IOutboxMessageUpdateService<TKey, TPayload>
 {
-  Task UpdateOutboxMessageAsync<TMessage, TParams>(
-    TMessage message,
+  Task UpdateOutboxMessageAsync<TParams>(
+    IOutboxMessage<TKey, TPayload> message,
     TParams parameters,
     CancellationToken ct = default)
-  where TMessage : IOutboxMessage<TKey, TPayload>
   where TParams : struct;
 }

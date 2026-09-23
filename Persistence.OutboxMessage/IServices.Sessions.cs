@@ -26,6 +26,7 @@ public interface IOutboxSessionTransactService<TSession> where TSession: IDispos
     Func<TServices, TSession, TParams, CancellationToken, Task> func1,
     Func<TServices, TSession, TParams, CancellationToken, Task> func2,
     CancellationToken ct = default
-  ) where TServices : IOutboxSessionServices<TSession>
-    where TParams : struct;
+  )
+  where TServices : IOutboxSessionServices<TSession>
+  where TParams : struct;
 }

@@ -23,22 +23,20 @@ public interface IInboxRetryOptionsService {
 
 public interface IInboxMessageUpdateService<TKey, TPayload>
 {
-  Task UpdateInboxMessageAsync<TMessage, TParam>(
-    TMessage message,
+  Task UpdateInboxMessageAsync<TParam>(
+    IInboxMessage<TKey, TPayload> message,
     TParam parameters,
     CancellationToken ct = default)
-  where TMessage : IInboxMessage<TKey, TPayload>
   where TParam : struct;
 }
 
 public interface IInboxMessageUpdateSessionService<TKey, TPayload, TSession>
   where TSession: IDisposable
 {
-  Task UpdateInboxMessageAsync<TMessage, TParam>(
+  Task UpdateInboxMessageAsync<TParam>(
     TSession session,
-    TMessage message,
+    IInboxMessage<TKey, TPayload> message,
     TParam parameters,
     CancellationToken ct = default)
-    where TMessage : IInboxMessage<TKey, TPayload>
     where TParam : struct;
 }

@@ -14,10 +14,9 @@ public interface IDeadLetterRetryOptionsService {
 
 public interface IDeadLetterMessageUpdateService<TKey, TPayload>
 {
-  Task UpdateDeadLetterMessageAsync<TMessage, TParams>(
-    TMessage message,
+  Task UpdateDeadLetterMessageAsync<TParams>(
+    IDeadLetterMessage<TKey, TPayload> message,
     TParams parameters,
     CancellationToken ct = default)
-  where TMessage : IDeadLetterMessage<TKey, TPayload>
   where TParams : struct;
 }
