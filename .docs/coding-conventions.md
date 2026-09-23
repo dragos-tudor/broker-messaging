@@ -51,6 +51,7 @@
   - `MSTest` as testing framework.
   - `Shouldly` for assertions.
   - `NSubstitute` for mocking interfaces and delegates.
+  - `AutoFixture` for automatically value settings [using `NSubstitute` integration].
 - keep test files adjacent to the code they test (e.g., Verifying.Tests.cs next to Verifying.cs).
 - isolate fixtures into `Fixture.Tests.cs` files.
 - use `Using.Tests.cs` files per project for TESTS ONLY global usings [MsTest, NSubstitute, Shouldly].
