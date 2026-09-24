@@ -1,22 +1,25 @@
 
-namespace ObservabilityInstrumentation;
+namespace Observability.Instrumentation;
 
 partial class InstrumentationFuncs
 {
-  const string SystemActivityKey = "kafka.system";
-  const string ComponentActivityKey = "kafka.component";
+  const string SystemTagName = "messaging";
 
-  internal static Activity SetDefaultActivityTags(
+  internal static Activity SetSystemActivityTags(
     this Activity activity,
-    string component,
     string system) =>
-      activity
-        .AddTag(SystemActivityKey, system)
-        .AddTag(ComponentActivityKey, component);
+      activity.AddTag(
+        SystemTagName,
+        system
+      );
 
   internal static Activity? SetActivityParentId(
     Activity? activity,
-    ActivityContext activityContext) =>
-      activity?.SetParentId(activityContext.TraceId, activityContext.SpanId, activityContext.TraceFlags);
+    ActivityContext context) =>
+      activity?.SetParentId(
+        context.TraceId,
+        context.SpanId,
+        context.TraceFlags
+      );
 
 }

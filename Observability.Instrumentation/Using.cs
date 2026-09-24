@@ -9,6 +9,6 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("Router.Inbound")]
 [assembly: InternalsVisibleTo("Router.Outbound")]
 
-namespace ObservabilityInstrumentation;
+namespace Observability.Instrumentation;
 
 public static partial class InstrumentationFuncs;

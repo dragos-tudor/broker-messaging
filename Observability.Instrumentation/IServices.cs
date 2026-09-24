@@ -1,6 +1,16 @@
 
-namespace ObservabilityInstrumentation;
+namespace Observability.Instrumentation;
 
 public interface IInstrumentationServices:
-  IActivitySourceService,
+  ITracingService,
   ILoggerService;
+
+public interface ITracingService
+{
+  ActivitySource GetActivitySource();
+}
+
+public interface ILoggerService
+{
+  ILogger GetLogger();
+}

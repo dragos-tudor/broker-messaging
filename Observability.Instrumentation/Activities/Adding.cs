@@ -1,5 +1,5 @@
 
-namespace ObservabilityInstrumentation;
+namespace Observability.Instrumentation;
 
 partial class InstrumentationFuncs
 {
@@ -12,7 +12,7 @@ partial class InstrumentationFuncs
   internal static Activity? AddActivityEvent(
     Activity? activity,
     string name,
-    IEnumerable<KeyValuePair<string, object?>>? attributes = null,
-    DateTimeOffset? timeStamp = default) =>
-      activity?.AddEvent(CreateActivityEvent(name, timeStamp, attributes));
+    DateTimeOffset timeStamp,
+    ActivityTagsCollection? tags = null) =>
+      activity?.AddEvent(CreateActivityEvent(name, timeStamp, tags));
 }

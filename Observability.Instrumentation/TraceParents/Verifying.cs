@@ -1,7 +1,8 @@
 
-namespace ObservabilityInstrumentation;
+namespace Observability.Instrumentation;
 
 partial class InstrumentationFuncs
 {
-  static bool HasMinTraceParentParts(string[] parts, int minParts = 4) => parts.Length >= minParts;
+  public static bool IsTraceParentW3C(Activity activity) =>
+    activity.IdFormat == ActivityIdFormat.W3C;
 }

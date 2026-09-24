@@ -1,7 +1,7 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ObservabilityInstrumentation;
+namespace Observability.Instrumentation;
 
 [TestClass]
 public partial class InstrumentationTests
