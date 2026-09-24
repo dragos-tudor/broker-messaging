@@ -1,37 +1,44 @@
-
 namespace Operations.Outbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static async Task<(TData, PublishingStates, Exception?)> PublishEnvelopeSuccessAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IPublishingServices<TKey, TValue, TMetadata, TConfirmation>
-  where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation>
+  static async Task<(
+    PublishingData<TKey, TValue, TMetadata, TConfirmation>,
+    PublishingStates,
+    Exception?)>
+    PublishEnvelopeSuccessAsync<TKey, TValue, TMetadata, TConfirmation>(
+      PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      PublishingData<TKey, TValue, TMetadata, TConfirmation> data,
+      CancellationToken ct = default)
   {
     var envelope = RequireEnvelope(data.Envelope);
 
-    await services.PublishEnvelopeAsync(envelope, ct);
+    await capabilities.PublishEnvelopeAsync(envelope, ct);
+
     return (data, PublishingStates.Success, null);
   }
 
-  static (TData, PublishingStates, Exception?) PublishEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation>(
-    TData data,
-    Exception exception)
-  where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation> =>
+  static (
+    PublishingData<TKey, TValue, TMetadata, TConfirmation>,
+    PublishingStates,
+    Exception?)
+    PublishEnvelopeError<TKey, TValue, TMetadata, TConfirmation>(
+      PublishingData<TKey, TValue, TMetadata, TConfirmation> data,
+      Exception exception) =>
     (data, PublishingStates.Error, exception);
 
-  internal static Task<(TData, PublishingStates, Exception?)> PublishEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IPublishingServices<TKey, TValue, TMetadata, TConfirmation>
-  where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation> =>
+  internal static Task<(
+    PublishingData<TKey, TValue, TMetadata, TConfirmation>,
+    PublishingStates,
+    Exception?)>
+    PublishEnvelopeAsync<TKey, TValue, TMetadata, TConfirmation>(
+      PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      PublishingData<TKey, TValue, TMetadata, TConfirmation> data,
+      CancellationToken ct = default) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      PublishEnvelopeSuccessAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>,
-      PublishEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation>,
+      PublishEnvelopeSuccessAsync,
+      PublishEnvelopeError,
       ct);
 }

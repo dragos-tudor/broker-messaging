@@ -3,40 +3,36 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  internal static async Task<(TData, HandlingStates, Exception?)> HandleInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IHandlingServices<TKey, TPayload>
-  where TData : IHandlingData<TKey, TPayload>
-  {
-    var message = RequireInboxMessage(data.InboxMessage);
+  static async Task<(HandlingData<TKey, TPayload>, HandlingStates, Exception?)>
+    HandleInboxMessageSuccessAsync<TKey, TPayload>(
+      HandlingCapabilities<TKey, TPayload> capabilities,
+      HandlingData<TKey, TPayload>  data,
+      CancellationToken ct = default)
+    {
+      var message = RequireInboxMessage(data.InboxMessage);
 
-    var (model, error) = await services.HandleInboxMessageAsync(message, ct);
-    if (error is not null)
-      return (data, HandlingStates.DomainError, CreateDomainException(error));
+      var (model, error) = await capabilities.HandleInboxMessageAsync(message, ct);
+      return error is not null?
+        (data, HandlingStates.DomainError, CreateDomainException(error)) :
+        (data with { Model = model }, HandlingStates.Success, null);
+    }
 
-    SetDomainModel(data, model!);
-    return (data, HandlingStates.Success, null);
-  }
-
-  static (TData, HandlingStates, Exception?) HandleInboxMessageError<TData, TKey, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : IHandlingData<TKey, TPayload> =>
+  static (HandlingData<TKey, TPayload>, HandlingStates, Exception?)
+    HandleInboxMessageError<TKey, TPayload>(
+      HandlingData<TKey, TPayload> data,
+      Exception exception) =>
     (data, HandlingStates.Error, exception);
 
-  internal static Task<(TData, HandlingStates, Exception?)> HandleInboxMessageAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IHandlingServices<TKey, TPayload>
-  where TData : IHandlingData<TKey, TPayload> =>
+  internal static Task<(HandlingData<TKey, TPayload>, HandlingStates, Exception?)>
+    HandleInboxMessageAsync<TKey, TPayload>(
+      HandlingCapabilities<TKey, TPayload> capabilities,
+      HandlingData<TKey, TPayload> data,
+      CancellationToken ct = default) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      HandleInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>,
-      HandleInboxMessageError<TData, TKey, TPayload>,
+      HandleInboxMessageSuccessAsync,
+      HandleInboxMessageError,
       ct
     );
 }

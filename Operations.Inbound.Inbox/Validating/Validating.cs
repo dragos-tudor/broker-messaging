@@ -4,35 +4,33 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static (TData, ValidatingStates, Exception?) ValidateInboxMessageSuccess<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data)
-  where TServices : IValidatingServices
-  where TData : IValidatingData<TKey, TPayload>
-  {
-    var message = RequireInboxMessage(data.InboxMessage);
+  static (ValidatingData<TKey, TPayload>, ValidatingStates, Exception?)
+    ValidateInboxMessageSuccess<TKey, TPayload>(
+      ValidatingCapabilities capabilities,
+      ValidatingData<TKey, TPayload> data)
+    {
+      var message = RequireInboxMessage(data.InboxMessage);
 
-    var error = Funcs.ValidateInboxMessage(message);
-    return error is not null?
-      (data, ValidatingStates.InvalidError, Funcs.CreateValidationException(error)):
-      (data, ValidatingStates.Success, null);
-  }
+      var error = Funcs.ValidateInboxMessage(message);
+      return error is not null?
+        (data, ValidatingStates.InvalidError, Funcs.CreateValidationException(error)):
+        (data, ValidatingStates.Success, null);
+    }
 
-  static (TData, ValidatingStates, Exception?) ValidateInboxMessageError<TData, TKey, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : IValidatingData<TKey, TPayload> =>
+  static (ValidatingData<TKey, TPayload>, ValidatingStates, Exception?)
+    ValidateInboxMessageError<TKey, TPayload>(
+      ValidatingData<TKey, TPayload> data,
+      Exception exception) =>
     (data, ValidatingStates.Error, exception);
 
-  internal static (TData, ValidatingStates, Exception?) ValidateInboxMessage<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data)
-  where TServices : IValidatingServices
-  where TData : IValidatingData<TKey, TPayload> =>
+  internal static (ValidatingData<TKey, TPayload>, ValidatingStates, Exception?)
+    ValidateInboxMessage<TKey, TPayload>(
+      ValidatingCapabilities capabilities,
+      ValidatingData<TKey, TPayload> data) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      ValidateInboxMessageSuccess<TServices, TData, TKey, TPayload>,
-      ValidateInboxMessageError<TData, TKey, TPayload>
+      ValidateInboxMessageSuccess,
+      ValidateInboxMessageError
     );
 }

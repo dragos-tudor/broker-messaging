@@ -1,36 +1,32 @@
-
 namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  internal static (TData, DispatchingStates, Exception?) DispatchDeadLetterEnvelopeSuccess<TServices, TData>(
-    TServices services,
-    TData data)
-  where TServices : IDispatchingServices
-  where TData : IDispatchingData
-  {
-    var result = RequireProduceResult(data.ProduceResult);
+  static (DispatchingData, DispatchingStates, Exception?)
+    DispatchDeadLetterEnvelopeSuccess(
+      DispatchingCapabilities capabilities,
+      DispatchingData data)
+    {
+      var result = RequireProduceResult(data.ProduceResult);
 
-    return result.IsAcknowledged?
-      (data, DispatchingStates.Ack, null):
-      (data, DispatchingStates.NotAck, null);
-  }
+      return result.IsAcknowledged
+        ? (data, DispatchingStates.Ack, null)
+        : (data, DispatchingStates.NotAck, null);
+    }
 
-  static (TData, DispatchingStates, Exception?) DispatchDeadLetterEnvelopeError<TData>(
-    TData data,
-    Exception exception)
-  where TData : IDispatchingData =>
+  static (DispatchingData, DispatchingStates, Exception?)
+    DispatchDeadLetterEnvelopeError(
+      DispatchingData data,
+      Exception exception) =>
     (data, DispatchingStates.Error, exception);
 
-  internal static (TData, DispatchingStates, Exception?) DispatchDeadLetterEnvelope<TServices, TData>(
-    TServices services,
-    TData data)
-  where TServices : IDispatchingServices
-  where TData : IDispatchingData =>
+  internal static (DispatchingData, DispatchingStates, Exception?)
+    DispatchDeadLetterEnvelope(
+      DispatchingCapabilities capabilities,
+      DispatchingData data) =>
     TryCatch(
-      services,
+      capabilities,
       data,
       DispatchDeadLetterEnvelopeSuccess,
-      DispatchDeadLetterEnvelopeError
-    );
+      DispatchDeadLetterEnvelopeError);
 }

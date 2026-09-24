@@ -3,40 +3,38 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async Task<(TData, AbandoningStates, Exception?)> AbandonInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IAbandoningServices<TKey, TPayload>
-  where TData : IAbandoningData<TKey, TPayload>
-  {
-    var message = RequireInboxMessage(data.InboxMessage);
-    var failureReason = message.FailureReason;
-    var lastError = message.LastError;
-    var @params = new AbandoningUpdate(InboxMessageStatus.Abandoned, lastError, failureReason);
+  static async Task<(AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)>
+    AbandonInboxMessageSuccessAsync<TKey, TPayload>(
+      AbandoningCapabilities<TKey, TPayload> capabilities,
+      AbandoningData<TKey, TPayload> data,
+      CancellationToken ct = default)
+    {
+      var message = RequireInboxMessage(data.InboxMessage);
+      var failureReason = message.FailureReason;
+      var lastError = message.LastError;
+      var @params = new AbandoningUpdate(InboxMessageStatus.Abandoned, lastError, failureReason);
 
-    await services.UpdateInboxMessageAsync(message, @params, ct);
+      await capabilities.UpdateInboxMessageAsync(message, @params, ct);
 
-    return (data, AbandoningStates.Success, null);
-  }
+      return (data, AbandoningStates.Success, null);
+    }
 
-  static (TData, AbandoningStates, Exception?) AbandonInboxMessageError<TData, TKey, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : IAbandoningData<TKey, TPayload> =>
+  static (AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)
+    AbandonInboxMessageError<TKey, TPayload>(
+      AbandoningData<TKey, TPayload> data,
+      Exception exception) =>
     (data, AbandoningStates.Error, exception);
 
-  internal static Task<(TData, AbandoningStates, Exception?)> AbandonInboxMessageAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IAbandoningServices<TKey, TPayload>
-  where TData : IAbandoningData<TKey, TPayload> =>
+  internal static Task<(AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)>
+    AbandonInboxMessageAsync<TKey, TPayload>(
+      AbandoningCapabilities<TKey, TPayload> capabilities,
+      AbandoningData<TKey, TPayload> data,
+      CancellationToken ct = default) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      AbandonInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>,
-      AbandonInboxMessageError<TData, TKey, TPayload>,
+      AbandonInboxMessageSuccessAsync,
+      AbandonInboxMessageError,
       ct
     );
-}
+  }

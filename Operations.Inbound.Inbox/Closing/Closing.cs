@@ -3,38 +3,36 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  internal static async Task<(TData, ClosingStates, Exception?)> CloseInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IClosingServices<TKey, TPayload>
-  where TData : IClosingData<TKey, TPayload>
-  {
-    var message = RequireInboxMessage(data.InboxMessage);
-    var @params = new ClosingUpdate(InboxMessageStatus.Closed);
+  static async Task<(ClosingData<TKey, TPayload>, ClosingStates, Exception?)>
+    CloseInboxMessageSuccessAsync<TKey, TPayload>(
+      ClosingCapabilities<TKey, TPayload> capabilities,
+      ClosingData<TKey, TPayload> data,
+      CancellationToken ct = default)
+    {
+      var message = RequireInboxMessage(data.InboxMessage);
+      var @params = new ClosingUpdate(InboxMessageStatus.Closed);
 
-    await services.UpdateInboxMessageAsync(message, @params, ct);
+      await capabilities.UpdateInboxMessageAsync(message, @params, ct);
 
-    return (data, ClosingStates.Success, null);
-  }
+      return (data, ClosingStates.Success, null);
+    }
 
-  static (TData, ClosingStates, Exception?) CloseInboxMessageError<TData, TKey, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : IClosingData<TKey, TPayload> =>
+  static (ClosingData<TKey, TPayload>, ClosingStates, Exception?)
+    CloseInboxMessageError<TKey, TPayload>(
+      ClosingData<TKey, TPayload> data,
+      Exception exception) =>
     (data, ClosingStates.Error, exception);
 
-  internal static Task<(TData, ClosingStates, Exception?)> CloseInboxMessageAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IClosingServices<TKey, TPayload>
-  where TData : IClosingData<TKey, TPayload> =>
+  internal static Task<(ClosingData<TKey, TPayload>, ClosingStates, Exception?)>
+    CloseInboxMessageAsync<TKey, TPayload>(
+      ClosingCapabilities<TKey, TPayload> capabilities,
+      ClosingData<TKey, TPayload> data,
+      CancellationToken ct = default) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      CloseInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>,
-      CloseInboxMessageError<TData, TKey, TPayload>,
+      CloseInboxMessageSuccessAsync,
+      CloseInboxMessageError,
       ct
     );
 }

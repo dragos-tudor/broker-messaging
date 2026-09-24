@@ -1,43 +1,34 @@
-
 namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  static async Task<(TData, AbandoningStates, Exception?)> AbandonDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct)
-  where TServices : IAbandoningServices<TKey, TPayload>
-  where TData : IAbandoningData<TKey, TPayload>
+  static async Task<(AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)>
+    AbandonDeadLetterMessageSuccessAsync<TKey, TPayload>(
+      AbandoningCapabilities<TKey, TPayload> capabilities,
+      AbandoningData<TKey, TPayload> data,
+      CancellationToken ct)
   {
     var message = RequireDeadLetterMessage(data.DeadLetterMessage);
-    var lastError = message.LastError;
-    var status = DeadLetterMessageStatus.Abandoned;
-    var @params = new AbandoningUpdate(status, lastError, null);
-
-    await services.UpdateDeadLetterMessageAsync(message, @params, ct);
-
+    var parameters = new AbandoningUpdate(DeadLetterMessageStatus.Abandoned, message.LastError, null);
+    await capabilities.UpdateDeadLetterMessageAsync(message, parameters, ct);
     return (data, AbandoningStates.Success, null);
   }
 
-  static (TData, AbandoningStates, Exception?) AbandonDeadLetterMessageError<TData, TKey, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : IAbandoningData<TKey, TPayload> =>
+  static (AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)
+    AbandonDeadLetterMessageError<TKey, TPayload>(
+      AbandoningData<TKey, TPayload> data,
+      Exception exception) =>
     (data, AbandoningStates.Error, exception);
 
-  internal static Task<(TData, AbandoningStates, Exception?)> AbandonDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct)
-  where TServices : IAbandoningServices<TKey, TPayload>
-  where TData : IAbandoningData<TKey, TPayload> =>
+  internal static Task<(AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)>
+    AbandonDeadLetterMessageAsync<TKey, TPayload>(
+      AbandoningCapabilities<TKey, TPayload> capabilities,
+      AbandoningData<TKey, TPayload> data,
+      CancellationToken ct) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      AbandonDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>,
-      AbandonDeadLetterMessageError<TData, TKey, TPayload>,
-      ct
-    );
-
+      AbandonDeadLetterMessageSuccessAsync,
+      AbandonDeadLetterMessageError,
+      ct);
 }

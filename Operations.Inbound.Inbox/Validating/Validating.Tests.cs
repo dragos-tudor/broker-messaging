@@ -5,12 +5,13 @@ public partial class InboxTests
   [TestMethod]
   public void validate_inbox_message__message_is_valid__returns_success()
   {
-    var services = Substitute.For<IValidatingServices>();
-    var inputData = new InboxData { InboxMessage = InboxData.CreateMessage() };
+    var capabilities = Fixture.Create<ValidatingCapabilities>();
+    var message = Fixture.Create<IInboxMessage<string, string>>();
+    var inputData = new ValidatingData<string, string>(message);
 
-    var (data, state, exception) = InboxFuncs.ValidateInboxMessage<IValidatingServices, InboxData, string, string>(services, inputData);
+    var (data, state, exception) = InboxFuncs.ValidateInboxMessage(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(ValidatingStates.Success);
     exception.ShouldBeNull();
   }
@@ -18,12 +19,12 @@ public partial class InboxTests
   [TestMethod]
   public void validate_inbox_message__message_missing__returns_error()
   {
-    var services = Substitute.For<IValidatingServices>();
-    var inputData = new InboxData();
+    var capabilities = Fixture.Create<ValidatingCapabilities>();
+    var inputData = new ValidatingData<string, string>(default);
 
-    var (data, state, exception) = InboxFuncs.ValidateInboxMessage<IValidatingServices, InboxData, string, string>(services, inputData);
+    var (data, state, exception) = InboxFuncs.ValidateInboxMessage(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(ValidatingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
@@ -31,13 +32,15 @@ public partial class InboxTests
   [TestMethod]
   public void validate_inbox_message__message_is_invalid__returns_invalid_error()
   {
-    var services = Substitute.For<IValidatingServices>();
-    var message = InboxData.CreateMessage() with { MessageId = Guid.Empty };
-    var inputData = new InboxData { InboxMessage = message };
+    var capabilities = Fixture.Create<ValidatingCapabilities>();
+    var message = Fixture.Build<InboxMessage<string, string>>()
+      .With(message => message.MessageId, Guid.Empty)
+      .Create();
+    var inputData = new ValidatingData<string, string>(message);
 
-    var (data, state, exception) = InboxFuncs.ValidateInboxMessage<IValidatingServices, InboxData, string, string>(services, inputData);
+    var (data, state, exception) = InboxFuncs.ValidateInboxMessage(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(ValidatingStates.InvalidError);
     exception.ShouldNotBeNull();
   }

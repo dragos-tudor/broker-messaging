@@ -5,29 +5,35 @@ public partial class DeadLetterTests
   [TestMethod]
   public async Task close_dead_letter_message__update_succeeds__returns_success()
   {
-    var services = Substitute.For<IClosingServices<string, string>>();
-    var inputData = new DeadLetterData { DeadLetterMessage = Substitute.For<IDeadLetterMessage<string, string>>() };
-    services.UpdateDeadLetterMessageAsync(Arg.Any<IDeadLetterMessage<string, string>>(), Arg.Any<ClosingUpdate>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+    var capabilities = Fixture.Create<ClosingCapabilities<string, string>>();
+    var message = Fixture.Create<IDeadLetterMessage<string, string>>();
+    var inputData = new ClosingData<string, string>(message);
+    var expectedUpdate = new ClosingUpdate(DeadLetterMessageStatus.Published);
+    capabilities.UpdateDeadLetterMessageAsync(inputData.DeadLetterMessage!, expectedUpdate, default).Returns(Task.CompletedTask);
 
-    var (data, state, exception) = await DeadLetterFuncs.CloseDeadLetterMessageAsync<IClosingServices<string, string>, DeadLetterData, string, string>(services, inputData, default);
+    var (data, state, exception) = await DeadLetterFuncs.CloseDeadLetterMessageAsync(capabilities, inputData, default);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(ClosingStates.Success);
     exception.ShouldBeNull();
+    capabilities.UpdateDeadLetterMessageAsync.Received(1)(inputData.DeadLetterMessage!, expectedUpdate, default);
   }
 
   [TestMethod]
   public async Task close_dead_letter_message__update_throws__returns_error_with_exception()
   {
-    var services = Substitute.For<IClosingServices<string, string>>();
+    var capabilities = Fixture.Create<ClosingCapabilities<string, string>>();
+    var message = Fixture.Create<IDeadLetterMessage<string, string>>();
+    var inputData = new ClosingData<string, string>(message);
+    var expectedUpdate = new ClosingUpdate(DeadLetterMessageStatus.Published);
     var expectedException = new InvalidOperationException("close failed");
-    var inputData = new DeadLetterData { DeadLetterMessage = Substitute.For<IDeadLetterMessage<string, string>>() };
-    services.UpdateDeadLetterMessageAsync(Arg.Any<IDeadLetterMessage<string, string>>(), Arg.Any<ClosingUpdate>(), Arg.Any<CancellationToken>()).ThrowsAsync(expectedException);
+    capabilities.UpdateDeadLetterMessageAsync(inputData.DeadLetterMessage!, expectedUpdate, default).ThrowsAsync(expectedException);
 
-    var (data, state, exception) = await DeadLetterFuncs.CloseDeadLetterMessageAsync<IClosingServices<string, string>, DeadLetterData, string, string>(services, inputData, default);
+    var (data, state, exception) = await DeadLetterFuncs.CloseDeadLetterMessageAsync(capabilities, inputData, default);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(ClosingStates.Error);
     exception.ShouldBeSameAs(expectedException);
+    capabilities.UpdateDeadLetterMessageAsync.Received(1)(inputData.DeadLetterMessage!, expectedUpdate, default);
   }
 }

@@ -5,29 +5,35 @@ public partial class OutboxTests
   [TestMethod]
   public async Task abandon_outbox_message__update_succeeds__returns_success()
   {
-    var services = Substitute.For<IAbandoningServices<string, string>>();
-    var inputData = new OutboxData { OutboxMessage = Substitute.For<IOutboxMessage<string, string>>() };
-    services.UpdateOutboxMessageAsync(Arg.Any<IOutboxMessage<string, string>>(), Arg.Any<AbandoningUpdate>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+    var capabilities = Fixture.Create<AbandoningCapabilities<string, string>>();
+    var message = Fixture.Create<IOutboxMessage<string, string>>();
+    var inputData = new AbandoningData<string, string>(message);
+    var expectedUpdate = new AbandoningUpdate(OutboxMessageStatus.Abandoned, message.LastError);
+    capabilities.UpdateOutboxMessageAsync(inputData.OutboxMessage!, expectedUpdate, default).Returns(Task.CompletedTask);
 
-    var (data, state, exception) = await OutboxFuncs.AbandonOutboxMessageAsync<IAbandoningServices<string, string>, OutboxData, string, string>(services, inputData);
+    var (data, state, exception) = await OutboxFuncs.AbandonOutboxMessageAsync(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(AbandoningStates.Success);
     exception.ShouldBeNull();
+    capabilities.UpdateOutboxMessageAsync.Received(1)(inputData.OutboxMessage!, expectedUpdate, default);
   }
 
   [TestMethod]
   public async Task abandon_outbox_message__update_throws__returns_error_with_exception()
   {
-    var services = Substitute.For<IAbandoningServices<string, string>>();
+    var capabilities = Fixture.Create<AbandoningCapabilities<string, string>>();
+    var message = Fixture.Create<IOutboxMessage<string, string>>();
+    var inputData = new AbandoningData<string, string>(message);
+    var expectedUpdate = new AbandoningUpdate(OutboxMessageStatus.Abandoned, message.LastError);
     var expectedException = new InvalidOperationException("abandon failed");
-    services.UpdateOutboxMessageAsync(Arg.Any<IOutboxMessage<string, string>>(), Arg.Any<AbandoningUpdate>(), Arg.Any<CancellationToken>()).ThrowsAsync(expectedException);
-    var inputData = new OutboxData { OutboxMessage = Substitute.For<IOutboxMessage<string, string>>() };
+    capabilities.UpdateOutboxMessageAsync(inputData.OutboxMessage!, expectedUpdate, default).ThrowsAsync(expectedException);
 
-    var (data, state, exception) = await OutboxFuncs.AbandonOutboxMessageAsync<IAbandoningServices<string, string>, OutboxData, string, string>(services, inputData);
+    var (data, state, exception) = await OutboxFuncs.AbandonOutboxMessageAsync(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(AbandoningStates.Error);
     exception.ShouldBeSameAs(expectedException);
+    capabilities.UpdateOutboxMessageAsync.Received(1)(inputData.OutboxMessage!, expectedUpdate, default);
   }
 }

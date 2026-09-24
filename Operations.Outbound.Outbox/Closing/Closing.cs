@@ -1,40 +1,34 @@
-
 namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static async Task<(TData, ClosingStates, Exception?)> CloseOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IClosingServices<TKey, TPayload>
-  where TData : IClosingData<TKey, TPayload>
-  {
-    var message = RequireOutboxMessage(data.OutboxMessage);
-    var @param = new ClosingUpdate(OutboxMessageStatus.Published);
+  static async Task<(ClosingData<TKey, TPayload>, ClosingStates, Exception?)>
+    CloseOutboxMessageSuccessAsync<TKey, TPayload>(
+      ClosingCapabilities<TKey, TPayload> capabilities,
+      ClosingData<TKey, TPayload> data,
+      CancellationToken ct = default)
+    {
+      var message = RequireOutboxMessage(data.OutboxMessage);
+      var parameters = new ClosingUpdate(OutboxMessageStatus.Published);
+      await capabilities.UpdateOutboxMessageAsync(message, parameters, ct);
+      return (data, ClosingStates.Success, null);
+    }
 
-    await services.UpdateOutboxMessageAsync(message, @param, ct);
-
-    return (data, ClosingStates.Success, null);
-  }
-
-  static (TData, ClosingStates, Exception?) CloseOutboxMessageError<TData, TKey, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : IClosingData<TKey, TPayload> =>
+  static (ClosingData<TKey, TPayload>, ClosingStates, Exception?)
+    CloseOutboxMessageError<TKey, TPayload>(
+      ClosingData<TKey, TPayload> data,
+      Exception exception) =>
     (data, ClosingStates.Error, exception);
 
-  internal static Task<(TData, ClosingStates, Exception?)> CloseOutboxMessageAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IClosingServices<TKey, TPayload>
-  where TData : IClosingData<TKey, TPayload> =>
+  internal static Task<(ClosingData<TKey, TPayload>, ClosingStates, Exception?)>
+    CloseOutboxMessageAsync<TKey, TPayload>(
+      ClosingCapabilities<TKey, TPayload> capabilities,
+      ClosingData<TKey, TPayload> data,
+      CancellationToken ct = default) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      CloseOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload>,
-      CloseOutboxMessageError<TData, TKey, TPayload>,
-      ct
-    );
+      CloseOutboxMessageSuccessAsync,
+      CloseOutboxMessageError,
+      ct);
 }

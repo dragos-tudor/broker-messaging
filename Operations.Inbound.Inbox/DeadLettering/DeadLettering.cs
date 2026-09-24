@@ -3,39 +3,36 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async Task<(TData, DeadLetteringStates, Exception?)> DeadLetterInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IDeadLetteringServices<TKey, TPayload>
-  where TData : IDeadLetteringData<TKey, TPayload>
-  {
-    var message = RequireInboxMessage(data.InboxMessage);
-    var lastError = message.LastError;
-    var @params = new DeadLetteringUpdate(InboxMessageStatus.DeadLettering, lastError);
+  static async Task<(DeadLetteringData<TKey, TPayload>, DeadLetteringStates, Exception?)>
+    DeadLetterInboxMessageSuccessAsync<TKey, TPayload>(
+      DeadLetteringCapabilities<TKey, TPayload> capabilities,
+      DeadLetteringData<TKey, TPayload> data,
+      CancellationToken ct = default)
+    {
+      var message = RequireInboxMessage(data.InboxMessage);
+      var lastError = message.LastError;
+      var @params = new DeadLetteringUpdate(InboxMessageStatus.DeadLettering, lastError);
 
-    await services.UpdateInboxMessageAsync(message, @params, ct);
+      await capabilities.UpdateInboxMessageAsync(message, @params, ct);
+      return (data, DeadLetteringStates.Success, null);
+    }
 
-    return (data, DeadLetteringStates.Success, null);
-  }
-
-  static (TData, DeadLetteringStates, Exception?) DeadLetterInboxMessageError<TData, TKey, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : IDeadLetteringData<TKey, TPayload> =>
+  static (DeadLetteringData<TKey, TPayload>, DeadLetteringStates, Exception?)
+    DeadLetterInboxMessageError<TKey, TPayload>(
+      DeadLetteringData<TKey, TPayload> data,
+      Exception exception) =>
     (data, DeadLetteringStates.Error, exception);
 
-  internal static Task<(TData, DeadLetteringStates, Exception?)> DeadLetterInboxMessageAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IDeadLetteringServices<TKey, TPayload>
-  where TData : IDeadLetteringData<TKey, TPayload> =>
+  internal static Task<(DeadLetteringData<TKey, TPayload>, DeadLetteringStates, Exception?)>
+    DeadLetterInboxMessageAsync<TKey, TPayload>(
+      DeadLetteringCapabilities<TKey, TPayload> capabilities,
+      DeadLetteringData<TKey, TPayload> data,
+      CancellationToken ct = default) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      DeadLetterInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>,
-      DeadLetterInboxMessageError<TData, TKey, TPayload>,
+      DeadLetterInboxMessageSuccessAsync,
+      DeadLetterInboxMessageError,
       ct
     );
 }

@@ -3,53 +3,42 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async Task<(TData, TransactingStates, Exception?)> TransactInboxMessageSuccessAsync<TServices, TData, TKey, TPayload, TSession>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : ITransactingServices<TKey, TPayload, TSession>
-  where TData : ITransactingData<TKey, TPayload>
-  where TSession : IDisposable
-  {
-    var message = RequireInboxMessage(data.InboxMessage);
-    var model = RequireDomainModel(data.DomainModel);
-    var @params = (model, message);
+  static async Task<(TransactingData<TKey, TPayload>, TransactingStates, Exception?)>
+    TransactInboxMessageSuccessAsync<TKey, TPayload, TSession>(
+      TransactingCapabilities<TKey, TPayload, TSession> capabilities,
+      TransactingData<TKey, TPayload> data,
+      CancellationToken ct = default)
+    where TSession : ISessionService
+    {
+      var message = RequireInboxMessage(data.InboxMessage);
+      var model = RequireDomainModel(data.Model);
+      var @param = new TransactingUpdate(InboxMessageStatus.Handled);
 
-    using var session = services.GetSession();
-    await services.TransactSessionAsync(
-      services,
-      session,
-      @params,
-      static (services, session, @params, ct) =>
-        services.StoreDomainModelAsync(session, @params.model, ct),
-      static (services, session, @params, ct) =>
-        services.UpdateInboxMessageAsync(session, @params.message,
-          new TransactingUpdate(InboxMessageStatus.Handled), ct),
-      ct
-    );
+      using var session = capabilities.GetSession();
+      await capabilities.StoreDomainModelAsync(session, model, ct);
+      await capabilities.UpdateInboxMessageAsync(session, message, @param, ct);
+      await session.CompleteAsync(ct);
 
-    return (data, TransactingStates.Success, null);
-  }
+      return (data, TransactingStates.Success, null);
+    }
 
-  static (TData, TransactingStates, Exception?) TransactInboxMessageError<TData, TKey, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : ITransactingData<TKey, TPayload> =>
+  static (TransactingData<TKey, TPayload>, TransactingStates, Exception?)
+    TransactInboxMessageError<TKey, TPayload>(
+      TransactingData<TKey, TPayload> data,
+      Exception exception) =>
     (data, TransactingStates.Error, exception);
 
-  internal static Task<(TData, TransactingStates, Exception?)> TransactInboxMessageAsync<TServices, TData, TKey, TPayload, TSession>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : ITransactingServices<TKey, TPayload, TSession>
-  where TData : ITransactingData<TKey, TPayload>
-  where TSession : IDisposable =>
+  internal static Task<(TransactingData<TKey, TPayload>, TransactingStates, Exception?)>
+    TransactInboxMessageAsync<TKey, TPayload, TSession>(
+      TransactingCapabilities<TKey, TPayload, TSession> capabilities,
+      TransactingData<TKey, TPayload> data,
+      CancellationToken ct = default)
+    where TSession : ISessionService =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      TransactInboxMessageSuccessAsync<TServices, TData, TKey, TPayload, TSession>,
-      TransactInboxMessageError<TData, TKey, TPayload>,
+      TransactInboxMessageSuccessAsync,
+      TransactInboxMessageError,
       ct
     );
-
 }

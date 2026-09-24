@@ -5,13 +5,13 @@ public partial class OutboxTests
   [TestMethod]
   public void validate_outbox_message__message_is_valid__returns_success()
   {
-    var services = Substitute.For<IValidatingServices<string, string>>();
-    var message = new OutboxMessage<string, string> { MessageId = Guid.NewGuid(), MessageKey = "key", Payload = "payload", Type = "type", CreatedAt = DateTime.UtcNow };
-    var inputData = new OutboxData { OutboxMessage = message };
+    var capabilities = Fixture.Create<ValidatingCapabilities>();
+    var message = Fixture.Create<IOutboxMessage<string, string>>();
+    var inputData = new ValidatingData<string, string>(message);
 
-    var (data, state, exception) = OutboxFuncs.ValidateOutboxMessage<IValidatingServices<string, string>, OutboxData, string, string>(services, inputData);
+    var (data, state, exception) = OutboxFuncs.ValidateOutboxMessage(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(ValidatingStates.Success);
     exception.ShouldBeNull();
   }
@@ -19,12 +19,12 @@ public partial class OutboxTests
   [TestMethod]
   public void validate_outbox_message__message_missing__returns_error()
   {
-    var services = Substitute.For<IValidatingServices<string, string>>();
-    var inputData = new OutboxData();
+    var capabilities = Fixture.Create<ValidatingCapabilities>();
+    var inputData = new ValidatingData<string, string>(default);
 
-    var (data, state, exception) = OutboxFuncs.ValidateOutboxMessage<IValidatingServices<string, string>, OutboxData, string, string>(services, inputData);
+    var (data, state, exception) = OutboxFuncs.ValidateOutboxMessage(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(ValidatingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }
@@ -32,13 +32,15 @@ public partial class OutboxTests
   [TestMethod]
   public void validate_outbox_message__message_is_invalid__returns_invalid_error()
   {
-    var services = Substitute.For<IValidatingServices<string, string>>();
-    var message = new OutboxMessage<string, string> { MessageId = Guid.Empty, MessageKey = "key", Payload = "payload", Type = "type", CreatedAt = DateTime.UtcNow };
-    var inputData = new OutboxData { OutboxMessage = message };
+    var capabilities = Fixture.Create<ValidatingCapabilities>();
+    var message = Fixture.Build<OutboxMessage<string, string>>()
+      .With(message => message.MessageId, Guid.Empty)
+      .Create();
+    var inputData = new ValidatingData<string, string>(message);
 
-    var (data, state, exception) = OutboxFuncs.ValidateOutboxMessage<IValidatingServices<string, string>, OutboxData, string, string>(services, inputData);
+    var (data, state, exception) = OutboxFuncs.ValidateOutboxMessage(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(ValidatingStates.InvalidError);
     exception.ShouldNotBeNull();
   }

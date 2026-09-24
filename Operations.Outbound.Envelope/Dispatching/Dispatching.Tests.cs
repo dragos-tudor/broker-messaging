@@ -6,18 +6,17 @@ public partial class EnvelopeTests
   [DataRow(true, DispatchingStates.Ack)]
   [DataRow(false, DispatchingStates.NotAck)]
   public void dispatch_envelope__produce_result_acknowledgement_varies__returns_matching_state(
-    bool isAcknowledged,
+    bool acknowledged,
     Enum expectedState)
   {
-    var services = Substitute.For<IDispatchingServices>();
-    var inputData = new EnvelopeData {
-      ProduceResult = new ProduceResult { IsAcknowledged = isAcknowledged }
-    };
+    var capabilities = Fixture.Create<DispatchingCapabilities>();
+    var inputData = new DispatchingData(
+      new ProduceResult { IsAcknowledged = acknowledged });
 
-    var (data, state, exception) = EnvelopeFuncs.DispatchEnvelope<
-      IDispatchingServices, EnvelopeData>(services, inputData);
+    var (data, state, exception) =
+      EnvelopeFuncs.DispatchEnvelope(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(expectedState);
     exception.ShouldBeNull();
   }
@@ -25,13 +24,13 @@ public partial class EnvelopeTests
   [TestMethod]
   public void dispatch_envelope__produce_result_missing__returns_error_with_exception()
   {
-    var services = Substitute.For<IDispatchingServices>();
-    var inputData = new EnvelopeData();
+    var capabilities = Fixture.Create<DispatchingCapabilities>();
+    var inputData = new DispatchingData(null);
 
-    var (data, state, exception) = EnvelopeFuncs.DispatchEnvelope<
-      IDispatchingServices, EnvelopeData>(services, inputData);
+    var (data, state, exception) =
+      EnvelopeFuncs.DispatchEnvelope(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(DispatchingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
   }

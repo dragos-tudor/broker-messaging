@@ -6,45 +6,164 @@ public partial class EnvelopeTests
   [DataRow(true, ProducingStates.Enqueue)]
   [DataRow(false, ProducingStates.NotEnqueue)]
   public void produce_envelope__broker_enqueue_result_varies__returns_matching_state(
-    bool isEnqueued,
+    bool enqueued,
     Enum expectedState)
   {
-    var services = Substitute.For<IProducingServices<string, byte[], object, string, string>>();
-    var envelope = Substitute.For<IEnvelope<string, byte[], object, string>>();
-    var message = Substitute.For<IOutboxMessage<string, string>>();
-    message.MessageId.Returns(Guid.NewGuid());
-    services.ProduceEnvelope(Arg.Any<IEnvelope<string, byte[], object, string>>(), Arg.Any<Action<bool, Exception?>>())
-      .Returns(isEnqueued);
-    var inputData = new EnvelopeData { Envelope = envelope, OutboxMessage = message };
+    var capabilities =
+      Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
 
-    var (data, state, exception) = EnvelopeFuncs.ProduceEnvelope<
-      IProducingServices<string, byte[], object, string, string>, EnvelopeData,
-      string, byte[], object, string, string>(services, inputData);
+    var envelope =
+      Fixture.Create<IEnvelope<string, byte[], object, string>>();
 
-    data.ShouldBeSameAs(inputData);
+    var message =
+      Fixture.Create<IOutboxMessage<string, string>>();
+
+    var inputData =
+      new ProducingData<string, byte[], object, string, string>(
+        envelope,
+        message);
+
+    capabilities.ProduceEnvelope(
+        inputData.Envelope!,
+        Arg.Any<Action<bool, Exception?>>())
+      .Returns(enqueued);
+
+    var (data, state, exception) =
+      EnvelopeFuncs.ProduceEnvelope(capabilities, inputData);
+
+    data.ShouldBe(inputData);
     state.ShouldBe(expectedState);
     exception.ShouldBeNull();
-    services.Received(1).ProduceEnvelope(envelope, Arg.Any<Action<bool, Exception?>>());
+
+    capabilities.ProduceEnvelope.Received(1)(
+      inputData.Envelope!,
+      Arg.Any<Action<bool, Exception?>>());
+  }
+
+  [TestMethod]
+  public void produce_envelope__callback_dispatches_exact_result()
+  {
+    var capabilities =
+      Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
+
+    var envelope =
+      Fixture.Create<IEnvelope<string, byte[], object, string>>();
+
+    var message =
+      Fixture.Create<IOutboxMessage<string, string>>();
+
+    var inputData =
+      new ProducingData<string, byte[], object, string, string>(
+        envelope,
+        message);
+
+    Action<bool, Exception?>? callback = null;
+
+    capabilities.ProduceEnvelope(
+        inputData.Envelope!,
+        Arg.Do<Action<bool, Exception?>>(
+          value => callback = value))
+      .Returns(true);
+
+    var (data, state, exception) =
+      EnvelopeFuncs.ProduceEnvelope(capabilities, inputData);
+
+    data.ShouldBe(inputData);
+    state.ShouldBe(ProducingStates.Enqueue);
+    exception.ShouldBeNull();
+
+    callback.ShouldNotBeNull();
+
+    var callbackException = new InvalidOperationException("broker failed");
+    callback!(true, callbackException);
+
+    capabilities.DispatchProduceResult.Received(1)(
+      Arg.Is<ProduceResult>(
+        result =>
+          result.MessageId == inputData.OutboxMessage!.MessageId &&
+          result.IsAcknowledged &&
+          result.Exception == callbackException));
+  }
+
+  [TestMethod]
+  public void produce_envelope__envelope_missing__returns_error()
+  {
+    var capabilities =
+      Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
+
+    var inputData =
+      new ProducingData<string, byte[], object, string, string>(
+        null,
+        Fixture.Create<IOutboxMessage<string, string>>());
+
+    var (data, state, exception) =
+      EnvelopeFuncs.ProduceEnvelope(capabilities, inputData);
+
+    data.ShouldBe(inputData);
+    state.ShouldBe(ProducingStates.Error);
+    exception.ShouldBeOfType<InvalidOperationException>();
+
+    capabilities.ProduceEnvelope.Received(0)(
+      default!,
+      Arg.Any<Action<bool, Exception?>>());
+  }
+
+  [TestMethod]
+  public void produce_envelope__outbox_message_missing__returns_error()
+  {
+    var capabilities =
+      Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
+
+    var inputData =
+      new ProducingData<string, byte[], object, string, string>(
+        Fixture.Create<IEnvelope<string, byte[], object, string>>(),
+        null);
+
+    var (data, state, exception) =
+      EnvelopeFuncs.ProduceEnvelope(capabilities, inputData);
+
+    data.ShouldBe(inputData);
+    state.ShouldBe(ProducingStates.Error);
+    exception.ShouldBeOfType<InvalidOperationException>();
+
+    capabilities.ProduceEnvelope.Received(0)(
+      default!,
+      Arg.Any<Action<bool, Exception?>>());
   }
 
   [TestMethod]
   public void produce_envelope__broker_throws__returns_error_with_exception()
   {
-    var services = Substitute.For<IProducingServices<string, byte[], object, string, string>>();
+    var capabilities =
+      Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
+
+    var envelope =
+      Fixture.Create<IEnvelope<string, byte[], object, string>>();
+
+    var message =
+      Fixture.Create<IOutboxMessage<string, string>>();
+
+    var inputData =
+      new ProducingData<string, byte[], object, string, string>(
+        envelope,
+        message);
+
     var expectedException = new InvalidOperationException("produce failed");
-    services.ProduceEnvelope(Arg.Any<IEnvelope<string, byte[], object, string>>(), Arg.Any<Action<bool, Exception?>>())
+
+    capabilities.ProduceEnvelope(
+        inputData.Envelope!,
+        Arg.Any<Action<bool, Exception?>>())
       .Throws(expectedException);
-    var inputData = new EnvelopeData {
-      Envelope = Substitute.For<IEnvelope<string, byte[], object, string>>(),
-      OutboxMessage = Substitute.For<IOutboxMessage<string, string>>()
-    };
 
-    var (data, state, exception) = EnvelopeFuncs.ProduceEnvelope<
-      IProducingServices<string, byte[], object, string, string>, EnvelopeData,
-      string, byte[], object, string, string>(services, inputData);
+    var (data, state, exception) =
+      EnvelopeFuncs.ProduceEnvelope(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(ProducingStates.Error);
     exception.ShouldBeSameAs(expectedException);
+
+    capabilities.ProduceEnvelope.Received(1)(
+      inputData.Envelope!,
+      Arg.Any<Action<bool, Exception?>>());
   }
 }

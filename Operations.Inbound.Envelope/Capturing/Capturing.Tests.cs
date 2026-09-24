@@ -1,4 +1,3 @@
-
 namespace Operations.Inbound.Envelope;
 
 public partial class EnvelopeTests
@@ -6,54 +5,71 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task capture_envelope__reader_returns_envelope__returns_success_and_sets_data()
   {
-    var services = Substitute.For<ICapturingServices<string, byte[], object, string>>();
-    var envelope = Substitute.For<IEnvelope<string, byte[], object, string>>();
-    var inputData = new EnvelopeData();
-    services.ReadEnvelope(Arg.Any<CancellationToken>())
+    var capabilities =
+      Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
+
+    var envelope =
+      Fixture.Create<IEnvelope<string, byte[], object, string>>();
+
+    var inputData =
+      new CapturingData<string, byte[], object, string>(null);
+
+    capabilities.ReadEnvelope(default)
       .Returns(Task.FromResult(envelope));
 
-    var (data, state, exception) = await EnvelopeFuncs.CaptureEnvelope<
-      ICapturingServices<string, byte[], object, string>, EnvelopeData,
-      string, byte[], object, string>(services, inputData);
+    var (data, state, exception) =
+      await EnvelopeFuncs.CaptureEnvelope(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
-    data.Envelope.ShouldBeSameAs(envelope);
+    data.Envelope.ShouldBe(envelope);
     state.ShouldBe(CapturingStates.Success);
     exception.ShouldBeNull();
+
+    capabilities.ReadEnvelope.Received(1)(default);
   }
 
   [TestMethod]
   public async Task capture_envelope__reader_returns_null__returns_not_captured()
   {
-    var services = Substitute.For<ICapturingServices<string, byte[], object, string>>();
-    var inputData = new EnvelopeData();
-    services.ReadEnvelope(Arg.Any<CancellationToken>())
-      .Returns(Task.FromResult<IEnvelope<string, byte[], object, string>>(result: null!));
+    var capabilities =
+      Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
 
-    var (data, state, exception) = await EnvelopeFuncs.CaptureEnvelope<
-      ICapturingServices<string, byte[], object, string>, EnvelopeData,
-      string, byte[], object, string>(services, inputData);
+    var inputData =
+      new CapturingData<string, byte[], object, string>(null);
 
-    data.ShouldBeSameAs(inputData);
-    data.Envelope.ShouldBeNull();
+    capabilities.ReadEnvelope(default)
+      .Returns(Task.FromResult<IEnvelope<string, byte[], object, string>>(null!));
+
+    var (data, state, exception) =
+      await EnvelopeFuncs.CaptureEnvelope(capabilities, inputData);
+
+    data.ShouldBe(inputData);
     state.ShouldBe(CapturingStates.NotCaptured);
     exception.ShouldBeNull();
+
+    capabilities.ReadEnvelope.Received(1)(default);
   }
 
   [TestMethod]
   public async Task capture_envelope__reader_throws__returns_error_with_exception()
   {
-    var services = Substitute.For<ICapturingServices<string, byte[], object, string>>();
-    var inputData = new EnvelopeData();
+    var capabilities =
+      Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
+
+    var inputData =
+      new CapturingData<string, byte[], object, string>(null);
+
     var expectedException = new InvalidOperationException("read failed");
-    services.ReadEnvelope(Arg.Any<CancellationToken>()).ThrowsAsync(expectedException);
 
-    var (data, state, exception) = await EnvelopeFuncs.CaptureEnvelope<
-      ICapturingServices<string, byte[], object, string>, EnvelopeData,
-      string, byte[], object, string>(services, inputData);
+    capabilities.ReadEnvelope(default)
+      .ThrowsAsync(expectedException);
 
-    data.ShouldBeSameAs(inputData);
+    var (data, state, exception) =
+      await EnvelopeFuncs.CaptureEnvelope(capabilities, inputData);
+
+    data.ShouldBe(inputData);
     state.ShouldBe(CapturingStates.Error);
     exception.ShouldBeSameAs(expectedException);
+
+    capabilities.ReadEnvelope.Received(1)(default);
   }
 }

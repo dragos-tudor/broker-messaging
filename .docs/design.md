@@ -153,12 +153,12 @@ states.
 
 - each operation has one-task responsibility [eg. capture an envelope, map a dead-letter message, validate an envelope, insert an inbox message].
 - each operation is independent of the others.
-- each operation uses specialized interfaces for services and data based on composition root pattern.
+- each operation uses concrete capabilities and concrete data.
 - 2 different type of operations:
   - pure operations [verifying, mapping, validating, producing, dispatching].
   - side-effect operations [capturing, inserting, transacting, publishing].
 - all operations have similar signature:
-  - services, shared data, cancellation token as parameters.
+  - concrete capabilities, concrete data, cancellation token as parameters.
   - (output data, state, exception?) as return type.
 - operations expected failures must return explicit states.
 - operations mutate only their owned pipeline data.

@@ -1,37 +1,35 @@
-
 namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  static async Task<(TData, RedirectingStates, Exception?)> RedirectDeadLetterEnvelopeSuccessAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IRedirectingServices<TKey, TValue, TMetadata, TConfirmation>
-  where TData : IRedirectingData<TKey, TValue, TMetadata, TConfirmation>
-  {
-    var envelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
+  static async Task<(RedirectingData<TKey, TValue, TMetadata, TConfirmation>, RedirectingStates, Exception?)>
+    RedirectDeadLetterEnvelopeSuccessAsync<TKey, TValue, TMetadata, TConfirmation>(
+      RedirectingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      RedirectingData<TKey, TValue, TMetadata, TConfirmation> data,
+      CancellationToken ct = default)
+    {
+      var envelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
 
-    await services.PublishDeadLetterEnvelopeAsync(envelope, ct);
-    return (data, RedirectingStates.Success, null);
-  }
+      await capabilities.PublishDeadLetterEnvelopeAsync(envelope, ct);
 
-  static (TData, RedirectingStates, Exception?) RedirectDeadLetterEnvelopeError<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
-    TData data,
-    Exception exception)
-  where TData : IRedirectingData<TKey, TValue, TMetadata, TConfirmation> =>
+      return (data, RedirectingStates.Success, null);
+    }
+
+  static (RedirectingData<TKey, TValue, TMetadata, TConfirmation>, RedirectingStates, Exception?)
+    RedirectDeadLetterEnvelopeError<TKey, TValue, TMetadata, TConfirmation>(
+      RedirectingData<TKey, TValue, TMetadata, TConfirmation> data,
+      Exception exception) =>
     (data, RedirectingStates.Error, exception);
 
-  internal static Task<(TData, RedirectingStates, Exception?)> RedirectDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IRedirectingServices<TKey, TValue, TMetadata, TConfirmation>
-  where TData : IRedirectingData<TKey, TValue, TMetadata, TConfirmation> =>
+  internal static Task<(RedirectingData<TKey, TValue, TMetadata, TConfirmation>, RedirectingStates, Exception?)>
+    RedirectDeadLetterEnvelopeAsync<TKey, TValue, TMetadata, TConfirmation>(
+      RedirectingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      RedirectingData<TKey, TValue, TMetadata, TConfirmation> data,
+      CancellationToken ct = default) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      RedirectDeadLetterEnvelopeSuccessAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>,
-      RedirectDeadLetterEnvelopeError<TServices, TData, TKey, TValue, TMetadata, TConfirmation>,
+      RedirectDeadLetterEnvelopeSuccessAsync,
+      RedirectDeadLetterEnvelopeError,
       ct);
 }

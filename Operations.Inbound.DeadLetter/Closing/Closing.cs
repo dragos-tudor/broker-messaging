@@ -1,40 +1,34 @@
-
 namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  static async Task<(TData, ClosingStates, Exception?)> CloseDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct)
-  where TServices : IClosingServices<TKey, TPayload>
-  where TData : IClosingData<TKey, TPayload>
+  static async Task<(ClosingData<TKey, TPayload>, ClosingStates, Exception?)>
+    CloseDeadLetterMessageSuccessAsync<TKey, TPayload>(
+      ClosingCapabilities<TKey, TPayload> capabilities,
+      ClosingData<TKey, TPayload> data,
+      CancellationToken ct)
   {
     var message = RequireDeadLetterMessage(data.DeadLetterMessage);
-    var @params = new ClosingUpdate(DeadLetterMessageStatus.Published);
-
-    await services.UpdateDeadLetterMessageAsync(message, @params, ct);
-
+    var parameters = new ClosingUpdate(DeadLetterMessageStatus.Published);
+    await capabilities.UpdateDeadLetterMessageAsync(message, parameters, ct);
     return (data, ClosingStates.Success, null);
   }
 
-  static (TData, ClosingStates, Exception?) CloseDeadLetterMessageError<TData, TKey, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : IClosingData<TKey, TPayload> =>
+  static (ClosingData<TKey, TPayload>, ClosingStates, Exception?)
+    CloseDeadLetterMessageError<TKey, TPayload>(
+      ClosingData<TKey, TPayload> data,
+      Exception exception) =>
     (data, ClosingStates.Error, exception);
 
-  internal static Task<(TData, ClosingStates, Exception?)> CloseDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct)
-  where TServices : IClosingServices<TKey, TPayload>
-  where TData : IClosingData<TKey, TPayload> =>
+  internal static Task<(ClosingData<TKey, TPayload>, ClosingStates, Exception?)>
+    CloseDeadLetterMessageAsync<TKey, TPayload>(
+      ClosingCapabilities<TKey, TPayload> capabilities,
+      ClosingData<TKey, TPayload> data,
+      CancellationToken ct) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      CloseDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>,
-      CloseDeadLetterMessageError<TData, TKey, TPayload>,
-      ct
-    );
+      CloseDeadLetterMessageSuccessAsync,
+      CloseDeadLetterMessageError,
+      ct);
 }

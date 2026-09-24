@@ -5,16 +5,16 @@ public partial class DeadLetterTests
   [TestMethod]
   public void map_dead_letter_message__mapper_returns_envelope__returns_success_and_sets_data()
   {
-    var services = Substitute.For<IMappingServices<string, byte[], object, string, string>>();
-    var message = Substitute.For<IDeadLetterMessage<string, string>>();
-    var envelope = Substitute.For<IDeadLetterEnvelope<string, byte[], object, string>>();
-    services.FromDeadLetterMessage(message, Arg.Any<DateTime>()).Returns(envelope);
-    var inputData = new DeadLetterData { DeadLetterMessage = message };
+    var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
+    var message = Fixture.Create<IDeadLetterMessage<string, string>>();
+    var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
+    var inputData = new MappingData<string, byte[], object, string, string>(message, default);
+    capabilities.FromDeadLetterMessage(inputData.DeadLetterMessage!, message.OriginatedAt).Returns(envelope);
 
-    var (data, state, exception) = DeadLetterFuncs.MapDeadLetterMessage<IMappingServices<string, byte[], object, string, string>, DeadLetterData, string, byte[], object, string, string>(services, inputData);
+    var (data, state, exception) = DeadLetterFuncs.MapDeadLetterMessage(capabilities, inputData);
 
     data.DeadLetterEnvelope.ShouldBeSameAs(envelope);
-    services.Received(1).FromDeadLetterMessage(message, Arg.Any<DateTime>());
+    capabilities.FromDeadLetterMessage.Received(1)(inputData.DeadLetterMessage!, message.OriginatedAt);
     state.ShouldBe(MappingStates.Success);
     exception.ShouldBeNull();
   }
@@ -22,28 +22,31 @@ public partial class DeadLetterTests
   [TestMethod]
   public void map_dead_letter_message__message_missing__returns_error()
   {
-    var services = Substitute.For<IMappingServices<string, byte[], object, string, string>>();
-    var inputData = new DeadLetterData();
+    var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
+    var inputData = new MappingData<string, byte[], object, string, string>(default, default);
 
-    var (data, state, exception) = DeadLetterFuncs.MapDeadLetterMessage<IMappingServices<string, byte[], object, string, string>, DeadLetterData, string, byte[], object, string, string>(services, inputData);
+    var (data, state, exception) = DeadLetterFuncs.MapDeadLetterMessage(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(MappingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
+    capabilities.FromDeadLetterMessage.Received(0)(default!, default);
   }
 
   [TestMethod]
   public void map_dead_letter_message__mapper_throws__returns_error_with_exception()
   {
-    var services = Substitute.For<IMappingServices<string, byte[], object, string, string>>();
+    var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
+    var message = Fixture.Create<IDeadLetterMessage<string, string>>();
+    var inputData = new MappingData<string, byte[], object, string, string>(message, default);
     var expectedException = new InvalidOperationException("mapping failed");
-    services.FromDeadLetterMessage(Arg.Any<IDeadLetterMessage<string, string>>(), Arg.Any<DateTime>()).Throws(expectedException);
-    var inputData = new DeadLetterData { DeadLetterMessage = Substitute.For<IDeadLetterMessage<string, string>>() };
+    capabilities.FromDeadLetterMessage(inputData.DeadLetterMessage!, message.OriginatedAt).Throws(expectedException);
 
-    var (data, state, exception) = DeadLetterFuncs.MapDeadLetterMessage<IMappingServices<string, byte[], object, string, string>, DeadLetterData, string, byte[], object, string, string>(services, inputData);
+    var (data, state, exception) = DeadLetterFuncs.MapDeadLetterMessage(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(MappingStates.Error);
     exception.ShouldBeSameAs(expectedException);
+    capabilities.FromDeadLetterMessage.Received(1)(inputData.DeadLetterMessage!, message.OriginatedAt);
   }
 }

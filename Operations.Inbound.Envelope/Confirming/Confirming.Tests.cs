@@ -1,4 +1,3 @@
-
 namespace Operations.Inbound.Envelope;
 
 public partial class EnvelopeTests
@@ -6,83 +5,150 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task confirm_envelope__confirmer_succeeds__returns_success()
   {
-    var services = Substitute.For<IConfirmingServices<string, byte[], object, string>>();
-    var envelope = Substitute.For<IEnvelope<string, byte[], object, string>>();
-    var inputData = new EnvelopeData { Envelope = envelope };
+    var capabilities =
+      Fixture.Create<ConfirmingCapabilities<string, byte[], object, string>>();
 
-    var (data, state, exception) = await EnvelopeFuncs.ConfirmEnvelope<IConfirmingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string>(services, inputData);
+    var envelope =
+      Fixture.Create<IEnvelope<string, byte[], object, string>>();
 
-    data.ShouldBeSameAs(inputData);
+    var inputData =
+      new ConfirmingData<string, byte[], object, string>(envelope);
+
+    capabilities.ConfirmEnvelope(
+        inputData.Envelope!,
+        default)
+      .Returns(Task.CompletedTask);
+
+    var (data, state, exception) =
+      await EnvelopeFuncs.ConfirmEnvelope(capabilities, inputData);
+
+    data.ShouldBe(inputData);
     state.ShouldBe(ConfirmingStates.Success);
     exception.ShouldBeNull();
+
+    capabilities.ConfirmEnvelope.Received(1)(inputData.Envelope!, default);
   }
 
   [TestMethod]
   public async Task confirm_envelope__envelope_missing__returns_error()
   {
-    var services = Substitute.For<IConfirmingServices<string, byte[], object, string>>();
-    var inputData = new EnvelopeData();
+    var capabilities =
+      Fixture.Create<ConfirmingCapabilities<string, byte[], object, string>>();
 
-    var (data, state, exception) = await EnvelopeFuncs.ConfirmEnvelope<IConfirmingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string>(services, inputData);
+    var inputData =
+      new ConfirmingData<string, byte[], object, string>(null);
 
-    data.ShouldBeSameAs(inputData);
+    var (data, state, exception) =
+      await EnvelopeFuncs.ConfirmEnvelope(capabilities, inputData);
+
+    data.ShouldBe(inputData);
     state.ShouldBe(ConfirmingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
+
+    capabilities.ConfirmEnvelope.Received(0)(default!, default);
   }
 
   [TestMethod]
   public async Task confirm_envelope__confirmer_throws__returns_error_with_exception()
   {
-    var services = Substitute.For<IConfirmingServices<string, byte[], object, string>>();
+    var capabilities =
+      Fixture.Create<ConfirmingCapabilities<string, byte[], object, string>>();
+
+    var envelope =
+      Fixture.Create<IEnvelope<string, byte[], object, string>>();
+
+    var inputData =
+      new ConfirmingData<string, byte[], object, string>(envelope);
+
     var expectedException = new InvalidOperationException("confirmation failed");
-    services.ConfirmEnvelope(Arg.Any<IEnvelope<string, byte[], object, string>>(), Arg.Any<CancellationToken>()).ThrowsAsync(expectedException);
-    var inputData = new EnvelopeData { Envelope = Substitute.For<IEnvelope<string, byte[], object, string>>() };
 
-    var (data, state, exception) = await EnvelopeFuncs.ConfirmEnvelope<IConfirmingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string>(services, inputData);
+    capabilities.ConfirmEnvelope(
+        inputData.Envelope!,
+        default)
+      .ThrowsAsync(expectedException);
 
-    data.ShouldBeSameAs(inputData);
+    var (data, state, exception) =
+      await EnvelopeFuncs.ConfirmEnvelope(capabilities, inputData);
+
+    data.ShouldBe(inputData);
     state.ShouldBe(ConfirmingStates.Error);
     exception.ShouldBeSameAs(expectedException);
+
+    capabilities.ConfirmEnvelope.Received(1)(inputData.Envelope!, default);
   }
 
   [TestMethod]
   public async Task confirm_final_envelope__confirmer_succeeds__returns_final_success()
   {
-    var services = Substitute.For<IConfirmingServices<string, byte[], object, string>>();
-    var inputData = new EnvelopeData { Envelope = Substitute.For<IEnvelope<string, byte[], object, string>>() };
+    var capabilities =
+      Fixture.Create<ConfirmingCapabilities<string, byte[], object, string>>();
 
-    var (data, state, exception) = await EnvelopeFuncs.ConfirmFinalEnvelope<IConfirmingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string>(services, inputData);
+    var envelope =
+      Fixture.Create<IEnvelope<string, byte[], object, string>>();
 
-    data.ShouldBeSameAs(inputData);
+    var inputData =
+      new ConfirmingData<string, byte[], object, string>(envelope);
+
+    capabilities.ConfirmEnvelope(
+        inputData.Envelope!,
+        default)
+      .Returns(Task.CompletedTask);
+
+    var (data, state, exception) =
+      await EnvelopeFuncs.ConfirmFinalEnvelope(capabilities, inputData);
+
+    data.ShouldBe(inputData);
     state.ShouldBe(ConfirmingFinalStates.Success);
     exception.ShouldBeNull();
+
+    capabilities.ConfirmEnvelope.Received(1)(inputData.Envelope!, default);
   }
 
   [TestMethod]
   public async Task confirm_final_envelope__envelope_missing__returns_final_error()
   {
-    var services = Substitute.For<IConfirmingServices<string, byte[], object, string>>();
-    var inputData = new EnvelopeData();
+    var capabilities =
+      Fixture.Create<ConfirmingCapabilities<string, byte[], object, string>>();
 
-    var (data, state, exception) = await EnvelopeFuncs.ConfirmFinalEnvelope<IConfirmingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string>(services, inputData);
+    var inputData =
+      new ConfirmingData<string, byte[], object, string>(null);
 
-    data.ShouldBeSameAs(inputData);
+    var (data, state, exception) =
+      await EnvelopeFuncs.ConfirmFinalEnvelope(capabilities, inputData);
+
+    data.ShouldBe(inputData);
     state.ShouldBe(ConfirmingFinalStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
+
+    capabilities.ConfirmEnvelope.Received(0)(default!, default);
   }
 
   [TestMethod]
   public async Task confirm_final_envelope__confirmer_throws__returns_final_error_with_exception()
   {
-    var services = Substitute.For<IConfirmingServices<string, byte[], object, string>>();
+    var capabilities =
+      Fixture.Create<ConfirmingCapabilities<string, byte[], object, string>>();
+
+    var envelope =
+      Fixture.Create<IEnvelope<string, byte[], object, string>>();
+
+    var inputData =
+      new ConfirmingData<string, byte[], object, string>(envelope);
+
     var expectedException = new InvalidOperationException("final confirmation failed");
-    services.ConfirmEnvelope(Arg.Any<IEnvelope<string, byte[], object, string>>(), Arg.Any<CancellationToken>()).ThrowsAsync(expectedException);
-    var inputData = new EnvelopeData { Envelope = Substitute.For<IEnvelope<string, byte[], object, string>>() };
 
-    var (data, state, exception) = await EnvelopeFuncs.ConfirmFinalEnvelope<IConfirmingServices<string, byte[], object, string>, EnvelopeData, string, byte[], object, string>(services, inputData);
+    capabilities.ConfirmEnvelope(
+        inputData.Envelope!,
+        default)
+      .ThrowsAsync(expectedException);
 
-    data.ShouldBeSameAs(inputData);
+    var (data, state, exception) =
+      await EnvelopeFuncs.ConfirmFinalEnvelope(capabilities, inputData);
+
+    data.ShouldBe(inputData);
     state.ShouldBe(ConfirmingFinalStates.Error);
     exception.ShouldBeSameAs(expectedException);
+
+    capabilities.ConfirmEnvelope.Received(1)(inputData.Envelope!, default);
   }
 }

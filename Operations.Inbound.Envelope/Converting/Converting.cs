@@ -1,38 +1,37 @@
-
 namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static (TData, ConvertingStates, Exception?) ConvertEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    TServices services,
-    TData data)
-  where TServices : IConvertingServices<TKey, TValue, TMetadata, TConfirmation>
-  where TData : IConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
-  {
-    var envelope = RequireEnvelope(data.Envelope);
-    var failureReason = RequireFailureReason(data);
+  static (ConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, ConvertingStates, Exception?)
+    ConvertEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      ConvertingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      ConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data)
+    {
+      var envelope = RequireEnvelope(data.Envelope);
+      var failureReason = RequireFailureReason(data);
+      var currentDate = capabilities.GetUtcDateTime();
+      var deadLetterEnvelope =
+        capabilities.FromEnvelope(envelope, failureReason, currentDate);
 
-    var deadLetter = services.FromEnvelope(envelope, failureReason, services.GetUtcDateTime());
-    SetDeadLetterEnvelope(data, deadLetter);
+      return (
+        data with { DeadLetterEnvelope = deadLetterEnvelope },
+        ConvertingStates.Success,
+        null);
+    }
 
-    return (data, ConvertingStates.Success, null);
-  }
-
-  static (TData, ConvertingStates, Exception?) ConvertEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : IConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+  static (ConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload>,ConvertingStates, Exception?)
+    ConvertEnvelopeError<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      ConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
+      Exception exception) =>
     (data, ConvertingStates.Error, exception);
 
-  internal static (TData, ConvertingStates, Exception?) ConvertEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    TServices services,
-    TData data)
-  where TServices : IConvertingServices<TKey, TValue, TMetadata, TConfirmation>
-  where TData : IConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+  internal static (ConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, ConvertingStates, Exception?)
+    ConvertEnvelope<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      ConvertingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      ConvertingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      ConvertEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
-      ConvertEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>
-    );
+      ConvertEnvelopeSuccess,
+      ConvertEnvelopeError);
 }

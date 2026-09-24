@@ -1,37 +1,35 @@
-
 namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static (TData, MappingStates, Exception?) MapEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    TServices services,
-    TData data)
-  where TServices : IMappingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
-  where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
-  {
-    var envelope = RequireEnvelope(data.Envelope);
+  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, MappingStates, Exception?)
+    MapEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data)
+    {
+      var envelope = RequireEnvelope(data.Envelope);
+      var currentDate = capabilities.GetUtcDateTime();
+      var message = capabilities.FromEnvelope(envelope, currentDate);
 
-    var message = services.FromEnvelope(envelope, services.GetUtcDateTime());
-    SetInboxMessage(data, message);
+      return (
+        data with { InboxMessage = message },
+        MappingStates.Success,
+        null);
+    }
 
-    return (data, MappingStates.Success, null);
-  }
-
-  static (TData, MappingStates, Exception?) MapEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, MappingStates, Exception?)
+    MapEnvelopeError<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
+      Exception exception) =>
     (data, MappingStates.Error, exception);
 
-  internal static (TData, MappingStates, Exception?) MapEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    TServices services,
-    TData data)
-  where TServices : IMappingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
-  where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
-  =>
+  internal static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, MappingStates, Exception?)
+    MapEnvelope<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      MapEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
-      MapEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>);
+      MapEnvelopeSuccess,
+      MapEnvelopeError);
 }

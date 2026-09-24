@@ -5,35 +5,76 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task publish_envelope__publisher_succeeds__returns_success()
   {
-    var services = Substitute.For<IPublishingServices<string, byte[], object, string>>();
-    var envelope = Substitute.For<IEnvelope<string, byte[], object, string>>();
-    var inputData = new EnvelopeData { Envelope = envelope };
+    var capabilities =
+      Fixture.Create<PublishingCapabilities<string, byte[], object, string>>();
 
-    var (data, state, exception) = await EnvelopeFuncs.PublishEnvelopeAsync<
-      IPublishingServices<string, byte[], object, string>, EnvelopeData,
-      string, byte[], object, string>(services, inputData);
+    var envelope =
+      Fixture.Create<IEnvelope<string, byte[], object, string>>();
 
-    data.ShouldBeSameAs(inputData);
+    var inputData =
+      new PublishingData<string, byte[], object, string>(envelope);
+
+    capabilities.PublishEnvelopeAsync(
+        inputData.Envelope!,
+        default)
+      .Returns(Task.CompletedTask);
+
+    var (data, state, exception) =
+      await EnvelopeFuncs.PublishEnvelopeAsync(capabilities, inputData);
+
+    data.ShouldBe(inputData);
     state.ShouldBe(PublishingStates.Success);
     exception.ShouldBeNull();
-    await services.Received(1).PublishEnvelopeAsync(envelope, Arg.Any<CancellationToken>());
+
+    capabilities.PublishEnvelopeAsync
+      .Received(1)(inputData.Envelope!, default);
   }
 
   [TestMethod]
   public async Task publish_envelope__publisher_throws__returns_error_with_exception()
   {
-    var services = Substitute.For<IPublishingServices<string, byte[], object, string>>();
+    var capabilities =
+      Fixture.Create<PublishingCapabilities<string, byte[], object, string>>();
+
+    var envelope =
+      Fixture.Create<IEnvelope<string, byte[], object, string>>();
+
+    var inputData =
+      new PublishingData<string, byte[], object, string>(envelope);
+
     var expectedException = new InvalidOperationException("publish failed");
-    services.PublishEnvelopeAsync(Arg.Any<IEnvelope<string, byte[], object, string>>(), Arg.Any<CancellationToken>())
+
+    capabilities.PublishEnvelopeAsync(
+        inputData.Envelope!,
+        default)
       .ThrowsAsync(expectedException);
-    var inputData = new EnvelopeData { Envelope = Substitute.For<IEnvelope<string, byte[], object, string>>() };
 
-    var (data, state, exception) = await EnvelopeFuncs.PublishEnvelopeAsync<
-      IPublishingServices<string, byte[], object, string>, EnvelopeData,
-      string, byte[], object, string>(services, inputData);
+    var (data, state, exception) =
+      await EnvelopeFuncs.PublishEnvelopeAsync(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(PublishingStates.Error);
     exception.ShouldBeSameAs(expectedException);
+
+    capabilities.PublishEnvelopeAsync
+      .Received(1)(inputData.Envelope!, default);
+  }
+
+  [TestMethod]
+  public async Task publish_envelope__envelope_missing__returns_error()
+  {
+    var capabilities =
+      Fixture.Create<PublishingCapabilities<string, byte[], object, string>>();
+
+    var inputData = new PublishingData<string, byte[], object, string>(null);
+
+    var (data, state, exception) =
+      await EnvelopeFuncs.PublishEnvelopeAsync(capabilities, inputData);
+
+    data.ShouldBe(inputData);
+    state.ShouldBe(PublishingStates.Error);
+    exception.ShouldBeOfType<InvalidOperationException>();
+
+    capabilities.PublishEnvelopeAsync.Received(0)(default!, default);
   }
 }

@@ -1,41 +1,42 @@
-
 using Funcs = Transport.Envelope.EnvelopeFuncs;
 
 namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static (TData, VerifyingStates, Exception?) VerifyEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
-    TServices services,
-    TData data)
-  where TServices : IVerifyingServices<TKey, TValue, TMetadata, TConfirmation>
-  where TData : IVerifyingData<TKey, TValue, TMetadata, TConfirmation>
-  {
-    var envelope = RequireEnvelope(data.Envelope);
+  static (VerifyingData<TKey, TValue, TMetadata, TConfirmation>, VerifyingStates, Exception?)
+    VerifyEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation>(
+      VerifyingCapabilities capabilities,
+      VerifyingData<TKey, TValue, TMetadata, TConfirmation> data)
+    {
+      var envelope = RequireEnvelope(data.Envelope);
+      var error = Funcs.ValidateEnvelope(envelope);
 
-    var error = Funcs.ValidateEnvelope(envelope);
-    if (error is not null)
-      return IsValidEnvelopeConfirmation(envelope.Confirmation) ?
-        (data, VerifyingStates.InvalidError, CreateValidationException(error)):
-        (data, VerifyingStates.InvalidConfirmableError, CreateValidationException(error));
+      if (error is not null)
+      {
+        var state = IsValidEnvelopeConfirmation(envelope.Confirmation)
+          ? VerifyingStates.InvalidError
+          : VerifyingStates.InvalidConfirmableError;
 
-    return (data, VerifyingStates.Success, null);
-  }
+        return (data, state, CreateValidationException(error));
+      }
 
-  static (TData, VerifyingStates, Exception?) VerifyEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation>(
-    TData data,
-    Exception exception)
-  where TData : IVerifyingData<TKey, TValue, TMetadata, TConfirmation> =>
+      return (data, VerifyingStates.Success, null);
+    }
+
+  static (VerifyingData<TKey, TValue, TMetadata, TConfirmation>, VerifyingStates, Exception?)
+    VerifyEnvelopeError<TKey, TValue, TMetadata, TConfirmation>(
+      VerifyingData<TKey, TValue, TMetadata, TConfirmation> data,
+      Exception exception) =>
     (data, VerifyingStates.Error, exception);
 
-  internal static (TData, VerifyingStates, Exception?) VerifyEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
-    TServices services,
-    TData data)
-  where TServices : IVerifyingServices<TKey, TValue, TMetadata, TConfirmation>
-  where TData : IVerifyingData<TKey, TValue, TMetadata, TConfirmation> =>
+  internal static (VerifyingData<TKey, TValue, TMetadata, TConfirmation>, VerifyingStates, Exception?)
+    VerifyEnvelope<TKey, TValue, TMetadata, TConfirmation>(
+      VerifyingCapabilities capabilities,
+      VerifyingData<TKey, TValue, TMetadata, TConfirmation> data) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      VerifyEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation>,
-      VerifyEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation>);
+      VerifyEnvelopeSuccess,
+      VerifyEnvelopeError);
 }

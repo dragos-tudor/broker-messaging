@@ -3,47 +3,45 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async Task<(TData, SchedulingStates, Exception?)> ScheduleInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct)
-  where TServices : ISchedulingServices<TKey, TPayload>
-  where TData : ISchedulingData<TKey, TPayload>
-  {
-    var message = RequireInboxMessage(data.InboxMessage);
-    var options = services.GetInboxRetryOptions();
+  static async Task<(SchedulingData<TKey, TPayload>, SchedulingStates, Exception?)>
+    ScheduleInboxMessageSuccessAsync<TKey, TPayload>(
+      SchedulingCapabilities<TKey, TPayload> capabilities,
+      SchedulingData<TKey, TPayload> data,
+      CancellationToken ct)
+    {
+      var message = RequireInboxMessage(data.InboxMessage);
+      var options = capabilities.GetInboxRetryOptions();
 
-    var nextRetryCount = IncrementInboxRetryCount(message.RetryCount);
-    var nextAttemptAt = CalculateNextAttemptAt(nextRetryCount, services.GetUtcDateTime(), options);
-    var nextStatus = GetInboxMessageStatus(nextRetryCount, options);
-    var failureReason = message.FailureReason;
-    var lastError = message.LastError;
-    var @params = new SchedulingUpdate(nextRetryCount, nextAttemptAt, nextStatus, lastError, failureReason);
+      var nextRetryCount = IncrementInboxRetryCount(message.RetryCount);
+      var nextAttemptAt = CalculateNextAttemptAt(nextRetryCount, capabilities.GetUtcDateTime(), options);
+      var nextStatus = GetInboxMessageStatus(nextRetryCount, options);
+      var failureReason = message.FailureReason;
+      var lastError = message.LastError;
+      var @params = new SchedulingUpdate(nextRetryCount, nextAttemptAt, nextStatus, lastError, failureReason);
 
-    await services.UpdateInboxMessageAsync(message, @params, ct);
+      await capabilities.UpdateInboxMessageAsync(message, @params, ct);
 
-    return nextStatus == InboxMessageStatus.Processing?
-      (data, SchedulingStates.NotExhausted, null):
-      (data, SchedulingStates.Exhausted, null);
-  }
+      return nextStatus == InboxMessageStatus.Processing?
+        (data, SchedulingStates.NotExhausted, null):
+        (data, SchedulingStates.Exhausted, null);
+    }
 
-  static (TData, SchedulingStates, Exception?) ScheduleInboxMessageError<TData, TKey, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : ISchedulingData<TKey, TPayload> =>
+  static (SchedulingData<TKey, TPayload>, SchedulingStates, Exception?)
+    ScheduleInboxMessageError<TKey, TPayload>(
+      SchedulingData<TKey, TPayload> data,
+      Exception exception) =>
     (data, SchedulingStates.Error, exception);
 
-  internal static Task<(TData, SchedulingStates, Exception?)> ScheduleInboxMessageAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct)
-  where TServices : ISchedulingServices<TKey, TPayload>
-  where TData : ISchedulingData<TKey, TPayload> =>
+  internal static Task<(SchedulingData<TKey, TPayload>, SchedulingStates, Exception?)>
+    ScheduleInboxMessageAsync<TKey, TPayload>(
+      SchedulingCapabilities<TKey, TPayload> capabilities,
+      SchedulingData<TKey, TPayload> data,
+      CancellationToken ct) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      ScheduleInboxMessageSuccessAsync<TServices, TData, TKey, TPayload>,
-      ScheduleInboxMessageError<TData, TKey, TPayload>,
+      ScheduleInboxMessageSuccessAsync,
+      ScheduleInboxMessageError,
       ct
     );
 }

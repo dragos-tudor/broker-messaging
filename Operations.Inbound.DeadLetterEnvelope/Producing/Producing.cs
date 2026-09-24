@@ -1,45 +1,45 @@
-
 namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  internal static (TData, ProducingStates, Exception?) ProduceDeadLetterEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    TServices services,
-    TData data)
-  where TServices : IProducingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
-  where TData : IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
+  static (ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, ProducingStates, Exception?)
+    ProduceDeadLetterEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data)
   {
-    var envelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
-    var message = RequireDeadLetterMessage(data.DeadLetterMessage);
-    var result = CreateProduceResult(message.MessageId);
+      var envelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
+      var message = RequireDeadLetterMessage(data.DeadLetterMessage);
+      var result = CreateProduceResult(message.MessageId);
 
-    var isEnqueued = services.ProduceDeadLetterEnvelope(envelope,
-      (isAcknowledged, exception) => {
-        SetProduceResultIsAcknowledged(result, isAcknowledged);
-        SetProduceResultException(result, exception);
-        services.DispatchProduceResult(result);
-      });
+      var isEnqueued =
+        capabilities.ProduceDeadLetterEnvelope(
+          envelope,
+          (isAcknowledged, exception) =>
+          {
+            SetProduceResultIsAcknowledged(result, isAcknowledged);
+            SetProduceResultException(result, exception);
+            capabilities.DispatchProduceResult(result);
+          });
 
-    return isEnqueued?
-      (data, ProducingStates.Enqueue, null):
-      (data, ProducingStates.NotEnqueue, null);
-  }
+      return isEnqueued
+        ? (data, ProducingStates.Enqueue, null)
+        : (data, ProducingStates.NotEnqueue, null);
+    }
 
-  static (TData, ProducingStates, Exception?) ProduceDeadLetterEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+  static (
+    ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, ProducingStates, Exception?)
+    ProduceDeadLetterEnvelopeError<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
+      Exception exception) =>
     (data, ProducingStates.Error, exception);
 
-  internal static (TData, ProducingStates, Exception?) ProduceDeadLetterEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    TServices services,
-    TData data)
-  where TServices : IProducingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
-  where TData : IProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+  internal static (ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, ProducingStates, Exception?)
+    ProduceDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      ProduceDeadLetterEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
-      ProduceDeadLetterEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>
-    );
+      ProduceDeadLetterEnvelopeSuccess,
+      ProduceDeadLetterEnvelopeError);
 }

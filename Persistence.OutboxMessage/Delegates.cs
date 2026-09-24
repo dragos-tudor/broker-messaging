@@ -1,0 +1,27 @@
+namespace Persistence.OutboxMessage;
+
+public delegate OutboxRetryOptions GetOutboxRetryOptions();
+
+public delegate TSession GetOutboxSession<TSession>() where TSession : IDisposable;
+
+public delegate Task<bool> InsertOutboxMessageSessionAsync<TKey, TPayload, TSession>(
+  TSession session,
+  IOutboxMessage<TKey, TPayload> message,
+  CancellationToken ct = default
+)
+where TSession : IDisposable;
+
+public delegate Task StoreDomainModelSessionAsync<TSession>(
+  TSession session,
+  object model,
+  CancellationToken ct = default
+)
+where TSession : IDisposable;
+
+public delegate Task UpdateOutboxMessageAsync<TKey, TPayload, TParam>(
+  IOutboxMessage<TKey, TPayload> message,
+  TParam parameters,
+  CancellationToken ct = default
+)
+where TParam : struct;
+

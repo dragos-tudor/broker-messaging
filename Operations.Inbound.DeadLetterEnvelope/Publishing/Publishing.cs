@@ -1,38 +1,35 @@
-
 namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  static async Task<(TData, PublishingStates, Exception?)> PublishDeadLetterEnvelopeSuccessAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IPublishingServices<TKey, TValue, TMetadata, TConfirmation>
-  where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation>
-  {
-    var envelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
+  static async Task<(PublishingData<TKey, TValue, TMetadata, TConfirmation>, PublishingStates, Exception?)>
+    PublishDeadLetterEnvelopeSuccessAsync<TKey, TValue, TMetadata, TConfirmation>(
+      PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      PublishingData<TKey, TValue, TMetadata, TConfirmation> data,
+      CancellationToken ct = default)
+    {
+      var envelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
 
-    await services.PublishDeadLetterEnvelopeAsync(envelope, ct);
-    return (data, PublishingStates.Success, null);
-  }
+      await capabilities.PublishDeadLetterEnvelopeAsync(envelope, ct);
 
-  static (TData, PublishingStates, Exception?) PublishDeadLetterEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation>(
-    TData data,
-    Exception exception)
-  where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation> =>
-      (data, PublishingStates.Error, exception);
+      return (data, PublishingStates.Success, null);
+    }
 
-  internal static Task<(TData, PublishingStates, Exception?)> PublishDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IPublishingServices<TKey, TValue, TMetadata, TConfirmation>
-  where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation> =>
+  static (PublishingData<TKey, TValue, TMetadata, TConfirmation>, PublishingStates, Exception?)
+    PublishDeadLetterEnvelopeError<TKey, TValue, TMetadata, TConfirmation>(
+      PublishingData<TKey, TValue, TMetadata, TConfirmation> data,
+      Exception exception) =>
+    (data, PublishingStates.Error, exception);
+
+  internal static Task<(PublishingData<TKey, TValue, TMetadata, TConfirmation>, PublishingStates, Exception?)>
+    PublishDeadLetterEnvelopeAsync<TKey, TValue, TMetadata, TConfirmation>(
+      PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      PublishingData<TKey, TValue, TMetadata, TConfirmation> data,
+      CancellationToken ct = default) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      PublishDeadLetterEnvelopeSuccessAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>,
-      PublishDeadLetterEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation>,
-      ct
-    );
+      PublishDeadLetterEnvelopeSuccessAsync,
+      PublishDeadLetterEnvelopeError,
+      ct);
 }

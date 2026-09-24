@@ -7,29 +7,33 @@ public partial class DeadLetterTests
   [DataRow(false, InsertingStates.Idempotent)]
   public async Task insert_dead_letter_message__persistence_result_varies__returns_matching_state(bool inserted, Enum expectedState)
   {
-    var services = Substitute.For<IInsertingServices<string, string>>();
-    var inputData = new DeadLetterData { DeadLetterMessage = Substitute.For<IDeadLetterMessage<string, string>>() };
-    services.InsertDeadLetterMessageAsync(Arg.Any<IDeadLetterMessage<string, string>>(), Arg.Any<CancellationToken>()).Returns(inserted);
+    var capabilities = Fixture.Create<InsertingCapabilities<string, string>>();
+    var message = Fixture.Create<IDeadLetterMessage<string, string>>();
+    var inputData = new InsertingData<string, string>(message);
+    capabilities.InsertDeadLetterMessageAsync(inputData.DeadLetterMessage!, default).Returns(inserted);
 
-    var (data, state, exception) = await DeadLetterFuncs.InsertDeadLetterMessageAsync<IInsertingServices<string, string>, DeadLetterData, string, string>(services, inputData);
+    var (data, state, exception) = await DeadLetterFuncs.InsertDeadLetterMessageAsync(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(expectedState);
     exception.ShouldBeNull();
+    capabilities.InsertDeadLetterMessageAsync.Received(1)(inputData.DeadLetterMessage!, default);
   }
 
   [TestMethod]
   public async Task insert_dead_letter_message__persistence_throws__returns_error_with_exception()
   {
-    var services = Substitute.For<IInsertingServices<string, string>>();
+    var capabilities = Fixture.Create<InsertingCapabilities<string, string>>();
+    var message = Fixture.Create<IDeadLetterMessage<string, string>>();
+    var inputData = new InsertingData<string, string>(message);
     var expectedException = new InvalidOperationException("insert failed");
-    services.InsertDeadLetterMessageAsync(Arg.Any<IDeadLetterMessage<string, string>>(), Arg.Any<CancellationToken>()).ThrowsAsync(expectedException);
-    var inputData = new DeadLetterData { DeadLetterMessage = Substitute.For<IDeadLetterMessage<string, string>>() };
+    capabilities.InsertDeadLetterMessageAsync(inputData.DeadLetterMessage!, default).ThrowsAsync(expectedException);
 
-    var (data, state, exception) = await DeadLetterFuncs.InsertDeadLetterMessageAsync<IInsertingServices<string, string>, DeadLetterData, string, string>(services, inputData);
+    var (data, state, exception) = await DeadLetterFuncs.InsertDeadLetterMessageAsync(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(InsertingStates.Error);
     exception.ShouldBeSameAs(expectedException);
+    capabilities.InsertDeadLetterMessageAsync.Received(1)(inputData.DeadLetterMessage!, default);
   }
 }

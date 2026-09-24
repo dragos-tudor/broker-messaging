@@ -1,39 +1,35 @@
-
 namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static async Task<(TData, CapturingStates, Exception?)> CaptureEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : ICapturingServices<TKey, TValue, TMetadata, TConfirmation>
-  where TData : ICapturingData<TKey, TValue, TMetadata, TConfirmation>
-  {
-    var envelope = await services.ReadEnvelope(ct);
+  static async Task<(CapturingData<TKey, TValue, TMetadata, TConfirmation>, CapturingStates, Exception?)>
+    CaptureEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation>(
+      CapturingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      CapturingData<TKey, TValue, TMetadata, TConfirmation> data,
+      CancellationToken ct = default)
+    {
+      var envelope = await capabilities.ReadEnvelope(ct);
 
-    return SetEnvelope(data, envelope) is not null ?
-      new(data, CapturingStates.Success, null) :
-      new(data, CapturingStates.NotCaptured, null);
-  }
+      return envelope is null
+        ? (data, CapturingStates.NotCaptured, null)
+        : (data with { Envelope = envelope }, CapturingStates.Success, null);
+    }
 
-  static (TData, CapturingStates, Exception?) CaptureEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation>(
-    TData data,
-    Exception exception)
-  where TData : ICapturingData<TKey, TValue, TMetadata, TConfirmation>
-    => (data, CapturingStates.Error, exception);
+  static (CapturingData<TKey, TValue, TMetadata, TConfirmation>, CapturingStates, Exception?)
+    CaptureEnvelopeError<TKey, TValue, TMetadata, TConfirmation>(
+      CapturingData<TKey, TValue, TMetadata, TConfirmation> data,
+      Exception exception) =>
+    (data, CapturingStates.Error, exception);
 
-  internal static Task<(TData, CapturingStates, Exception?)> CaptureEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : ICapturingServices<TKey, TValue, TMetadata, TConfirmation>
-  where TData : ICapturingData<TKey, TValue, TMetadata, TConfirmation> =>
+  internal static Task<(CapturingData<TKey, TValue, TMetadata, TConfirmation>, CapturingStates, Exception?)>
+    CaptureEnvelope<TKey, TValue, TMetadata, TConfirmation>(
+      CapturingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      CapturingData<TKey, TValue, TMetadata, TConfirmation> data,
+      CancellationToken ct = default) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      CaptureEnvelopeSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation>,
-      CaptureEnvelopeError<TData, TKey, TValue, TMetadata, TConfirmation>,
-      ct
-    );
+      CaptureEnvelopeSuccess,
+      CaptureEnvelopeError,
+      ct);
 }

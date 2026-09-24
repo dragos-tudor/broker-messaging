@@ -7,33 +7,65 @@ public partial class DeadLetterTests
   [DataRow(0, SchedulingStates.Exhausted)]
   public async Task schedule_dead_letter_message__retry_limit_varies__returns_matching_state(int maxRetries, Enum expectedState)
   {
-    var services = Substitute.For<ISchedulingServices<string, string>>();
-    var inputData = new DeadLetterData { DeadLetterMessage = Substitute.For<IDeadLetterMessage<string, string>>() };
-    services.GetDeadLetterRetryOptions().Returns(CreateDeadLetterRetryOptions(maxRetries));
-    services.GetUtcDateTime().Returns(DateTime.UtcNow);
-    services.UpdateDeadLetterMessageAsync(Arg.Any<IDeadLetterMessage<string, string>>(), Arg.Any<SchedulingUpdate>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+    var capabilities = Fixture.Create<SchedulingCapabilities<string, string>>();
+    var message = Fixture.Create<IDeadLetterMessage<string, string>>();
+    message.RetryCount = 0;
+    var inputData = new SchedulingData<string, string>(message);
+    var options = Fixture.Build<DeadLetterRetryOptions>()
+      .With(options => options.MaxRetryAttempts, maxRetries)
+      .With(options => options.RetryBaseDelay, TimeSpan.Zero)
+      .With(options => options.MaxRetryDelay, TimeSpan.Zero)
+      .Create();
+    var now = Fixture.Create<DateTime>();
+    var nextRetryCount = IncrementDeadLetterRetryCount(message.RetryCount);
+    var expectedUpdate = new SchedulingUpdate(
+      nextRetryCount,
+      CalculateNextAttemptAt(nextRetryCount, now, options),
+      GetDeadLetterMessageStatus(nextRetryCount, options),
+      message.LastError);
+    capabilities.GetDeadLetterRetryOptions().Returns(options);
+    capabilities.GetUtcDateTime().Returns(now);
+    capabilities.UpdateDeadLetterMessageAsync(inputData.Message!, expectedUpdate, default).Returns(Task.CompletedTask);
 
-    var (data, state, exception) = await DeadLetterFuncs.ScheduleDeadLetterMessageAsync<ISchedulingServices<string, string>, DeadLetterData, string, string>(services, inputData, default);
+    var (data, state, exception) = await DeadLetterFuncs.ScheduleDeadLetterMessageAsync(capabilities, inputData, default);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(expectedState);
     exception.ShouldBeNull();
+    capabilities.GetDeadLetterRetryOptions.Received(1)();
+    capabilities.GetUtcDateTime.Received(1)();
+    capabilities.UpdateDeadLetterMessageAsync.Received(1)(inputData.Message!, expectedUpdate, default);
   }
 
   [TestMethod]
   public async Task schedule_dead_letter_message__update_throws__returns_error_with_exception()
   {
-    var services = Substitute.For<ISchedulingServices<string, string>>();
+    var capabilities = Fixture.Create<SchedulingCapabilities<string, string>>();
+    var message = Fixture.Create<IDeadLetterMessage<string, string>>();
+    message.RetryCount = 0;
+    var inputData = new SchedulingData<string, string>(message);
+    var options = Fixture.Build<DeadLetterRetryOptions>()
+      .With(options => options.MaxRetryAttempts, 5)
+      .With(options => options.RetryBaseDelay, TimeSpan.Zero)
+      .With(options => options.MaxRetryDelay, TimeSpan.Zero)
+      .Create();
+    var now = Fixture.Create<DateTime>();
+    var nextRetryCount = IncrementDeadLetterRetryCount(message.RetryCount);
+    var expectedUpdate = new SchedulingUpdate(
+      nextRetryCount,
+      CalculateNextAttemptAt(nextRetryCount, now, options),
+      GetDeadLetterMessageStatus(nextRetryCount, options),
+      message.LastError);
     var expectedException = new InvalidOperationException("schedule failed");
-    services.GetDeadLetterRetryOptions().Returns(CreateDeadLetterRetryOptions());
-    services.GetUtcDateTime().Returns(DateTime.UtcNow);
-    services.UpdateDeadLetterMessageAsync(Arg.Any<IDeadLetterMessage<string, string>>(), Arg.Any<SchedulingUpdate>(), Arg.Any<CancellationToken>()).ThrowsAsync(expectedException);
-    var inputData = new DeadLetterData { DeadLetterMessage = Substitute.For<IDeadLetterMessage<string, string>>() };
+    capabilities.GetDeadLetterRetryOptions().Returns(options);
+    capabilities.GetUtcDateTime().Returns(now);
+    capabilities.UpdateDeadLetterMessageAsync(inputData.Message!, expectedUpdate, default).ThrowsAsync(expectedException);
 
-    var (data, state, exception) = await DeadLetterFuncs.ScheduleDeadLetterMessageAsync<ISchedulingServices<string, string>, DeadLetterData, string, string>(services, inputData, default);
+    var (data, state, exception) = await DeadLetterFuncs.ScheduleDeadLetterMessageAsync(capabilities, inputData, default);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(SchedulingStates.Error);
     exception.ShouldBeSameAs(expectedException);
+    capabilities.UpdateDeadLetterMessageAsync.Received(1)(inputData.Message!, expectedUpdate, default);
   }
 }

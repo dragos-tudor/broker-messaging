@@ -5,42 +5,47 @@ public partial class InboxTests
   [TestMethod]
   public async Task handle_inbox_message__handler_returns_model__returns_success_and_sets_model()
   {
-    var services = Substitute.For<IHandlingServices<string, string>>();
+    var capabilities = Fixture.Create<HandlingCapabilities<string, string>>();
+    var message = Fixture.Create<IInboxMessage<string, string>>();
     var model = new object();
-    var inputData = new InboxData { InboxMessage = InboxData.CreateMessage() };
-    services.HandleInboxMessageAsync(Arg.Any<IInboxMessage<string, string>>(), Arg.Any<CancellationToken>()).Returns((model, (string?)null));
+    var inputData = new HandlingData<string, string>(message);
+    capabilities.HandleInboxMessageAsync(inputData.InboxMessage!, default).Returns((model, null));
 
-    var (data, state, exception) = await InboxFuncs.HandleInboxMessageAsync<IHandlingServices<string, string>, InboxData, string, string>(services, inputData);
+    var (data, state, exception) = await InboxFuncs.HandleInboxMessageAsync(capabilities, inputData);
 
-    data.DomainModel.ShouldBeSameAs(model);
+    data.Model.ShouldBeSameAs(model);
     state.ShouldBe(HandlingStates.Success);
     exception.ShouldBeNull();
+    capabilities.HandleInboxMessageAsync.Received(1)(inputData.InboxMessage!, default);
   }
 
   [TestMethod]
   public async Task handle_inbox_message__handler_returns_domain_error__returns_domain_error()
   {
-    var services = Substitute.For<IHandlingServices<string, string>>();
-    var inputData = new InboxData { InboxMessage = InboxData.CreateMessage() };
-    services.HandleInboxMessageAsync(Arg.Any<IInboxMessage<string, string>>(), Arg.Any<CancellationToken>()).Returns(((object?)null, "business failure"));
+    var capabilities = Fixture.Create<HandlingCapabilities<string, string>>();
+    var message = Fixture.Create<IInboxMessage<string, string>>();
+    var inputData = new HandlingData<string, string>(message);
+    capabilities.HandleInboxMessageAsync(inputData.InboxMessage!, default).Returns((null, "business failure"));
 
-    var (data, state, exception) = await InboxFuncs.HandleInboxMessageAsync<IHandlingServices<string, string>, InboxData, string, string>(services, inputData);
+    var (data, state, exception) = await InboxFuncs.HandleInboxMessageAsync(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(HandlingStates.DomainError);
     exception.ShouldBeOfType<DomainException>().Message.ShouldBe("business failure");
+    capabilities.HandleInboxMessageAsync.Received(1)(inputData.InboxMessage!, default);
   }
 
   [TestMethod]
   public async Task handle_inbox_message__message_missing__returns_error()
   {
-    var services = Substitute.For<IHandlingServices<string, string>>();
-    var inputData = new InboxData();
+    var capabilities = Fixture.Create<HandlingCapabilities<string, string>>();
+    var inputData = new HandlingData<string, string>(default);
 
-    var (data, state, exception) = await InboxFuncs.HandleInboxMessageAsync<IHandlingServices<string, string>, InboxData, string, string>(services, inputData);
+    var (data, state, exception) = await InboxFuncs.HandleInboxMessageAsync(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(HandlingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
+    capabilities.HandleInboxMessageAsync.Received(0)(default!, default);
   }
 }

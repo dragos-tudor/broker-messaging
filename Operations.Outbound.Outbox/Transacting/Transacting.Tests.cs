@@ -5,29 +5,39 @@ public partial class OutboxTests
   [TestMethod]
   public async Task transact_outbox_message__domain_model_missing__returns_error()
   {
-    var services = Substitute.For<ITransactingServices<string, string, IDisposable>>();
-    var inputData = new OutboxData { OutboxMessage = Substitute.For<IOutboxMessage<string, string>>() };
+    var capabilities = Fixture.Create<TransactingCapabilities<string, string, ISessionService>>();
+    var message = Fixture.Create<IOutboxMessage<string, string>>();
+    var inputData = new TransactingData<string, string>(message, default);
 
-    var (data, state, exception) = await OutboxFuncs.TransactOutboxMessageAsync<ITransactingServices<string, string, IDisposable>, OutboxData, string, string, IDisposable>(services, inputData);
+    var (data, state, exception) = await OutboxFuncs.TransactOutboxMessageAsync(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(TransactingStates.Error);
     exception.ShouldBeOfType<InvalidOperationException>();
+    capabilities.GetSession.Received(0)();
   }
 
   [TestMethod]
   public async Task transact_outbox_message__transaction_succeeds__returns_success()
   {
-    var services = Substitute.For<ITransactingServices<string, string, IDisposable>>();
-    var session = Substitute.For<IDisposable>();
-    var inputData = new OutboxData { OutboxMessage = Substitute.For<IOutboxMessage<string, string>>(), DomainModel = new object() };
-    services.GetSession().Returns(session);
-    services.TransactSessionAsync(Arg.Any<ITransactingServices<string, string, IDisposable>>(), Arg.Any<IDisposable>(), Arg.Any<(object model, IOutboxMessage<string, string> message)>(), Arg.Any<Func<ITransactingServices<string, string, IDisposable>, IDisposable, (object model, IOutboxMessage<string, string> message), CancellationToken, Task>>(), Arg.Any<Func<ITransactingServices<string, string, IDisposable>, IDisposable, (object model, IOutboxMessage<string, string> message), CancellationToken, Task>>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+    var capabilities = Fixture.Create<TransactingCapabilities<string, string, ISessionService>>();
+    var session = Substitute.For<ISessionService>();
+    var message = Fixture.Create<IOutboxMessage<string, string>>();
+    var model = Fixture.Create<object>();
+    var inputData = new TransactingData<string, string>(message, model);
+    capabilities.GetSession().Returns(session);
+    capabilities.PersistDomainModelAsync(session, model, default).Returns(Task.CompletedTask);
+    capabilities.InsertOutboxMessageAsync(session, inputData.OutboxMessage!, default).Returns(true);
+    session.CompleteAsync(default).Returns(Task.CompletedTask);
 
-    var (data, state, exception) = await OutboxFuncs.TransactOutboxMessageAsync<ITransactingServices<string, string, IDisposable>, OutboxData, string, string, IDisposable>(services, inputData);
+    var (data, state, exception) = await OutboxFuncs.TransactOutboxMessageAsync(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
+    data.ShouldBe(inputData);
     state.ShouldBe(TransactingStates.Success);
     exception.ShouldBeNull();
+    capabilities.GetSession.Received(1)();
+    capabilities.PersistDomainModelAsync.Received(1)(session, model, default);
+    capabilities.InsertOutboxMessageAsync.Received(1)(session, inputData.OutboxMessage!, default);
+    session.Received(1).CompleteAsync(default);
   }
 }

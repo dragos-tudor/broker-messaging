@@ -1,42 +1,34 @@
-
 namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static async Task<(TData, AbandoningStates, Exception?)> AbandonOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IAbandoningServices<TKey, TPayload>
-  where TData : IAbandoningData<TKey, TPayload>
+  static async Task<(AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)>
+    AbandonOutboxMessageSuccessAsync<TKey, TPayload>(
+      AbandoningCapabilities<TKey, TPayload> capabilities,
+      AbandoningData<TKey, TPayload> data,
+      CancellationToken ct = default)
   {
     var message = RequireOutboxMessage(data.OutboxMessage);
-    var lastError = message.LastError;
-    var status = OutboxMessageStatus.Abandoned;
-    var @params = new AbandoningUpdate(status, lastError);
-
-    await services.UpdateOutboxMessageAsync(message, @params, ct);
-
+    var parameters = new AbandoningUpdate(OutboxMessageStatus.Abandoned, message.LastError);
+    await capabilities.UpdateOutboxMessageAsync(message, parameters, ct);
     return (data, AbandoningStates.Success, null);
   }
 
-  static (TData, AbandoningStates, Exception?) AbandonOutboxMessageError<TServices, TData, TKey, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : IAbandoningData<TKey, TPayload> =>
+  static (AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)
+    AbandonOutboxMessageError<TKey, TPayload>(
+      AbandoningData<TKey, TPayload> data,
+      Exception exception) =>
     (data, AbandoningStates.Error, exception);
 
-  internal static Task<(TData, AbandoningStates, Exception?)> AbandonOutboxMessageAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IAbandoningServices<TKey, TPayload>
-  where TData : IAbandoningData<TKey, TPayload> =>
+  internal static Task<(AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)>
+    AbandonOutboxMessageAsync<TKey, TPayload>(
+      AbandoningCapabilities<TKey, TPayload> capabilities,
+      AbandoningData<TKey, TPayload> data,
+      CancellationToken ct = default) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      AbandonOutboxMessageSuccessAsync<TServices, TData, TKey, TPayload>,
-      AbandonOutboxMessageError<TServices, TData, TKey, TPayload>,
-      ct
-    );
+      AbandonOutboxMessageSuccessAsync,
+      AbandonOutboxMessageError,
+      ct);
 }

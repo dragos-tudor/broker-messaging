@@ -1,39 +1,34 @@
-
 namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  static async Task<(TData, InsertingStates, Exception?)> InsertDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IInsertingServices<TKey, TPayload>
-  where TData : IInsertingData<TKey, TPayload>
+  static async Task<(InsertingData<TKey, TPayload>, InsertingStates, Exception?)>
+    InsertDeadLetterMessageSuccessAsync<TKey, TPayload>(
+      InsertingCapabilities<TKey, TPayload> capabilities,
+      InsertingData<TKey, TPayload> data,
+      CancellationToken ct = default)
   {
     var message = RequireDeadLetterMessage(data.DeadLetterMessage);
-
-    return await services.InsertDeadLetterMessageAsync(message, ct)?
-      (data, InsertingStates.Success, null):
-      (data, InsertingStates.Idempotent, null);
+    return await capabilities.InsertDeadLetterMessageAsync(message, ct)
+      ? (data, InsertingStates.Success, null)
+      : (data, InsertingStates.Idempotent, null);
   }
 
-  static (TData, InsertingStates, Exception?) InsertDeadLetterMessageError<TData, TKey, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : IInsertingData<TKey, TPayload> =>
+  static (InsertingData<TKey, TPayload>, InsertingStates, Exception?)
+    InsertDeadLetterMessageError<TKey, TPayload>(
+      InsertingData<TKey, TPayload> data,
+      Exception exception) =>
     (data, InsertingStates.Error, exception);
 
-  internal static Task<(TData, InsertingStates, Exception?)> InsertDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(
-    TServices services,
-    TData data,
-    CancellationToken ct = default)
-  where TServices : IInsertingServices<TKey, TPayload>
-  where TData : IInsertingData<TKey, TPayload> =>
+  internal static Task<(InsertingData<TKey, TPayload>, InsertingStates, Exception?)>
+    InsertDeadLetterMessageAsync<TKey, TPayload>(
+      InsertingCapabilities<TKey, TPayload> capabilities,
+      InsertingData<TKey, TPayload> data,
+      CancellationToken ct = default) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      InsertDeadLetterMessageSuccessAsync<TServices, TData, TKey, TPayload>,
-      InsertDeadLetterMessageError<TData, TKey, TPayload>,
-      ct
-    );
+      InsertDeadLetterMessageSuccessAsync,
+      InsertDeadLetterMessageError,
+      ct);
 }

@@ -1,37 +1,30 @@
-
 namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  internal static (TData, MappingStates, Exception?) MapDeadLetterMessageSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    TServices services,
-    TData data)
-  where TServices : IMappingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
-  where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
+  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, MappingStates, Exception?)
+    MapDeadLetterMessageSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data)
   {
     var message = RequireDeadLetterMessage(data.DeadLetterMessage);
-
-    var envelope = services.FromDeadLetterMessage(message, message.OriginatedAt);
-    SetDeadLetterEnvelope(data, envelope);
-
-    return (data, MappingStates.Success, null);
+    var envelope = capabilities.FromDeadLetterMessage(message, message.OriginatedAt);
+    return (data with { DeadLetterEnvelope = envelope }, MappingStates.Success, null);
   }
 
-  internal static (TData, MappingStates, Exception?) MapDeadLetterMessageError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    TData data,
-    Exception exception)
-  where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, MappingStates, Exception?)
+    MapDeadLetterMessageError<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
+      Exception exception) =>
     (data, MappingStates.Error, exception);
 
-  internal static (TData, MappingStates, Exception?) MapDeadLetterMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    TServices services,
-    TData data)
-  where TServices : IMappingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
-  where TData : IMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
+  internal static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, MappingStates, Exception?)
+    MapDeadLetterMessage<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data) =>
     TryCatch(
-      services,
+      capabilities,
       data,
-      MapDeadLetterMessageSuccess<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>,
-      MapDeadLetterMessageError<TData, TKey, TValue, TMetadata, TConfirmation, TPayload>
-    );
+      MapDeadLetterMessageSuccess,
+      MapDeadLetterMessageError);
 }

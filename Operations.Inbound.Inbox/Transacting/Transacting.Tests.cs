@@ -3,31 +3,42 @@ namespace Operations.Inbound.Inbox;
 public partial class InboxTests
 {
   [TestMethod]
-  public async Task transact_inbox_message__domain_model_missing__returns_error()
+  public async Task transact_inbox_message__transaction_succeeds__returns_success()
   {
-    var services = Substitute.For<ITransactingServices<string, string, IDisposable>>();
-    var inputData = new InboxData { InboxMessage = InboxData.CreateMessage() };
+    var capabilities = Fixture.Create<TransactingCapabilities<string, string, ISessionService>>();
+    var session = Substitute.For<ISessionService>();
+    var message = Fixture.Create<IInboxMessage<string, string>>();
+    var model = new object();
+    var inputData = new TransactingData<string, string>(message, model);
+    var expectedUpdate = new TransactingUpdate(InboxMessageStatus.Handled);
+    capabilities.GetSession().Returns(session);
+    session.CompleteAsync(default).Returns(Task.CompletedTask);
+    capabilities.StoreDomainModelAsync(session, model, default).Returns(Task.CompletedTask);
+    capabilities.UpdateInboxMessageAsync(session, inputData.InboxMessage!, expectedUpdate, default).Returns(Task.CompletedTask);
 
-    var (data, state, exception) = await InboxFuncs.TransactInboxMessageAsync<ITransactingServices<string, string, IDisposable>, InboxData, string, string, IDisposable>(services, inputData);
+    var (data, state, exception) = await InboxFuncs.TransactInboxMessageAsync(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
-    state.ShouldBe(TransactingStates.Error);
-    exception.ShouldBeOfType<InvalidOperationException>();
+    data.ShouldBe(inputData);
+    state.ShouldBe(TransactingStates.Success);
+    exception.ShouldBeNull();
+    capabilities.GetSession.Received(1)();
+    capabilities.StoreDomainModelAsync.Received(1)(session, model, default);
+    capabilities.UpdateInboxMessageAsync.Received(1)(session, inputData.InboxMessage!, expectedUpdate, default);
+    session.Received(1).CompleteAsync(default);
   }
 
   [TestMethod]
-  public async Task transact_inbox_message__transaction_succeeds__returns_success()
+  public async Task transact_inbox_message__domain_model_missing__returns_error()
   {
-    var services = Substitute.For<ITransactingServices<string, string, IDisposable>>();
-    var session = Substitute.For<IDisposable>();
-    var inputData = new InboxData { InboxMessage = InboxData.CreateMessage(), DomainModel = new object() };
-    services.GetSession().Returns(session);
-    services.TransactSessionAsync(Arg.Any<ITransactingServices<string, string, IDisposable>>(), Arg.Any<IDisposable>(), Arg.Any<(object model, IInboxMessage<string, string> message)>(), Arg.Any<Func<ITransactingServices<string, string, IDisposable>, IDisposable, (object model, IInboxMessage<string, string> message), CancellationToken, Task>>(), Arg.Any<Func<ITransactingServices<string, string, IDisposable>, IDisposable, (object model, IInboxMessage<string, string> message), CancellationToken, Task>>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+    var capabilities = Fixture.Create<TransactingCapabilities<string, string, ISessionService>>();
+    var message = Fixture.Create<IInboxMessage<string, string>>();
+    var inputData = new TransactingData<string, string>(message, default);
 
-    var (data, state, exception) = await InboxFuncs.TransactInboxMessageAsync<ITransactingServices<string, string, IDisposable>, InboxData, string, string, IDisposable>(services, inputData);
+    var (data, state, exception) = await InboxFuncs.TransactInboxMessageAsync(capabilities, inputData);
 
-    data.ShouldBeSameAs(inputData);
-    state.ShouldBe(TransactingStates.Success);
-    exception.ShouldBeNull();
+    data.ShouldBe(inputData);
+    state.ShouldBe(TransactingStates.Error);
+    exception.ShouldBeOfType<InvalidOperationException>();
+    capabilities.GetSession.Received(0)();
   }
 }
