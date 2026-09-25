@@ -1,5 +1,5 @@
 namespace Operations.Inbound.Inbox;
 
-sealed record ConvertingCapabilities(
+public sealed record ConvertingCapabilities(
   GetUtcDateTime GetUtcDateTime
 );

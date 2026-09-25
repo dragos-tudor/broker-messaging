@@ -1,6 +1,6 @@
 namespace Operations.Inbound.DeadLetter;
 
-sealed record SchedulingCapabilities<TKey, TPayload>(
+public sealed record SchedulingCapabilities<TKey, TPayload>(
   UpdateDeadLetterMessageAsync<TKey, TPayload, SchedulingUpdate>
     UpdateDeadLetterMessageAsync,
   GetDeadLetterRetryOptions GetDeadLetterRetryOptions,

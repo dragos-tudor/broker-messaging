@@ -1,6 +1,6 @@
 namespace Operations.Inbound.DeadLetter;
 
-sealed record ClosingCapabilities<TKey, TPayload>(
+public sealed record ClosingCapabilities<TKey, TPayload>(
   UpdateDeadLetterMessageAsync<TKey, TPayload, ClosingUpdate>
     UpdateDeadLetterMessageAsync
 );

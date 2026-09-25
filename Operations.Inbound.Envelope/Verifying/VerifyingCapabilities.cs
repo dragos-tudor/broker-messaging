@@ -1,3 +1,3 @@
 namespace Operations.Inbound.Envelope;
 
-sealed record VerifyingCapabilities;
+public sealed record VerifyingCapabilities;

@@ -1,3 +1,3 @@
 namespace Operations.Inbound.DeadLetterEnvelope;
 
-sealed record DispatchingCapabilities;
+public sealed record DispatchingCapabilities;

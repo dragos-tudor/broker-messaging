@@ -1,3 +1,3 @@
 namespace Operations.Outbound.Outbox;
 
-sealed record ValidatingCapabilities;
+public sealed record ValidatingCapabilities;

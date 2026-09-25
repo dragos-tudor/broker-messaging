@@ -1,3 +1,3 @@
 namespace Operations.Inbound.Inbox;
 
-sealed record ValidatingCapabilities;
+public sealed record ValidatingCapabilities;
