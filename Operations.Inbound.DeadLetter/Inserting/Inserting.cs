@@ -2,28 +2,28 @@ namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  static async Task<(InsertingData<TKey, TPayload>, string, Exception?)>
+  static async Task<(object?[], string, Exception?)>
     InsertDeadLetterMessageSuccessAsync<TKey, TPayload>(
       InsertingCapabilities<TKey, TPayload> capabilities,
-      InsertingData<TKey, TPayload> data,
+      object?[] data,
       CancellationToken ct = default)
   {
-    var message = RequireDeadLetterMessage(data.DeadLetterMessage);
+    var message = RequireDeadLetterMessage(GetDeadLetterMessage<TKey, TPayload>(data));
     return await capabilities.InsertDeadLetterMessageAsync(message, ct)
       ? (data, InsertingStates.Success, null)
       : (data, InsertingStates.Idempotent, null);
   }
 
-  static (InsertingData<TKey, TPayload>, string, Exception?)
-    InsertDeadLetterMessageError<TKey, TPayload>(
-      InsertingData<TKey, TPayload> data,
+  static (object?[], string, Exception?)
+    InsertDeadLetterMessageError(
+      object?[] data,
       Exception exception) =>
     (data, InsertingStates.Error, exception);
 
-  internal static Task<(InsertingData<TKey, TPayload>, string, Exception?)>
+  internal static Task<(object?[], string, Exception?)>
     InsertDeadLetterMessageAsync<TKey, TPayload>(
       InsertingCapabilities<TKey, TPayload> capabilities,
-      InsertingData<TKey, TPayload> data,
+      object?[] data,
       CancellationToken ct = default) =>
     TryCatch(
       capabilities,

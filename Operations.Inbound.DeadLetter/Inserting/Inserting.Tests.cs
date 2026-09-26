@@ -9,15 +9,15 @@ public partial class DeadLetterTests
   {
     var capabilities = Fixture.Create<InsertingCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = new InsertingData<string, string>(message);
-    capabilities.InsertDeadLetterMessageAsync(inputData.DeadLetterMessage!, default).Returns(inserted);
+    var inputData = CreateData(message);
+    capabilities.InsertDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, default).Returns(inserted);
 
     var (data, state, exception) = await DeadLetterFuncs.InsertDeadLetterMessageAsync(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(expectedState);
     exception.ShouldBeNull();
-    capabilities.InsertDeadLetterMessageAsync.Received(1)(inputData.DeadLetterMessage!, default);
+    capabilities.InsertDeadLetterMessageAsync.Received(1)(GetDeadLetterMessage<string, string>(inputData)!, default);
   }
 
   [TestMethod]
@@ -25,15 +25,15 @@ public partial class DeadLetterTests
   {
     var capabilities = Fixture.Create<InsertingCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = new InsertingData<string, string>(message);
+    var inputData = CreateData(message);
     var expectedException = new InvalidOperationException("insert failed");
-    capabilities.InsertDeadLetterMessageAsync(inputData.DeadLetterMessage!, default).ThrowsAsync(expectedException);
+    capabilities.InsertDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, default).ThrowsAsync(expectedException);
 
     var (data, state, exception) = await DeadLetterFuncs.InsertDeadLetterMessageAsync(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(InsertingStates.Error);
     exception.ShouldBeSameAs(expectedException);
-    capabilities.InsertDeadLetterMessageAsync.Received(1)(inputData.DeadLetterMessage!, default);
+    capabilities.InsertDeadLetterMessageAsync.Received(1)(GetDeadLetterMessage<string, string>(inputData)!, default);
   }
 }

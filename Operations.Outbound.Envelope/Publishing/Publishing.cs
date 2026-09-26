@@ -3,15 +3,15 @@ namespace Operations.Outbound.Envelope;
 partial class EnvelopeFuncs
 {
   static async Task<(
-    PublishingData<TKey, TValue, TMetadata, TConfirmation>,
+    object?[],
     string,
     Exception?)>
     PublishEnvelopeSuccessAsync<TKey, TValue, TMetadata, TConfirmation>(
       PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
-      PublishingData<TKey, TValue, TMetadata, TConfirmation> data,
+      object?[] data,
       CancellationToken ct = default)
   {
-    var envelope = RequireEnvelope(data.Envelope);
+    var envelope = RequireEnvelope(GetEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
 
     await capabilities.PublishEnvelopeAsync(envelope, ct);
 
@@ -19,21 +19,21 @@ partial class EnvelopeFuncs
   }
 
   static (
-    PublishingData<TKey, TValue, TMetadata, TConfirmation>,
+    object?[],
     string,
     Exception?)
-    PublishEnvelopeError<TKey, TValue, TMetadata, TConfirmation>(
-      PublishingData<TKey, TValue, TMetadata, TConfirmation> data,
+    PublishEnvelopeError(
+      object?[] data,
       Exception exception) =>
     (data, PublishingStates.Error, exception);
 
   internal static Task<(
-    PublishingData<TKey, TValue, TMetadata, TConfirmation>,
+    object?[],
     string,
     Exception?)>
     PublishEnvelopeAsync<TKey, TValue, TMetadata, TConfirmation>(
       PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
-      PublishingData<TKey, TValue, TMetadata, TConfirmation> data,
+      object?[] data,
       CancellationToken ct = default) =>
     TryCatch(
       capabilities,

@@ -9,12 +9,12 @@ public partial class InboxTests
     var session = Substitute.For<ISessionService>();
     var message = Fixture.Create<IInboxMessage<string, string>>();
     var model = new object();
-    var inputData = new TransactingData<string, string>(message, model);
+    var inputData = CreateInboxData(message, model: model);
     var expectedUpdate = new TransactingUpdate(InboxMessageStatus.Handled);
     capabilities.GetSession().Returns(session);
     session.CompleteAsync(default).Returns(Task.CompletedTask);
     capabilities.StoreDomainModelAsync(session, model, default).Returns(Task.CompletedTask);
-    capabilities.UpdateInboxMessageAsync(session, inputData.InboxMessage!, expectedUpdate, default).Returns(Task.CompletedTask);
+    capabilities.UpdateInboxMessageAsync(session, GetInboxMessage<string, string>(inputData)!, expectedUpdate, default).Returns(Task.CompletedTask);
 
     var (data, state, exception) = await InboxFuncs.TransactInboxMessageAsync(capabilities, inputData);
 
@@ -23,7 +23,7 @@ public partial class InboxTests
     exception.ShouldBeNull();
     capabilities.GetSession.Received(1)();
     capabilities.StoreDomainModelAsync.Received(1)(session, model, default);
-    capabilities.UpdateInboxMessageAsync.Received(1)(session, inputData.InboxMessage!, expectedUpdate, default);
+    capabilities.UpdateInboxMessageAsync.Received(1)(session, GetInboxMessage<string, string>(inputData)!, expectedUpdate, default);
     session.Received(1).CompleteAsync(default);
   }
 
@@ -32,7 +32,7 @@ public partial class InboxTests
   {
     var capabilities = Fixture.Create<TransactingCapabilities<string, string, ISessionService>>();
     var message = Fixture.Create<IInboxMessage<string, string>>();
-    var inputData = new TransactingData<string, string>(message, default);
+    var inputData = CreateInboxData(message);
 
     var (data, state, exception) = await InboxFuncs.TransactInboxMessageAsync(capabilities, inputData);
 

@@ -10,7 +10,7 @@ public partial class InboxTests
     var capabilities = Fixture.Create<SchedulingCapabilities<string, string>>();
     var message = Fixture.Create<IInboxMessage<string, string>>();
     message.RetryCount = 0;
-    var inputData = new SchedulingData<string, string>(message);
+    var inputData = CreateInboxData(message);
     var options = Fixture.Build<InboxRetryOptions>()
       .With(options => options.MaxRetryAttempts, maxRetries)
       .With(options => options.RetryBaseDelay, TimeSpan.Zero)
@@ -26,7 +26,7 @@ public partial class InboxTests
       message.FailureReason);
     capabilities.GetInboxRetryOptions().Returns(options);
     capabilities.GetUtcDateTime().Returns(now);
-    capabilities.UpdateInboxMessageAsync(inputData.InboxMessage!, expectedUpdate, default).Returns(Task.CompletedTask);
+    capabilities.UpdateInboxMessageAsync(GetInboxMessage<string, string>(inputData)!, expectedUpdate, default).Returns(Task.CompletedTask);
 
     var (data, state, exception) = await InboxFuncs.ScheduleInboxMessageAsync(capabilities, inputData, default);
 
@@ -35,14 +35,14 @@ public partial class InboxTests
     exception.ShouldBeNull();
     capabilities.GetInboxRetryOptions.Received(1)();
     capabilities.GetUtcDateTime.Received(1)();
-    capabilities.UpdateInboxMessageAsync.Received(1)(inputData.InboxMessage!, expectedUpdate, default);
+    capabilities.UpdateInboxMessageAsync.Received(1)(GetInboxMessage<string, string>(inputData)!, expectedUpdate, default);
   }
 
   [TestMethod]
   public async Task schedule_inbox_message__message_missing__returns_error()
   {
     var capabilities = Fixture.Create<SchedulingCapabilities<string, string>>();
-    var inputData = new SchedulingData<string, string>(default);
+    var inputData = CreateInboxData<string, string>();
 
     var (data, state, exception) = await InboxFuncs.ScheduleInboxMessageAsync(capabilities, inputData, default);
 

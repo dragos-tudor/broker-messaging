@@ -12,10 +12,10 @@ public partial class EnvelopeTests
       Fixture.Create<IEnvelope<string, byte[], object, string>>();
 
     var inputData =
-      new PublishingData<string, byte[], object, string>(envelope);
+      CreateEnvelopeData(envelope);
 
     capabilities.PublishEnvelopeAsync(
-        inputData.Envelope!,
+        GetEnvelope<string, byte[], object, string>(inputData)!,
         default)
       .Returns(Task.CompletedTask);
 
@@ -27,7 +27,7 @@ public partial class EnvelopeTests
     exception.ShouldBeNull();
 
     capabilities.PublishEnvelopeAsync
-      .Received(1)(inputData.Envelope!, default);
+      .Received(1)(GetEnvelope<string, byte[], object, string>(inputData)!, default);
   }
 
   [TestMethod]
@@ -40,12 +40,12 @@ public partial class EnvelopeTests
       Fixture.Create<IEnvelope<string, byte[], object, string>>();
 
     var inputData =
-      new PublishingData<string, byte[], object, string>(envelope);
+      CreateEnvelopeData(envelope);
 
     var expectedException = new InvalidOperationException("publish failed");
 
     capabilities.PublishEnvelopeAsync(
-        inputData.Envelope!,
+        GetEnvelope<string, byte[], object, string>(inputData)!,
         default)
       .ThrowsAsync(expectedException);
 
@@ -57,7 +57,7 @@ public partial class EnvelopeTests
     exception.ShouldBeSameAs(expectedException);
 
     capabilities.PublishEnvelopeAsync
-      .Received(1)(inputData.Envelope!, default);
+      .Received(1)(GetEnvelope<string, byte[], object, string>(inputData)!, default);
   }
 
   [TestMethod]
@@ -66,7 +66,7 @@ public partial class EnvelopeTests
     var capabilities =
       Fixture.Create<PublishingCapabilities<string, byte[], object, string>>();
 
-    var inputData = new PublishingData<string, byte[], object, string>(null);
+    var inputData = CreateEnvelopeData<string, byte[], object, string>(null);
 
     var (data, state, exception) =
       await EnvelopeFuncs.PublishEnvelopeAsync(capabilities, inputData);

@@ -3,30 +3,32 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async Task<(HandlingData<TKey, TPayload>, string, Exception?)>
+  static async Task<(object?[], string, Exception?)>
     HandleInboxMessageSuccessAsync<TKey, TPayload>(
       HandlingCapabilities<TKey, TPayload> capabilities,
-      HandlingData<TKey, TPayload>  data,
+      object?[]  data,
       CancellationToken ct = default)
     {
-      var message = RequireInboxMessage(data.InboxMessage);
+      var message = RequireInboxMessage(GetInboxMessage<TKey, TPayload>(data));
 
       var (model, error) = await capabilities.HandleInboxMessageAsync(message, ct);
-      return error is not null?
-        (data, HandlingStates.DomainError, CreateDomainException(error)) :
-        (data with { Model = model }, HandlingStates.Success, null);
+      if (error is not null)
+        return (data, HandlingStates.DomainError, CreateDomainException(error));
+
+      SetDomainModel(data, model);
+      return (data, HandlingStates.Success, null);
     }
 
-  static (HandlingData<TKey, TPayload>, string, Exception?)
-    HandleInboxMessageError<TKey, TPayload>(
-      HandlingData<TKey, TPayload> data,
+  static (object?[], string, Exception?)
+    HandleInboxMessageError(
+      object?[] data,
       Exception exception) =>
     (data, HandlingStates.Error, exception);
 
-  internal static Task<(HandlingData<TKey, TPayload>, string, Exception?)>
+  internal static Task<(object?[], string, Exception?)>
     HandleInboxMessageAsync<TKey, TPayload>(
       HandlingCapabilities<TKey, TPayload> capabilities,
-      HandlingData<TKey, TPayload> data,
+      object?[] data,
       CancellationToken ct = default) =>
     TryCatch(
       capabilities,

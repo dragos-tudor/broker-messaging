@@ -7,7 +7,6 @@ global using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Operations.Inbound.Inbox")]
-[assembly: InternalsVisibleTo("Operations.Inbound.Envelope")]
 
 namespace Persistence.InboxMessage;
 

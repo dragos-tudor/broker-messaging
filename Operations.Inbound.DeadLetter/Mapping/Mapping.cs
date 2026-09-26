@@ -2,26 +2,27 @@ namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
+  static (object?[], string, Exception?)
     MapDeadLetterMessageSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
-      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data)
+      object?[] data)
   {
-    var message = RequireDeadLetterMessage(data.DeadLetterMessage);
+    var message = RequireDeadLetterMessage(GetDeadLetterMessage<TKey, TPayload>(data));
     var envelope = capabilities.FromDeadLetterMessage(message, message.OriginatedAt);
-    return (data with { DeadLetterEnvelope = envelope }, MappingStates.Success, null);
+    SetDeadLetterEnvelope(data, envelope);
+    return (data, MappingStates.Success, null);
   }
 
-  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
-    MapDeadLetterMessageError<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
+  static (object?[], string, Exception?)
+    MapDeadLetterMessageError(
+      object?[] data,
       Exception exception) =>
     (data, MappingStates.Error, exception);
 
-  internal static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
+  internal static (object?[], string, Exception?)
     MapDeadLetterMessage<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
-      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data) =>
+      object?[] data) =>
     TryCatch(
       capabilities,
       data,

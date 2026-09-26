@@ -7,10 +7,10 @@ public partial class DeadLetterEnvelopeTests
   {
     var capabilities = Fixture.Create<RedirectingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
-    var inputData = new RedirectingData<string, byte[], object, string>(envelope);
+    var inputData = CreateEnvelopeData(envelope);
 
     capabilities.PublishDeadLetterEnvelopeAsync(
-        inputData.DeadLetterEnvelope!,
+        GetDeadLetterEnvelope<string, byte[], object, string>(inputData)!,
         default)
       .Returns(Task.CompletedTask);
 
@@ -24,14 +24,14 @@ public partial class DeadLetterEnvelopeTests
     exception.ShouldBeNull();
 
     capabilities.PublishDeadLetterEnvelopeAsync
-      .Received(1)(inputData.DeadLetterEnvelope!, default);
+      .Received(1)(GetDeadLetterEnvelope<string, byte[], object, string>(inputData)!, default);
   }
 
   [TestMethod]
   public async Task redirect_dead_letter_envelope__envelope_missing__returns_error_with_exception()
   {
     var capabilities = Fixture.Create<RedirectingCapabilities<string, byte[], object, string>>();
-    var inputData = new RedirectingData<string, byte[], object, string>(null);
+    var inputData = CreateEnvelopeData<string, byte[], object, string>(null);
 
     var (data, state, exception) =
       await DeadLetterEnvelopeFuncs.RedirectDeadLetterEnvelopeAsync(
@@ -51,11 +51,11 @@ public partial class DeadLetterEnvelopeTests
   {
     var capabilities = Fixture.Create<RedirectingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
-    var inputData = new RedirectingData<string, byte[], object, string>(envelope);
+    var inputData = CreateEnvelopeData(envelope);
     var expectedException = new InvalidOperationException("redirect failed");
 
     capabilities.PublishDeadLetterEnvelopeAsync(
-        inputData.DeadLetterEnvelope!,
+        GetDeadLetterEnvelope<string, byte[], object, string>(inputData)!,
         default)
       .Throws(expectedException);
 
@@ -69,6 +69,6 @@ public partial class DeadLetterEnvelopeTests
     exception.ShouldBeSameAs(expectedException);
 
     capabilities.PublishDeadLetterEnvelopeAsync
-      .Received(1)(inputData.DeadLetterEnvelope!, default);
+      .Received(1)(GetDeadLetterEnvelope<string, byte[], object, string>(inputData)!, default);
   }
 }

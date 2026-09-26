@@ -2,29 +2,30 @@ namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static async Task<(CapturingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)>
+  static async Task<(object?[], string, Exception?)>
     CaptureEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation>(
       CapturingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
-      CapturingData<TKey, TValue, TMetadata, TConfirmation> data,
+      object?[] data,
       CancellationToken ct = default)
     {
       var envelope = await capabilities.ReadEnvelope(ct);
 
+      SetEnvelope(data, envelope);
       return envelope is null
         ? (data, CapturingStates.NotCaptured, null)
-        : (data with { Envelope = envelope }, CapturingStates.Success, null);
+        : (data, CapturingStates.Success, null);
     }
 
-  static (CapturingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)
-    CaptureEnvelopeError<TKey, TValue, TMetadata, TConfirmation>(
-      CapturingData<TKey, TValue, TMetadata, TConfirmation> data,
+  static (object?[], string, Exception?)
+    CaptureEnvelopeError(
+      object?[] data,
       Exception exception) =>
     (data, CapturingStates.Error, exception);
 
-  internal static Task<(CapturingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)>
+  internal static Task<(object?[], string, Exception?)>
     CaptureEnvelope<TKey, TValue, TMetadata, TConfirmation>(
       CapturingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
-      CapturingData<TKey, TValue, TMetadata, TConfirmation> data,
+      object?[] data,
       CancellationToken ct = default) =>
     TryCatch(
       capabilities,

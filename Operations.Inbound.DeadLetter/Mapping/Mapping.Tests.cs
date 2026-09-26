@@ -8,13 +8,13 @@ public partial class DeadLetterTests
     var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
     var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
-    var inputData = new MappingData<string, byte[], object, string, string>(message, default);
-    capabilities.FromDeadLetterMessage(inputData.DeadLetterMessage!, message.OriginatedAt).Returns(envelope);
+    var inputData = CreateData(message);
+    capabilities.FromDeadLetterMessage(GetDeadLetterMessage<string, string>(inputData)!, message.OriginatedAt).Returns(envelope);
 
     var (data, state, exception) = DeadLetterFuncs.MapDeadLetterMessage(capabilities, inputData);
 
-    data.DeadLetterEnvelope.ShouldBeSameAs(envelope);
-    capabilities.FromDeadLetterMessage.Received(1)(inputData.DeadLetterMessage!, message.OriginatedAt);
+    GetDeadLetterEnvelope<string, byte[], object, string>(data).ShouldBeSameAs(envelope);
+    capabilities.FromDeadLetterMessage.Received(1)(GetDeadLetterMessage<string, string>(inputData)!, message.OriginatedAt);
     state.ShouldBe(MappingStates.Success);
     exception.ShouldBeNull();
   }
@@ -23,7 +23,7 @@ public partial class DeadLetterTests
   public void map_dead_letter_message__message_missing__returns_error()
   {
     var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
-    var inputData = new MappingData<string, byte[], object, string, string>(default, default);
+    var inputData = CreateData<string, string>(default);
 
     var (data, state, exception) = DeadLetterFuncs.MapDeadLetterMessage(capabilities, inputData);
 
@@ -38,15 +38,15 @@ public partial class DeadLetterTests
   {
     var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = new MappingData<string, byte[], object, string, string>(message, default);
+    var inputData = CreateData(message);
     var expectedException = new InvalidOperationException("mapping failed");
-    capabilities.FromDeadLetterMessage(inputData.DeadLetterMessage!, message.OriginatedAt).Throws(expectedException);
+    capabilities.FromDeadLetterMessage(GetDeadLetterMessage<string, string>(inputData)!, message.OriginatedAt).Throws(expectedException);
 
     var (data, state, exception) = DeadLetterFuncs.MapDeadLetterMessage(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(MappingStates.Error);
     exception.ShouldBeSameAs(expectedException);
-    capabilities.FromDeadLetterMessage.Received(1)(inputData.DeadLetterMessage!, message.OriginatedAt);
+    capabilities.FromDeadLetterMessage.Received(1)(GetDeadLetterMessage<string, string>(inputData)!, message.OriginatedAt);
   }
 }

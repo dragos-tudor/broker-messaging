@@ -2,32 +2,30 @@ namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
+  static (object?[], string, Exception?)
     MapEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
-      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data)
+      object?[] data)
     {
-      var envelope = RequireEnvelope(data.Envelope);
+      var envelope = RequireEnvelope(GetEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
       var currentDate = capabilities.GetUtcDateTime();
 
       var message = capabilities.FromEnvelope(envelope, currentDate);
 
-      return (
-        data with { InboxMessage = message },
-        MappingStates.Success,
-        null);
+      SetInboxMessage(data, message);
+      return (data, MappingStates.Success, null);
     }
 
-  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
-    MapEnvelopeError<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
+  static (object?[], string, Exception?)
+    MapEnvelopeError(
+      object?[] data,
       Exception exception) =>
     (data, MappingStates.Error, exception);
 
-  internal static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
+  internal static (object?[], string, Exception?)
     MapEnvelope<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
-      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data) =>
+      object?[] data) =>
     TryCatch(
       capabilities,
       data,

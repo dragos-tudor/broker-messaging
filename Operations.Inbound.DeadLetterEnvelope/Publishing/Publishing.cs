@@ -2,29 +2,29 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  static async Task<(PublishingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)>
+  static async Task<(object?[], string, Exception?)>
     PublishDeadLetterEnvelopeSuccessAsync<TKey, TValue, TMetadata, TConfirmation>(
       PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
-      PublishingData<TKey, TValue, TMetadata, TConfirmation> data,
+      object?[] data,
       CancellationToken ct = default)
     {
-      var envelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
+      var envelope = RequireDeadLetterEnvelope(GetDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
 
       await capabilities.PublishDeadLetterEnvelopeAsync(envelope, ct);
 
       return (data, PublishingStates.Success, null);
     }
 
-  static (PublishingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)
-    PublishDeadLetterEnvelopeError<TKey, TValue, TMetadata, TConfirmation>(
-      PublishingData<TKey, TValue, TMetadata, TConfirmation> data,
+  static (object?[], string, Exception?)
+    PublishDeadLetterEnvelopeError(
+      object?[] data,
       Exception exception) =>
     (data, PublishingStates.Error, exception);
 
-  internal static Task<(PublishingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)>
+  internal static Task<(object?[], string, Exception?)>
     PublishDeadLetterEnvelopeAsync<TKey, TValue, TMetadata, TConfirmation>(
       PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
-      PublishingData<TKey, TValue, TMetadata, TConfirmation> data,
+      object?[] data,
       CancellationToken ct = default) =>
     TryCatch(
       capabilities,

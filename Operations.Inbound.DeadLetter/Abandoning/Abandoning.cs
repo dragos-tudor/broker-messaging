@@ -2,28 +2,28 @@ namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  static async Task<(AbandoningData<TKey, TPayload>, string, Exception?)>
+  static async Task<(object?[], string, Exception?)>
     AbandonDeadLetterMessageSuccessAsync<TKey, TPayload>(
       AbandoningCapabilities<TKey, TPayload> capabilities,
-      AbandoningData<TKey, TPayload> data,
+      object?[] data,
       CancellationToken ct)
   {
-    var message = RequireDeadLetterMessage(data.DeadLetterMessage);
+    var message = RequireDeadLetterMessage(GetDeadLetterMessage<TKey, TPayload>(data));
     var parameters = new AbandoningUpdate(DeadLetterMessageStatus.Abandoned, message.LastError, null);
     await capabilities.UpdateDeadLetterMessageAsync(message, parameters, ct);
     return (data, AbandoningStates.Success, null);
   }
 
-  static (AbandoningData<TKey, TPayload>, string, Exception?)
-    AbandonDeadLetterMessageError<TKey, TPayload>(
-      AbandoningData<TKey, TPayload> data,
+  static (object?[], string, Exception?)
+    AbandonDeadLetterMessageError(
+      object?[] data,
       Exception exception) =>
     (data, AbandoningStates.Error, exception);
 
-  internal static Task<(AbandoningData<TKey, TPayload>, string, Exception?)>
+  internal static Task<(object?[], string, Exception?)>
     AbandonDeadLetterMessageAsync<TKey, TPayload>(
       AbandoningCapabilities<TKey, TPayload> capabilities,
-      AbandoningData<TKey, TPayload> data,
+      object?[] data,
       CancellationToken ct) =>
     TryCatch(
       capabilities,

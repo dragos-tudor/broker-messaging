@@ -8,15 +8,15 @@ public partial class InboxTests
     var capabilities = Fixture.Create<HandlingCapabilities<string, string>>();
     var message = Fixture.Create<IInboxMessage<string, string>>();
     var model = new object();
-    var inputData = new HandlingData<string, string>(message);
-    capabilities.HandleInboxMessageAsync(inputData.InboxMessage!, default).Returns((model, null));
+    var inputData = CreateInboxData(message);
+    capabilities.HandleInboxMessageAsync(GetInboxMessage<string, string>(inputData)!, default).Returns((model, null));
 
     var (data, state, exception) = await InboxFuncs.HandleInboxMessageAsync(capabilities, inputData);
 
-    data.Model.ShouldBeSameAs(model);
+    InboxFuncs.GetDomainModel<string, string>(data).ShouldBeSameAs(model);
     state.ShouldBe(HandlingStates.Success);
     exception.ShouldBeNull();
-    capabilities.HandleInboxMessageAsync.Received(1)(inputData.InboxMessage!, default);
+    capabilities.HandleInboxMessageAsync.Received(1)(GetInboxMessage<string, string>(inputData)!, default);
   }
 
   [TestMethod]
@@ -24,22 +24,22 @@ public partial class InboxTests
   {
     var capabilities = Fixture.Create<HandlingCapabilities<string, string>>();
     var message = Fixture.Create<IInboxMessage<string, string>>();
-    var inputData = new HandlingData<string, string>(message);
-    capabilities.HandleInboxMessageAsync(inputData.InboxMessage!, default).Returns((null, "business failure"));
+    var inputData = CreateInboxData(message);
+    capabilities.HandleInboxMessageAsync(GetInboxMessage<string, string>(inputData)!, default).Returns((null, "business failure"));
 
     var (data, state, exception) = await InboxFuncs.HandleInboxMessageAsync(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(HandlingStates.DomainError);
     exception.ShouldBeOfType<DomainException>().Message.ShouldBe("business failure");
-    capabilities.HandleInboxMessageAsync.Received(1)(inputData.InboxMessage!, default);
+    capabilities.HandleInboxMessageAsync.Received(1)(GetInboxMessage<string, string>(inputData)!, default);
   }
 
   [TestMethod]
   public async Task handle_inbox_message__message_missing__returns_error()
   {
     var capabilities = Fixture.Create<HandlingCapabilities<string, string>>();
-    var inputData = new HandlingData<string, string>(default);
+    var inputData = CreateInboxData<string, string>();
 
     var (data, state, exception) = await InboxFuncs.HandleInboxMessageAsync(capabilities, inputData);
 

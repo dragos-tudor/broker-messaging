@@ -2,16 +2,13 @@ namespace Operations.Outbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static (
-    ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>,
-    string,
-    Exception?)
+  static (object?[], string, Exception?)
     ProduceEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
-      ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data)
+      object?[] data)
   {
-    var envelope = RequireEnvelope(data.Envelope);
-    var message = RequireOutboxMessage(data.OutboxMessage);
+    var envelope = RequireEnvelope(GetEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
+    var message = RequireOutboxMessage(GetOutboxMessage<TKey, TPayload>(data));
     var result = CreateProduceResult(message.MessageId);
 
     var isEnqueued =
@@ -29,25 +26,19 @@ partial class EnvelopeFuncs
       : (data, ProducingStates.NotEnqueue, null);
   }
 
-  static (
-    ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>,
-    string,
-    Exception?)
-    ProduceEnvelopeError<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
+  static (object?[], string, Exception?)
+    ProduceEnvelopeError(
+      object?[] data,
       Exception exception) =>
     (data, ProducingStates.Error, exception);
 
-  internal static (
-    ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>,
-    string,
-    Exception?)
+  internal static (object?[], string, Exception?)
     ProduceEnvelope<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
-      ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data) =>
+      object?[] data) =>
     TryCatch(
       capabilities,
       data,
-      ProduceEnvelopeSuccess,
+      ProduceEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>,
       ProduceEnvelopeError);
 }

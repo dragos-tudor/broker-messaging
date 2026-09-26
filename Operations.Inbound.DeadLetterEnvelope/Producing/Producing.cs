@@ -2,13 +2,13 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  static (ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
+  static (object?[], string, Exception?)
     ProduceDeadLetterEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
-      ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data)
+      object?[] data)
   {
-      var envelope = RequireDeadLetterEnvelope(data.DeadLetterEnvelope);
-      var message = RequireDeadLetterMessage(data.DeadLetterMessage);
+      var envelope = RequireDeadLetterEnvelope(GetDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
+      var message = RequireDeadLetterMessage(GetDeadLetterMessage<TKey, TPayload>(data));
       var result = CreateProduceResult(message.MessageId);
 
       var isEnqueued =
@@ -27,19 +27,22 @@ partial class DeadLetterEnvelopeFuncs
     }
 
   static (
-    ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
-    ProduceDeadLetterEnvelopeError<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
+    object?[], string, Exception?)
+    ProduceDeadLetterEnvelopeError(
+      object?[] data,
       Exception exception) =>
     (data, ProducingStates.Error, exception);
 
-  internal static (ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
+  internal static (object?[], string, Exception?)
     ProduceDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
-      ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data) =>
+      object?[] data) =>
     TryCatch(
       capabilities,
       data,
-      ProduceDeadLetterEnvelopeSuccess,
+      (currentCapabilities, currentData) =>
+        ProduceDeadLetterEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+          currentCapabilities,
+          currentData),
       ProduceDeadLetterEnvelopeError);
 }

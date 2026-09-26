@@ -9,7 +9,7 @@ public partial class DeadLetterEnvelopeTests
     bool acknowledged,
     string expectedState)
   {
-    var inputData = new DispatchingData( new ProduceResult { IsAcknowledged = acknowledged });
+    var inputData = CreateDispatchingData(new ProduceResult { IsAcknowledged = acknowledged });
     var capabilities = Fixture.Create<DispatchingCapabilities>();
 
     var (data, state, exception) =
@@ -25,7 +25,7 @@ public partial class DeadLetterEnvelopeTests
   [TestMethod]
   public void dispatch_dead_letter_envelope__result_missing__returns_error_with_exception()
   {
-    var inputData = new DispatchingData(null);
+    var inputData = CreateDispatchingData(null);
     var capabilities = Fixture.Create<DispatchingCapabilities>();
 
     var (data, state, exception) =

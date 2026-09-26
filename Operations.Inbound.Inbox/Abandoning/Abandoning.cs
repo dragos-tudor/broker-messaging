@@ -3,13 +3,13 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async Task<(AbandoningData<TKey, TPayload>, string, Exception?)>
+  static async Task<(object?[], string, Exception?)>
     AbandonInboxMessageSuccessAsync<TKey, TPayload>(
       AbandoningCapabilities<TKey, TPayload> capabilities,
-      AbandoningData<TKey, TPayload> data,
+      object?[] data,
       CancellationToken ct = default)
     {
-      var message = RequireInboxMessage(data.InboxMessage);
+      var message = RequireInboxMessage(GetInboxMessage<TKey, TPayload>(data));
       var failureReason = message.FailureReason;
       var lastError = message.LastError;
       var @params = new AbandoningUpdate(InboxMessageStatus.Abandoned, lastError, failureReason);
@@ -19,16 +19,16 @@ partial class InboxFuncs
       return (data, AbandoningStates.Success, null);
     }
 
-  static (AbandoningData<TKey, TPayload>, string, Exception?)
-    AbandonInboxMessageError<TKey, TPayload>(
-      AbandoningData<TKey, TPayload> data,
+  static (object?[], string, Exception?)
+    AbandonInboxMessageError(
+      object?[] data,
       Exception exception) =>
     (data, AbandoningStates.Error, exception);
 
-  internal static Task<(AbandoningData<TKey, TPayload>, string, Exception?)>
+  internal static Task<(object?[], string, Exception?)>
     AbandonInboxMessageAsync<TKey, TPayload>(
       AbandoningCapabilities<TKey, TPayload> capabilities,
-      AbandoningData<TKey, TPayload> data,
+      object?[] data,
       CancellationToken ct = default) =>
     TryCatch(
       capabilities,

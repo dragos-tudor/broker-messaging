@@ -2,31 +2,28 @@ namespace Operations.Outbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static (
-    DispatchingData,
-    string,
-    Exception?)
+  static (object?[], string,Exception?)
     DispatchEnvelopeSuccess(
       DispatchingCapabilities capabilities,
-      DispatchingData data)
+      object?[] data)
   {
-    var result = RequireProduceResult(data.ProduceResult);
+    var result = RequireProduceResult(GetProduceResult(data));
 
     return result.IsAcknowledged
       ? (data, DispatchingStates.Ack, null)
       : (data, DispatchingStates.NotAck, null);
   }
 
-  static (DispatchingData, string, Exception?)
+  static (object?[], string, Exception?)
     DispatchEnvelopeError(
-      DispatchingData data,
+      object?[] data,
       Exception exception) =>
     (data, DispatchingStates.Error, exception);
 
-  internal static (DispatchingData, string, Exception?)
+  internal static (object?[], string, Exception?)
     DispatchEnvelope(
       DispatchingCapabilities capabilities,
-      DispatchingData data) =>
+      object?[] data) =>
     TryCatch(
       capabilities,
       data,

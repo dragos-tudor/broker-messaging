@@ -7,10 +7,10 @@ global using Transport.DeadLetterEnvelope;
 global using Foundation.Extensions;
 global using static Foundation.Extensions.ExtensionsFuncs;
 global using static Persistence.DeadLetterMessage.DeadLetterMessageFuncs;
+global using static Transport.DeadLetterEnvelope.DeadLetterEnvelopeFuncs;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Pipelines.Inbound")]
-[assembly: InternalsVisibleTo("Routing.Inbound")]
 
 namespace Operations.Inbound.DeadLetter;
 

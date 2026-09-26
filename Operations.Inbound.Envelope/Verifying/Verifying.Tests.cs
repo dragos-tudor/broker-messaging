@@ -5,8 +5,10 @@ public partial class EnvelopeTests
   [TestMethod]
   public void verify_envelope__envelope_is_valid__returns_success()
   {
-    var capabilities = Fixture.Create<VerifyingCapabilities>();
+    object?[] inputData = [null, null, null, null, null];
+    var capabilities = Fixture.Create<VerifyingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
+    SetEnvelope(inputData, envelope);
 
     envelope.Key.Returns("key");
     envelope.Value.Returns([1]);
@@ -14,11 +16,7 @@ public partial class EnvelopeTests
     envelope.Metadata.Returns(new object());
     envelope.Confirmation.Returns("confirmation");
 
-    var inputData =
-      new VerifyingData<string, byte[], object, string>(envelope);
-
-    var (data, state, exception) =
-      EnvelopeFuncs.VerifyEnvelope(capabilities, inputData);
+    var (data, state, exception) = VerifyEnvelope(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(VerifyingStates.Success);
@@ -28,14 +26,13 @@ public partial class EnvelopeTests
   [TestMethod]
   public void verify_envelope__confirmable_invalid_envelope__returns_invalid_error()
   {
-    var capabilities = Fixture.Create<VerifyingCapabilities>();
+    object?[] inputData = [null, null, null, null, null];
+    var capabilities = Fixture.Create<VerifyingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
+    SetEnvelope(inputData, envelope);
 
     envelope.Key.Returns((string)null!);
     envelope.Confirmation.Returns("confirmation");
-
-    var inputData =
-      new VerifyingData<string, byte[], object, string>(envelope);
 
     var (data, state, exception) =
       EnvelopeFuncs.VerifyEnvelope(capabilities, inputData);
@@ -48,17 +45,15 @@ public partial class EnvelopeTests
   [TestMethod]
   public void verify_envelope__non_confirmable_invalid_envelope__returns_confirmable_error()
   {
-    var capabilities = Fixture.Create<VerifyingCapabilities>();
+    object?[] inputData = [null, null, null, null, null];
+    var capabilities = Fixture.Create<VerifyingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
+    SetEnvelope(inputData, envelope);
 
     envelope.Key.Returns((string)null!);
     envelope.Confirmation.Returns((string)null!);
 
-    var inputData =
-      new VerifyingData<string, byte[], object, string>(envelope);
-
-    var (data, state, exception) =
-      EnvelopeFuncs.VerifyEnvelope(capabilities, inputData);
+    var (data, state, exception) = VerifyEnvelope(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(VerifyingStates.InvalidConfirmableError);
@@ -68,12 +63,10 @@ public partial class EnvelopeTests
   [TestMethod]
   public void verify_envelope__envelope_missing__returns_error_with_exception()
   {
-    var capabilities = Fixture.Create<VerifyingCapabilities>();
-    var inputData =
-      new VerifyingData<string, byte[], object, string>(null);
+    object?[] inputData = [null, null, null, null, null];
+    var capabilities = Fixture.Create<VerifyingCapabilities<string, byte[], object, string>>();
 
-    var (data, state, exception) =
-      EnvelopeFuncs.VerifyEnvelope(capabilities, inputData);
+    var (data, state, exception) = VerifyEnvelope(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(VerifyingStates.Error);

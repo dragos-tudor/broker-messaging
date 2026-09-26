@@ -3,12 +3,12 @@ namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static (VerifyingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)
+  static (object?[], string, Exception?)
     VerifyEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation>(
-      VerifyingCapabilities capabilities,
-      VerifyingData<TKey, TValue, TMetadata, TConfirmation> data)
+      VerifyingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      object?[] data)
     {
-      var envelope = RequireEnvelope(data.Envelope);
+      var envelope = RequireEnvelope(GetEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
       var error = ValidateEnvelope(envelope);
 
       if (error is not null)
@@ -23,16 +23,16 @@ partial class EnvelopeFuncs
       return (data, VerifyingStates.Success, null);
     }
 
-  static (VerifyingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)
-    VerifyEnvelopeError<TKey, TValue, TMetadata, TConfirmation>(
-      VerifyingData<TKey, TValue, TMetadata, TConfirmation> data,
+  static (object?[], string, Exception?)
+    VerifyEnvelopeError(
+      object?[] data,
       Exception exception) =>
     (data, VerifyingStates.Error, exception);
 
-  internal static (VerifyingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)
+  internal static (object?[], string, Exception?)
     VerifyEnvelope<TKey, TValue, TMetadata, TConfirmation>(
-      VerifyingCapabilities capabilities,
-      VerifyingData<TKey, TValue, TMetadata, TConfirmation> data) =>
+      VerifyingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      object?[] data) =>
     TryCatch(
       capabilities,
       data,

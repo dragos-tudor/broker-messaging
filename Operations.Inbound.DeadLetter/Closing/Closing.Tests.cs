@@ -7,16 +7,16 @@ public partial class DeadLetterTests
   {
     var capabilities = Fixture.Create<ClosingCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = new ClosingData<string, string>(message);
+    var inputData = CreateData(message);
     var expectedUpdate = new ClosingUpdate(DeadLetterMessageStatus.Published);
-    capabilities.UpdateDeadLetterMessageAsync(inputData.DeadLetterMessage!, expectedUpdate, default).Returns(Task.CompletedTask);
+    capabilities.UpdateDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default).Returns(Task.CompletedTask);
 
     var (data, state, exception) = await DeadLetterFuncs.CloseDeadLetterMessageAsync(capabilities, inputData, default);
 
     data.ShouldBe(inputData);
     state.ShouldBe(ClosingStates.Success);
     exception.ShouldBeNull();
-    capabilities.UpdateDeadLetterMessageAsync.Received(1)(inputData.DeadLetterMessage!, expectedUpdate, default);
+    capabilities.UpdateDeadLetterMessageAsync.Received(1)(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default);
   }
 
   [TestMethod]
@@ -24,16 +24,16 @@ public partial class DeadLetterTests
   {
     var capabilities = Fixture.Create<ClosingCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = new ClosingData<string, string>(message);
+    var inputData = CreateData(message);
     var expectedUpdate = new ClosingUpdate(DeadLetterMessageStatus.Published);
     var expectedException = new InvalidOperationException("close failed");
-    capabilities.UpdateDeadLetterMessageAsync(inputData.DeadLetterMessage!, expectedUpdate, default).ThrowsAsync(expectedException);
+    capabilities.UpdateDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default).ThrowsAsync(expectedException);
 
     var (data, state, exception) = await DeadLetterFuncs.CloseDeadLetterMessageAsync(capabilities, inputData, default);
 
     data.ShouldBe(inputData);
     state.ShouldBe(ClosingStates.Error);
     exception.ShouldBeSameAs(expectedException);
-    capabilities.UpdateDeadLetterMessageAsync.Received(1)(inputData.DeadLetterMessage!, expectedUpdate, default);
+    capabilities.UpdateDeadLetterMessageAsync.Received(1)(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default);
   }
 }

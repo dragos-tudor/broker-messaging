@@ -5,22 +5,17 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task capture_envelope__reader_returns_envelope__returns_success_and_sets_data()
   {
-    var capabilities =
-      Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
-
-    var envelope =
-      Fixture.Create<IEnvelope<string, byte[], object, string>>();
-
-    var inputData =
-      new CapturingData<string, byte[], object, string>(null);
+    object?[] inputData = [null, null, null, null, null];
+    var capabilities = Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
+    var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
 
     capabilities.ReadEnvelope(default)
       .Returns(Task.FromResult(envelope));
 
     var (data, state, exception) =
-      await EnvelopeFuncs.CaptureEnvelope(capabilities, inputData);
+      await CaptureEnvelope(capabilities, inputData);
 
-    data.Envelope.ShouldBe(envelope);
+    GetEnvelope<string, byte[], object, string>(data).ShouldBe(envelope);
     state.ShouldBe(CapturingStates.Success);
     exception.ShouldBeNull();
 
@@ -30,17 +25,15 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task capture_envelope__reader_returns_null__returns_not_captured()
   {
-    var capabilities =
-      Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
-
-    var inputData =
-      new CapturingData<string, byte[], object, string>(null);
+    object?[] inputData = [null, null, null, null, null];
+    var capabilities = Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
+    var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
 
     capabilities.ReadEnvelope(default)
       .Returns(Task.FromResult<IEnvelope<string, byte[], object, string>>(null!));
 
     var (data, state, exception) =
-      await EnvelopeFuncs.CaptureEnvelope(capabilities, inputData);
+      await CaptureEnvelope(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(CapturingStates.NotCaptured);
@@ -52,19 +45,15 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task capture_envelope__reader_throws__returns_error_with_exception()
   {
-    var capabilities =
-      Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
-
-    var inputData =
-      new CapturingData<string, byte[], object, string>(null);
+    object?[] inputData = [null, null, null, null, null];
+    var capabilities = Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
 
     var expectedException = new InvalidOperationException("read failed");
-
     capabilities.ReadEnvelope(default)
       .ThrowsAsync(expectedException);
 
     var (data, state, exception) =
-      await EnvelopeFuncs.CaptureEnvelope(capabilities, inputData);
+      await CaptureEnvelope(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(CapturingStates.Error);

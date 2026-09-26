@@ -6,8 +6,6 @@ global using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Operations.Inbound.DeadLetter")]
-[assembly: InternalsVisibleTo("Operations.Inbound.DeadLetterEnvelope")]
-[assembly: InternalsVisibleTo("Operations.Inbound.Inbox")]
 
 namespace Persistence.DeadLetterMessage;
 

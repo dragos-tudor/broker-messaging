@@ -3,28 +3,28 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async Task<(InsertingData<TKey, TPayload>, string, Exception?)>
+  static async Task<(object?[], string, Exception?)>
     InsertInboxMessageSuccessAsync<TKey, TPayload>(
       InsertingCapabilities<TKey, TPayload> capabilities,
-      InsertingData<TKey, TPayload> data,
+      object?[] data,
       CancellationToken ct = default)
     {
-      var message = RequireInboxMessage(data.InboxMessage);
+      var message = RequireInboxMessage(GetInboxMessage<TKey, TPayload>(data));
       return await capabilities.InsertInboxMessageAsync(message, ct)?
         (data, InsertingStates.Success, null):
         (data, InsertingStates.Idempotent, null);
     }
 
-  static (InsertingData<TKey, TPayload>, string, Exception?)
-    InsertInboxMessageError<TKey, TPayload>(
-      InsertingData<TKey, TPayload> data,
+  static (object?[], string, Exception?)
+    InsertInboxMessageError(
+      object?[] data,
       Exception exception) =>
     (data, InsertingStates.Error, exception);
 
-  internal static Task<(InsertingData<TKey, TPayload>, string, Exception?)>
+  internal static Task<(object?[], string, Exception?)>
     InsertInboxMessageAsync<TKey, TPayload>(
       InsertingCapabilities<TKey, TPayload> capabilities,
-      InsertingData<TKey, TPayload> data,
+      object?[] data,
       CancellationToken ct = default) =>
     TryCatch(
       capabilities,

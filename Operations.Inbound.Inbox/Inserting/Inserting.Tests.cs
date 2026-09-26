@@ -9,22 +9,22 @@ public partial class InboxTests
   {
     var capabilities = Fixture.Create<InsertingCapabilities<string, string>>();
     var message = Fixture.Create<IInboxMessage<string, string>>();
-    var inputData = new InsertingData<string, string>(message);
-    capabilities.InsertInboxMessageAsync(inputData.InboxMessage!, default).Returns(inserted);
+    var inputData = CreateInboxData(message);
+    capabilities.InsertInboxMessageAsync(GetInboxMessage<string, string>(inputData)!, default).Returns(inserted);
 
     var (data, state, exception) = await InboxFuncs.InsertInboxMessageAsync(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(expectedState);
     exception.ShouldBeNull();
-    capabilities.InsertInboxMessageAsync.Received(1)(inputData.InboxMessage!, default);
+    capabilities.InsertInboxMessageAsync.Received(1)(GetInboxMessage<string, string>(inputData)!, default);
   }
 
   [TestMethod]
   public async Task insert_inbox_message__message_missing__returns_error()
   {
     var capabilities = Fixture.Create<InsertingCapabilities<string, string>>();
-    var inputData = new InsertingData<string, string>(default);
+    var inputData = CreateInboxData<string, string>();
 
     var (data, state, exception) = await InboxFuncs.InsertInboxMessageAsync(capabilities, inputData);
 

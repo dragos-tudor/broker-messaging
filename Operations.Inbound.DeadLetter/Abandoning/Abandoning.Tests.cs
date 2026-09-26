@@ -7,16 +7,16 @@ public partial class DeadLetterTests
   {
     var capabilities = Fixture.Create<AbandoningCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = new AbandoningData<string, string>(message);
+    var inputData = CreateData(message);
     var expectedUpdate = new AbandoningUpdate(DeadLetterMessageStatus.Abandoned, message.LastError, null);
-    capabilities.UpdateDeadLetterMessageAsync(inputData.DeadLetterMessage!, expectedUpdate, default).Returns(Task.CompletedTask);
+    capabilities.UpdateDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default).Returns(Task.CompletedTask);
 
     var (data, state, exception) = await DeadLetterFuncs.AbandonDeadLetterMessageAsync(capabilities, inputData, default);
 
     data.ShouldBe(inputData);
     state.ShouldBe(AbandoningStates.Success);
     exception.ShouldBeNull();
-    capabilities.UpdateDeadLetterMessageAsync.Received(1)(inputData.DeadLetterMessage!, expectedUpdate, default);
+    capabilities.UpdateDeadLetterMessageAsync.Received(1)(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default);
   }
 
   [TestMethod]
@@ -24,16 +24,16 @@ public partial class DeadLetterTests
   {
     var capabilities = Fixture.Create<AbandoningCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = new AbandoningData<string, string>(message);
+    var inputData = CreateData(message);
     var expectedUpdate = new AbandoningUpdate(DeadLetterMessageStatus.Abandoned, message.LastError, null);
     var expectedException = new InvalidOperationException("abandon failed");
-    capabilities.UpdateDeadLetterMessageAsync(inputData.DeadLetterMessage!, expectedUpdate, default).ThrowsAsync(expectedException);
+    capabilities.UpdateDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default).ThrowsAsync(expectedException);
 
     var (data, state, exception) = await DeadLetterFuncs.AbandonDeadLetterMessageAsync(capabilities, inputData, default);
 
     data.ShouldBe(inputData);
     state.ShouldBe(AbandoningStates.Error);
     exception.ShouldBeSameAs(expectedException);
-    capabilities.UpdateDeadLetterMessageAsync.Received(1)(inputData.DeadLetterMessage!, expectedUpdate, default);
+    capabilities.UpdateDeadLetterMessageAsync.Received(1)(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default);
   }
 }

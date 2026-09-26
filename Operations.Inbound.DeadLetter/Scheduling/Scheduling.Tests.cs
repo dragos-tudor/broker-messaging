@@ -10,7 +10,7 @@ public partial class DeadLetterTests
     var capabilities = Fixture.Create<SchedulingCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
     message.RetryCount = 0;
-    var inputData = new SchedulingData<string, string>(message);
+    var inputData = CreateData(message);
     var options = Fixture.Build<DeadLetterRetryOptions>()
       .With(options => options.MaxRetryAttempts, maxRetries)
       .With(options => options.RetryBaseDelay, TimeSpan.Zero)
@@ -25,7 +25,7 @@ public partial class DeadLetterTests
       message.LastError);
     capabilities.GetDeadLetterRetryOptions().Returns(options);
     capabilities.GetUtcDateTime().Returns(now);
-    capabilities.UpdateDeadLetterMessageAsync(inputData.Message!, expectedUpdate, default).Returns(Task.CompletedTask);
+    capabilities.UpdateDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default).Returns(Task.CompletedTask);
 
     var (data, state, exception) = await DeadLetterFuncs.ScheduleDeadLetterMessageAsync(capabilities, inputData, default);
 
@@ -34,7 +34,7 @@ public partial class DeadLetterTests
     exception.ShouldBeNull();
     capabilities.GetDeadLetterRetryOptions.Received(1)();
     capabilities.GetUtcDateTime.Received(1)();
-    capabilities.UpdateDeadLetterMessageAsync.Received(1)(inputData.Message!, expectedUpdate, default);
+    capabilities.UpdateDeadLetterMessageAsync.Received(1)(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default);
   }
 
   [TestMethod]
@@ -43,7 +43,7 @@ public partial class DeadLetterTests
     var capabilities = Fixture.Create<SchedulingCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
     message.RetryCount = 0;
-    var inputData = new SchedulingData<string, string>(message);
+    var inputData = CreateData(message);
     var options = Fixture.Build<DeadLetterRetryOptions>()
       .With(options => options.MaxRetryAttempts, 5)
       .With(options => options.RetryBaseDelay, TimeSpan.Zero)
@@ -59,13 +59,13 @@ public partial class DeadLetterTests
     var expectedException = new InvalidOperationException("schedule failed");
     capabilities.GetDeadLetterRetryOptions().Returns(options);
     capabilities.GetUtcDateTime().Returns(now);
-    capabilities.UpdateDeadLetterMessageAsync(inputData.Message!, expectedUpdate, default).ThrowsAsync(expectedException);
+    capabilities.UpdateDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default).ThrowsAsync(expectedException);
 
     var (data, state, exception) = await DeadLetterFuncs.ScheduleDeadLetterMessageAsync(capabilities, inputData, default);
 
     data.ShouldBe(inputData);
     state.ShouldBe(SchedulingStates.Error);
     exception.ShouldBeSameAs(expectedException);
-    capabilities.UpdateDeadLetterMessageAsync.Received(1)(inputData.Message!, expectedUpdate, default);
+    capabilities.UpdateDeadLetterMessageAsync.Received(1)(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default);
   }
 }

@@ -8,7 +8,9 @@ global using Transport.DeadLetterEnvelope;
 global using Foundation.Extensions;
 global using static Persistence.InboxMessage.InboxMessageFuncs;
 global using static Transport.Envelope.EnvelopeFuncs;
+global using static Transport.DeadLetterEnvelope.DeadLetterEnvelopeFuncs;
 global using static Foundation.Extensions.ExtensionsFuncs;
+global using static Operations.Inbound.Envelope.EnvelopeFuncs;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Pipelines.Inbound")]

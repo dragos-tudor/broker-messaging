@@ -12,15 +12,15 @@ public partial class DeadLetterEnvelopeTests
     var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = new ProducingData<string, byte[], object, string, string>(envelope, message);
+    var inputData = CreateProducingData(envelope, message);
 
     capabilities.ProduceDeadLetterEnvelope(
-        inputData.DeadLetterEnvelope!,
+        GetDeadLetterEnvelope<string, byte[], object, string>(inputData)!,
         Arg.Any<Action<bool, Exception?>>())
       .Returns(enqueued);
 
     var (data, state, exception) =
-      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope(
+      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope<string, byte[], object, string, string>(
         capabilities,
         inputData);
 
@@ -30,7 +30,7 @@ public partial class DeadLetterEnvelopeTests
 
     capabilities.ProduceDeadLetterEnvelope
       .Received(1)(
-        inputData.DeadLetterEnvelope!,
+        GetDeadLetterEnvelope<string, byte[], object, string>(inputData)!,
         Arg.Any<Action<bool, Exception?>>());
   }
 
@@ -40,18 +40,18 @@ public partial class DeadLetterEnvelopeTests
     var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = new ProducingData<string, byte[], object, string, string>(envelope, message);
+    var inputData = CreateProducingData(envelope, message);
 
     Action<bool, Exception?>? callback = null;
 
     capabilities.ProduceDeadLetterEnvelope(
-        inputData.DeadLetterEnvelope!,
+        GetDeadLetterEnvelope<string, byte[], object, string>(inputData)!,
         Arg.Do<Action<bool, Exception?>>(
           value => callback = value))
       .Returns(true);
 
     var (data, state, exception) =
-      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope(
+      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope<string, byte[], object, string, string>(
         capabilities,
         inputData);
 
@@ -68,7 +68,7 @@ public partial class DeadLetterEnvelopeTests
       .Received(1)(
         Arg.Is<ProduceResult>(
           result =>
-            result.MessageId == inputData.DeadLetterMessage!.MessageId &&
+            result.MessageId == GetDeadLetterMessage<string, string>(inputData)!.MessageId &&
             result.IsAcknowledged &&
             result.Exception == callbackException));
   }
@@ -78,12 +78,12 @@ public partial class DeadLetterEnvelopeTests
   {
     var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
     var inputData =
-      new ProducingData<string, byte[], object, string, string>(
+      CreateProducingData<string, byte[], object, string, string>(
         null,
         Fixture.Create<IDeadLetterMessage<string, string>>());
 
     var (data, state, exception) =
-      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope(
+      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope<string, byte[], object, string, string>(
         capabilities,
         inputData);
 
@@ -100,12 +100,12 @@ public partial class DeadLetterEnvelopeTests
   {
     var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
     var inputData =
-      new ProducingData<string, byte[], object, string, string>(
+      CreateProducingData<string, byte[], object, string, string>(
         Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>(),
         null);
 
     var (data, state, exception) =
-      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope(
+      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope<string, byte[], object, string, string>(
         capabilities,
         inputData);
 
@@ -123,16 +123,16 @@ public partial class DeadLetterEnvelopeTests
     var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = new ProducingData<string, byte[], object, string, string>(envelope, message);
+    var inputData = CreateProducingData(envelope, message);
     var expectedException = new InvalidOperationException("produce failed");
 
     capabilities.ProduceDeadLetterEnvelope(
-        inputData.DeadLetterEnvelope!,
+        GetDeadLetterEnvelope<string, byte[], object, string>(inputData)!,
         Arg.Any<Action<bool, Exception?>>())
       .Throws(expectedException);
 
     var (data, state, exception) =
-      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope(
+      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope<string, byte[], object, string, string>(
         capabilities,
         inputData);
 
@@ -142,7 +142,7 @@ public partial class DeadLetterEnvelopeTests
 
     capabilities.ProduceDeadLetterEnvelope
       .Received(1)(
-        inputData.DeadLetterEnvelope!,
+        GetDeadLetterEnvelope<string, byte[], object, string>(inputData)!,
         Arg.Any<Action<bool, Exception?>>());
   }
 }

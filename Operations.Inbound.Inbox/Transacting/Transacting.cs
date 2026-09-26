@@ -3,15 +3,15 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async Task<(TransactingData<TKey, TPayload>, string, Exception?)>
+  static async Task<(object?[], string, Exception?)>
     TransactInboxMessageSuccessAsync<TKey, TPayload, TSession>(
       TransactingCapabilities<TKey, TPayload, TSession> capabilities,
-      TransactingData<TKey, TPayload> data,
+      object?[] data,
       CancellationToken ct = default)
     where TSession : ISessionService
     {
-      var message = RequireInboxMessage(data.InboxMessage);
-      var model = RequireDomainModel(data.Model);
+      var message = RequireInboxMessage(GetInboxMessage<TKey, TPayload>(data));
+      var model = RequireDomainModel(GetDomainModel<TKey, TPayload>(data));
       var @param = new TransactingUpdate(InboxMessageStatus.Handled);
 
       using var session = capabilities.GetSession();
@@ -22,16 +22,16 @@ partial class InboxFuncs
       return (data, TransactingStates.Success, null);
     }
 
-  static (TransactingData<TKey, TPayload>, string, Exception?)
-    TransactInboxMessageError<TKey, TPayload>(
-      TransactingData<TKey, TPayload> data,
+  static (object?[], string, Exception?)
+    TransactInboxMessageError(
+      object?[] data,
       Exception exception) =>
     (data, TransactingStates.Error, exception);
 
-  internal static Task<(TransactingData<TKey, TPayload>, string, Exception?)>
+  internal static Task<(object?[], string, Exception?)>
     TransactInboxMessageAsync<TKey, TPayload, TSession>(
       TransactingCapabilities<TKey, TPayload, TSession> capabilities,
-      TransactingData<TKey, TPayload> data,
+      object?[] data,
       CancellationToken ct = default)
     where TSession : ISessionService =>
     TryCatch(

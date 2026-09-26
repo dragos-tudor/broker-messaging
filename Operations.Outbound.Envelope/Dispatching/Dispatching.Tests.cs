@@ -10,8 +10,7 @@ public partial class EnvelopeTests
     string expectedState)
   {
     var capabilities = Fixture.Create<DispatchingCapabilities>();
-    var inputData = new DispatchingData(
-      new ProduceResult { IsAcknowledged = acknowledged });
+    var inputData = CreateDispatchingData(new ProduceResult { IsAcknowledged = acknowledged });
 
     var (data, state, exception) =
       EnvelopeFuncs.DispatchEnvelope(capabilities, inputData);
@@ -25,7 +24,7 @@ public partial class EnvelopeTests
   public void dispatch_envelope__produce_result_missing__returns_error_with_exception()
   {
     var capabilities = Fixture.Create<DispatchingCapabilities>();
-    var inputData = new DispatchingData(null);
+    var inputData = CreateDispatchingData(null);
 
     var (data, state, exception) =
       EnvelopeFuncs.DispatchEnvelope(capabilities, inputData);

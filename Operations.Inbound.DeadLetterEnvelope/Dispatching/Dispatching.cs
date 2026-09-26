@@ -2,28 +2,28 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  static (DispatchingData, string, Exception?)
+  static (object?[], string, Exception?)
     DispatchDeadLetterEnvelopeSuccess(
       DispatchingCapabilities capabilities,
-      DispatchingData data)
+      object?[] data)
     {
-      var result = RequireProduceResult(data.ProduceResult);
+      var result = RequireProduceResult(GetProduceResult(data));
 
       return result.IsAcknowledged
         ? (data, DispatchingStates.Ack, null)
         : (data, DispatchingStates.NotAck, null);
     }
 
-  static (DispatchingData, string, Exception?)
+  static (object?[], string, Exception?)
     DispatchDeadLetterEnvelopeError(
-      DispatchingData data,
+      object?[] data,
       Exception exception) =>
     (data, DispatchingStates.Error, exception);
 
-  internal static (DispatchingData, string, Exception?)
+  internal static (object?[], string, Exception?)
     DispatchDeadLetterEnvelope(
       DispatchingCapabilities capabilities,
-      DispatchingData data) =>
+      object?[] data) =>
     TryCatch(
       capabilities,
       data,

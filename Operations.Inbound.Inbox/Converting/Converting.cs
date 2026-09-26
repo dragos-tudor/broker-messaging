@@ -3,30 +3,32 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static (ConvertingData<TKey, TPayload>, string, Exception?)
+  static (object?[], string, Exception?)
     ConvertInboxMessageSuccess<TKey, TPayload>(
       ConvertingCapabilities capabilities,
-      ConvertingData<TKey, TPayload> data)
+      object?[] data)
   {
-    var message = RequireInboxMessage(data.InboxMessage);
+    var message = RequireInboxMessage(GetInboxMessage<TKey, TPayload>(data));
     var deadLetter = FromInboxMessage(message, capabilities.GetUtcDateTime());
-    return (data with { DeadLetterMessage = deadLetter }, ConvertingStates.Success, null);
+    SetDeadLetterMessage(data, deadLetter);
+    return (data, ConvertingStates.Success, null);
   }
 
-  static (ConvertingData<TKey, TPayload>, string, Exception?)
-    ConvertInboxMessageError<TKey, TPayload>(
-      ConvertingData<TKey, TPayload> data,
+  static (object?[], string, Exception?)
+    ConvertInboxMessageError(
+      object?[] data,
       Exception exception) =>
     (data, ConvertingStates.Error, exception);
 
-  internal static (ConvertingData<TKey, TPayload>, string, Exception?)
+  internal static (object?[], string, Exception?)
     ConvertInboxMessage<TKey, TPayload>(
       ConvertingCapabilities capabilities,
-      ConvertingData<TKey, TPayload> data) =>
+      object?[] data) =>
     TryCatch(
       capabilities,
       data,
-      ConvertInboxMessageSuccess,
+      (currentCapabilities, currentData) =>
+        ConvertInboxMessageSuccess<TKey, TPayload>(currentCapabilities, currentData),
       ConvertInboxMessageError
     );
 }

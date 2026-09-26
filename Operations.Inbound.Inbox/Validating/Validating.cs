@@ -4,12 +4,12 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static (ValidatingData<TKey, TPayload>, string, Exception?)
+  static (object?[], string, Exception?)
     ValidateInboxMessageSuccess<TKey, TPayload>(
-      ValidatingCapabilities capabilities,
-      ValidatingData<TKey, TPayload> data)
+      ValidatingCapabilities<TKey, TPayload> capabilities,
+      object?[] data)
     {
-      var message = RequireInboxMessage(data.InboxMessage);
+      var message = RequireInboxMessage(GetInboxMessage<TKey, TPayload>(data));
 
       var error = Funcs.ValidateInboxMessage(message);
       return error is not null?
@@ -17,16 +17,16 @@ partial class InboxFuncs
         (data, ValidatingStates.Success, null);
     }
 
-  static (ValidatingData<TKey, TPayload>, string, Exception?)
-    ValidateInboxMessageError<TKey, TPayload>(
-      ValidatingData<TKey, TPayload> data,
+  static (object?[], string, Exception?)
+    ValidateInboxMessageError(
+      object?[] data,
       Exception exception) =>
     (data, ValidatingStates.Error, exception);
 
-  internal static (ValidatingData<TKey, TPayload>, string, Exception?)
+  internal static (object?[], string, Exception?)
     ValidateInboxMessage<TKey, TPayload>(
-      ValidatingCapabilities capabilities,
-      ValidatingData<TKey, TPayload> data) =>
+      ValidatingCapabilities<TKey, TPayload> capabilities,
+      object?[] data) =>
     TryCatch(
       capabilities,
       data,
