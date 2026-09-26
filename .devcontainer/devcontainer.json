@@ -8,7 +8,9 @@
 		}
 	},
 	"mounts": [
-		{ "source": "nuget", "target": "/root/.nuget", "type": "volume" }
+		{ "source": "nuget", "target": "/root/.nuget", "type": "volume" },
+    { "source": "codex-broker-messaging", "target": "/root/.codex", "type": "volume" },
+    { "source": "gemini-broker-messaging", "target": "/root/.gemini", "type": "volume" }
 	],
 	"containerEnv": {
     "DEV_NETWORK": "dev-network",
@@ -19,8 +21,7 @@
     "CONTAINERS_REGISTRIES_CONF": "/workspaces/broker-messaging/.podman/registries.conf",
     "CONTAINERS_STORAGE_CONF": "/workspaces/broker-messaging/.podman/storage.conf",
     "DOTNET_ROOT": "/root/.dotnet",
-    "WORKSPACE_ROOT": "/workspaces/broker-messaging",
-    "CODEX_HOME": "/workspaces/broker-messaging/.codex"
+    "WORKSPACE_ROOT": "/workspaces/broker-messaging"
 	},
 	"runArgs": [
 		"--name=broker-messaging",
