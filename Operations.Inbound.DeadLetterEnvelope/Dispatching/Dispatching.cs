@@ -2,7 +2,7 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  static (DispatchingData, DispatchingStates, Exception?)
+  static (DispatchingData, string, Exception?)
     DispatchDeadLetterEnvelopeSuccess(
       DispatchingCapabilities capabilities,
       DispatchingData data)
@@ -14,13 +14,13 @@ partial class DeadLetterEnvelopeFuncs
         : (data, DispatchingStates.NotAck, null);
     }
 
-  static (DispatchingData, DispatchingStates, Exception?)
+  static (DispatchingData, string, Exception?)
     DispatchDeadLetterEnvelopeError(
       DispatchingData data,
       Exception exception) =>
     (data, DispatchingStates.Error, exception);
 
-  internal static (DispatchingData, DispatchingStates, Exception?)
+  internal static (DispatchingData, string, Exception?)
     DispatchDeadLetterEnvelope(
       DispatchingCapabilities capabilities,
       DispatchingData data) =>

@@ -1,10 +1,11 @@
 
 namespace Operations.Inbound.Envelope;
 
-internal enum VerifyingStates
+internal static class VerifyingStates
 {
-  Success,
-  InvalidError,
-  InvalidConfirmableError,
-  Error
+  const string Scope = $"{nameof(VerifyingStates)}";
+  internal const string Success = $"{Scope}.{nameof(Success)}";
+  internal const string InvalidError = $"{Scope}.{nameof(InvalidError)}";
+  internal const string InvalidConfirmableError = $"{Scope}.{nameof(InvalidConfirmableError)}";
+  internal const string Error = $"{Scope}.{nameof(Error)}";
 }

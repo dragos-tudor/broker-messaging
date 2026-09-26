@@ -2,7 +2,7 @@ namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  static async Task<(SchedulingData<TKey, TPayload>, SchedulingStates, Exception?)>
+  static async Task<(SchedulingData<TKey, TPayload>, string, Exception?)>
     ScheduleDeadLetterMessageSuccessAsync<TKey, TPayload>(
       SchedulingCapabilities<TKey, TPayload> capabilities,
       SchedulingData<TKey, TPayload> data,
@@ -22,13 +22,13 @@ partial class DeadLetterFuncs
       : (data, SchedulingStates.Exhausted, null);
   }
 
-  static (SchedulingData<TKey, TPayload>, SchedulingStates, Exception?)
+  static (SchedulingData<TKey, TPayload>, string, Exception?)
     ScheduleDeadLetterMessageError<TKey, TPayload>(
       SchedulingData<TKey, TPayload> data,
       Exception exception) =>
     (data, SchedulingStates.Error, exception);
 
-  internal static Task<(SchedulingData<TKey, TPayload>, SchedulingStates, Exception?)>
+  internal static Task<(SchedulingData<TKey, TPayload>, string, Exception?)>
     ScheduleDeadLetterMessageAsync<TKey, TPayload>(
       SchedulingCapabilities<TKey, TPayload> capabilities,
       SchedulingData<TKey, TPayload> data,

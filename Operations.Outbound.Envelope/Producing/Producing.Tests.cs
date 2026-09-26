@@ -7,7 +7,7 @@ public partial class EnvelopeTests
   [DataRow(false, ProducingStates.NotEnqueue)]
   public void produce_envelope__broker_enqueue_result_varies__returns_matching_state(
     bool enqueued,
-    Enum expectedState)
+    string expectedState)
   {
     var capabilities =
       Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();

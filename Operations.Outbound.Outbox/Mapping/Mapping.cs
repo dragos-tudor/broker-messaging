@@ -2,7 +2,7 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, MappingStates, Exception?)
+  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
     MapOutboxMessageSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
       MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data)
@@ -12,13 +12,13 @@ partial class OutboxFuncs
       return (data with { Envelope = envelope }, MappingStates.Success, null);
     }
 
-  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, MappingStates, Exception?)
+  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
     MapOutboxMessageError<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
       Exception exception) =>
     (data, MappingStates.Error, exception);
 
-  internal static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, MappingStates, Exception?)
+  internal static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
     MapOutboxMessage<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
       MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data) =>

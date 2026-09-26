@@ -1,8 +1,9 @@
 
 namespace Operations.Inbound.Inbox;
 
-internal enum ConvertingStates
+internal static class ConvertingStates
 {
-  Success,
-  Error
+  const string Scope = $"{nameof(ConvertingStates)}";
+  internal const string Success = $"{Scope}.{nameof(Success)}";
+  internal const string Error = $"{Scope}.{nameof(Error)}";
 }

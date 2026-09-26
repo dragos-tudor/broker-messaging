@@ -1,8 +1,9 @@
 
 namespace Operations.Inbound.DeadLetterEnvelope;
 
-internal enum PublishingStates
+internal static class PublishingStates
 {
-  Success,
-  Error
+  const string Scope = $"{nameof(PublishingStates)}";
+  internal const string Success = $"{Scope}.{nameof(Success)}";
+  internal const string Error = $"{Scope}.{nameof(Error)}";
 }

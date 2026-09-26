@@ -4,7 +4,7 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static (ValidatingData<TKey, TPayload>, ValidatingStates, Exception?)
+  static (ValidatingData<TKey, TPayload>, string, Exception?)
     ValidateInboxMessageSuccess<TKey, TPayload>(
       ValidatingCapabilities capabilities,
       ValidatingData<TKey, TPayload> data)
@@ -17,13 +17,13 @@ partial class InboxFuncs
         (data, ValidatingStates.Success, null);
     }
 
-  static (ValidatingData<TKey, TPayload>, ValidatingStates, Exception?)
+  static (ValidatingData<TKey, TPayload>, string, Exception?)
     ValidateInboxMessageError<TKey, TPayload>(
       ValidatingData<TKey, TPayload> data,
       Exception exception) =>
     (data, ValidatingStates.Error, exception);
 
-  internal static (ValidatingData<TKey, TPayload>, ValidatingStates, Exception?)
+  internal static (ValidatingData<TKey, TPayload>, string, Exception?)
     ValidateInboxMessage<TKey, TPayload>(
       ValidatingCapabilities capabilities,
       ValidatingData<TKey, TPayload> data) =>

@@ -2,7 +2,7 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static async Task<(AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)>
+  static async Task<(AbandoningData<TKey, TPayload>, string, Exception?)>
     AbandonOutboxMessageSuccessAsync<TKey, TPayload>(
       AbandoningCapabilities<TKey, TPayload> capabilities,
       AbandoningData<TKey, TPayload> data,
@@ -14,13 +14,13 @@ partial class OutboxFuncs
     return (data, AbandoningStates.Success, null);
   }
 
-  static (AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)
+  static (AbandoningData<TKey, TPayload>, string, Exception?)
     AbandonOutboxMessageError<TKey, TPayload>(
       AbandoningData<TKey, TPayload> data,
       Exception exception) =>
     (data, AbandoningStates.Error, exception);
 
-  internal static Task<(AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)>
+  internal static Task<(AbandoningData<TKey, TPayload>, string, Exception?)>
     AbandonOutboxMessageAsync<TKey, TPayload>(
       AbandoningCapabilities<TKey, TPayload> capabilities,
       AbandoningData<TKey, TPayload> data,

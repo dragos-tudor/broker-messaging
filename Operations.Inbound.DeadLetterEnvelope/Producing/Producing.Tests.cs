@@ -7,7 +7,7 @@ public partial class DeadLetterEnvelopeTests
   [DataRow(false, ProducingStates.NotEnqueue)]
   public void produce_dead_letter_envelope__enqueue_result_varies__returns_matching_state(
     bool enqueued,
-    Enum expectedState)
+    string expectedState)
   {
     var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();

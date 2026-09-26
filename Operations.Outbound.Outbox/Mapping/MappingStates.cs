@@ -1,8 +1,9 @@
 
 namespace Operations.Outbound.Outbox;
 
-internal enum MappingStates
+internal static class MappingStates
 {
-  Success,
-  Error
+  const string Scope = $"{nameof(MappingStates)}";
+  internal const string Success = $"{Scope}.{nameof(Success)}";
+  internal const string Error = $"{Scope}.{nameof(Error)}";
 }

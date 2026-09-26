@@ -3,7 +3,7 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async Task<(InsertingData<TKey, TPayload>, InsertingStates, Exception?)>
+  static async Task<(InsertingData<TKey, TPayload>, string, Exception?)>
     InsertInboxMessageSuccessAsync<TKey, TPayload>(
       InsertingCapabilities<TKey, TPayload> capabilities,
       InsertingData<TKey, TPayload> data,
@@ -15,13 +15,13 @@ partial class InboxFuncs
         (data, InsertingStates.Idempotent, null);
     }
 
-  static (InsertingData<TKey, TPayload>, InsertingStates, Exception?)
+  static (InsertingData<TKey, TPayload>, string, Exception?)
     InsertInboxMessageError<TKey, TPayload>(
       InsertingData<TKey, TPayload> data,
       Exception exception) =>
     (data, InsertingStates.Error, exception);
 
-  internal static Task<(InsertingData<TKey, TPayload>, InsertingStates, Exception?)>
+  internal static Task<(InsertingData<TKey, TPayload>, string, Exception?)>
     InsertInboxMessageAsync<TKey, TPayload>(
       InsertingCapabilities<TKey, TPayload> capabilities,
       InsertingData<TKey, TPayload> data,

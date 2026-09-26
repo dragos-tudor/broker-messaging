@@ -5,7 +5,7 @@ public partial class OutboxTests
   [TestMethod]
   [DataRow(5, SchedulingStates.NotExhausted)]
   [DataRow(0, SchedulingStates.Exhausted)]
-  public async Task schedule_outbox_message__retry_limit_varies__returns_matching_state(int maxRetries, Enum expectedState)
+  public async Task schedule_outbox_message__retry_limit_varies__returns_matching_state(int maxRetries, string expectedState)
   {
     var capabilities = Fixture.Create<SchedulingCapabilities<string, string>>();
     var message = Fixture.Create<IOutboxMessage<string, string>>();

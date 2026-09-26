@@ -3,7 +3,7 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async Task<(SchedulingData<TKey, TPayload>, SchedulingStates, Exception?)>
+  static async Task<(SchedulingData<TKey, TPayload>, string, Exception?)>
     ScheduleInboxMessageSuccessAsync<TKey, TPayload>(
       SchedulingCapabilities<TKey, TPayload> capabilities,
       SchedulingData<TKey, TPayload> data,
@@ -26,13 +26,13 @@ partial class InboxFuncs
         (data, SchedulingStates.Exhausted, null);
     }
 
-  static (SchedulingData<TKey, TPayload>, SchedulingStates, Exception?)
+  static (SchedulingData<TKey, TPayload>, string, Exception?)
     ScheduleInboxMessageError<TKey, TPayload>(
       SchedulingData<TKey, TPayload> data,
       Exception exception) =>
     (data, SchedulingStates.Error, exception);
 
-  internal static Task<(SchedulingData<TKey, TPayload>, SchedulingStates, Exception?)>
+  internal static Task<(SchedulingData<TKey, TPayload>, string, Exception?)>
     ScheduleInboxMessageAsync<TKey, TPayload>(
       SchedulingCapabilities<TKey, TPayload> capabilities,
       SchedulingData<TKey, TPayload> data,

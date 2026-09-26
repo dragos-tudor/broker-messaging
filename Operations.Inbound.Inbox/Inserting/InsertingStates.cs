@@ -1,9 +1,10 @@
 
 namespace Operations.Inbound.Inbox;
 
-internal enum InsertingStates
+internal static class InsertingStates
 {
-  Success,
-  Error,
-  Idempotent
+  const string Scope = $"{nameof(InsertingStates)}";
+  internal const string Success = $"{Scope}.{nameof(Success)}";
+  internal const string Error = $"{Scope}.{nameof(Error)}";
+  internal const string Idempotent = $"{Scope}.{nameof(Idempotent)}";
 }

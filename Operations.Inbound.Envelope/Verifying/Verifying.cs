@@ -1,16 +1,15 @@
-using Funcs = Transport.Envelope.EnvelopeFuncs;
 
 namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static (VerifyingData<TKey, TValue, TMetadata, TConfirmation>, VerifyingStates, Exception?)
+  static (VerifyingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)
     VerifyEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation>(
       VerifyingCapabilities capabilities,
       VerifyingData<TKey, TValue, TMetadata, TConfirmation> data)
     {
       var envelope = RequireEnvelope(data.Envelope);
-      var error = Funcs.ValidateEnvelope(envelope);
+      var error = ValidateEnvelope(envelope);
 
       if (error is not null)
       {
@@ -24,13 +23,13 @@ partial class EnvelopeFuncs
       return (data, VerifyingStates.Success, null);
     }
 
-  static (VerifyingData<TKey, TValue, TMetadata, TConfirmation>, VerifyingStates, Exception?)
+  static (VerifyingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)
     VerifyEnvelopeError<TKey, TValue, TMetadata, TConfirmation>(
       VerifyingData<TKey, TValue, TMetadata, TConfirmation> data,
       Exception exception) =>
     (data, VerifyingStates.Error, exception);
 
-  internal static (VerifyingData<TKey, TValue, TMetadata, TConfirmation>, VerifyingStates, Exception?)
+  internal static (VerifyingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)
     VerifyEnvelope<TKey, TValue, TMetadata, TConfirmation>(
       VerifyingCapabilities capabilities,
       VerifyingData<TKey, TValue, TMetadata, TConfirmation> data) =>

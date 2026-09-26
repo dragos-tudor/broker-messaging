@@ -2,7 +2,7 @@ namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  static async Task<(AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)>
+  static async Task<(AbandoningData<TKey, TPayload>, string, Exception?)>
     AbandonDeadLetterMessageSuccessAsync<TKey, TPayload>(
       AbandoningCapabilities<TKey, TPayload> capabilities,
       AbandoningData<TKey, TPayload> data,
@@ -14,13 +14,13 @@ partial class DeadLetterFuncs
     return (data, AbandoningStates.Success, null);
   }
 
-  static (AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)
+  static (AbandoningData<TKey, TPayload>, string, Exception?)
     AbandonDeadLetterMessageError<TKey, TPayload>(
       AbandoningData<TKey, TPayload> data,
       Exception exception) =>
     (data, AbandoningStates.Error, exception);
 
-  internal static Task<(AbandoningData<TKey, TPayload>, AbandoningStates, Exception?)>
+  internal static Task<(AbandoningData<TKey, TPayload>, string, Exception?)>
     AbandonDeadLetterMessageAsync<TKey, TPayload>(
       AbandoningCapabilities<TKey, TPayload> capabilities,
       AbandoningData<TKey, TPayload> data,

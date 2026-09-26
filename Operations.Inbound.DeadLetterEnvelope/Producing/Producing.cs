@@ -2,7 +2,7 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  static (ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, ProducingStates, Exception?)
+  static (ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
     ProduceDeadLetterEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
       ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data)
@@ -27,13 +27,13 @@ partial class DeadLetterEnvelopeFuncs
     }
 
   static (
-    ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, ProducingStates, Exception?)
+    ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
     ProduceDeadLetterEnvelopeError<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
       Exception exception) =>
     (data, ProducingStates.Error, exception);
 
-  internal static (ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, ProducingStates, Exception?)
+  internal static (ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
     ProduceDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
       ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data) =>

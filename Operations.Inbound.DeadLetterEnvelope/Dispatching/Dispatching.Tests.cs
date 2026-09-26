@@ -7,7 +7,7 @@ public partial class DeadLetterEnvelopeTests
   [DataRow(false, DispatchingStates.NotAck)]
   public void dispatch_dead_letter_envelope__acknowledgement_varies__returns_matching_state(
     bool acknowledged,
-    Enum expectedState)
+    string expectedState)
   {
     var inputData = new DispatchingData( new ProduceResult { IsAcknowledged = acknowledged });
     var capabilities = Fixture.Create<DispatchingCapabilities>();

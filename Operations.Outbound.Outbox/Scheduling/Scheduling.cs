@@ -2,7 +2,7 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static async Task<(SchedulingData<TKey, TPayload>, SchedulingStates, Exception?)>
+  static async Task<(SchedulingData<TKey, TPayload>, string, Exception?)>
     ScheduleOutboxMessageSuccessAsync<TKey, TPayload>(
       SchedulingCapabilities<TKey, TPayload> capabilities,
       SchedulingData<TKey, TPayload> data,
@@ -20,13 +20,13 @@ partial class OutboxFuncs
         : (data, SchedulingStates.Exhausted, null);
     }
 
-  static (SchedulingData<TKey, TPayload>, SchedulingStates, Exception?)
+  static (SchedulingData<TKey, TPayload>, string, Exception?)
     ScheduleOutboxMessageError<TKey, TPayload>(
       SchedulingData<TKey, TPayload> data,
       Exception exception) =>
     (data, SchedulingStates.Error, exception);
 
-  internal static Task<(SchedulingData<TKey, TPayload>, SchedulingStates, Exception?)>
+  internal static Task<(SchedulingData<TKey, TPayload>, string, Exception?)>
     ScheduleOutboxMessageAsync<TKey, TPayload>(
       SchedulingCapabilities<TKey, TPayload> capabilities,
       SchedulingData<TKey, TPayload> data,

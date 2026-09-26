@@ -1,9 +1,10 @@
 
 namespace Operations.Inbound.Inbox;
 
-internal enum HandlingStates
+internal static class HandlingStates
 {
-  Success,
-  DomainError,
-  Error
+  const string Scope = $"{nameof(HandlingStates)}";
+  internal const string Success = $"{Scope}.{nameof(Success)}";
+  internal const string DomainError = $"{Scope}.{nameof(DomainError)}";
+  internal const string Error = $"{Scope}.{nameof(Error)}";
 }

@@ -1,9 +1,10 @@
 
 namespace Operations.Outbound.Outbox;
 
-internal enum SchedulingStates
+internal static class SchedulingStates
 {
-  Exhausted,
-  NotExhausted,
-  Error
+  const string Scope = $"{nameof(SchedulingStates)}";
+  internal const string Exhausted = $"{Scope}.{nameof(Exhausted)}";
+  internal const string NotExhausted = $"{Scope}.{nameof(NotExhausted)}";
+  internal const string Error = $"{Scope}.{nameof(Error)}";
 }

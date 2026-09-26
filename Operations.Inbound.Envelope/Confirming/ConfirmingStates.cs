@@ -1,14 +1,16 @@
 
 namespace Operations.Inbound.Envelope;
 
-internal enum ConfirmingStates
+internal static class ConfirmingStates
 {
-  Success,
-  Error
+  const string Scope = $"{nameof(ConfirmingStates)}";
+  internal const string Success = $"{Scope}.{nameof(Success)}";
+  internal const string Error = $"{Scope}.{nameof(Error)}";
 }
 
-internal enum ConfirmingFinalStates
+internal static class ConfirmingFinalStates
 {
-  Success,
-  Error
+  const string Scope = $"{nameof(ConfirmingFinalStates)}";
+  internal const string Success = $"{Scope}.{nameof(Success)}";
+  internal const string Error = $"{Scope}.{nameof(Error)}";
 }

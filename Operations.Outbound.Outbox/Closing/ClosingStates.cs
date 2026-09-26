@@ -1,8 +1,9 @@
 
 namespace Operations.Outbound.Outbox;
 
-internal enum ClosingStates
+internal static class ClosingStates
 {
-  Success,
-  Error
+  const string Scope = $"{nameof(ClosingStates)}";
+  internal const string Success = $"{Scope}.{nameof(Success)}";
+  internal const string Error = $"{Scope}.{nameof(Error)}";
 }

@@ -3,7 +3,7 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async Task<(DeadLetteringData<TKey, TPayload>, DeadLetteringStates, Exception?)>
+  static async Task<(DeadLetteringData<TKey, TPayload>, string, Exception?)>
     DeadLetterInboxMessageSuccessAsync<TKey, TPayload>(
       DeadLetteringCapabilities<TKey, TPayload> capabilities,
       DeadLetteringData<TKey, TPayload> data,
@@ -17,13 +17,13 @@ partial class InboxFuncs
       return (data, DeadLetteringStates.Success, null);
     }
 
-  static (DeadLetteringData<TKey, TPayload>, DeadLetteringStates, Exception?)
+  static (DeadLetteringData<TKey, TPayload>, string, Exception?)
     DeadLetterInboxMessageError<TKey, TPayload>(
       DeadLetteringData<TKey, TPayload> data,
       Exception exception) =>
     (data, DeadLetteringStates.Error, exception);
 
-  internal static Task<(DeadLetteringData<TKey, TPayload>, DeadLetteringStates, Exception?)>
+  internal static Task<(DeadLetteringData<TKey, TPayload>, string, Exception?)>
     DeadLetterInboxMessageAsync<TKey, TPayload>(
       DeadLetteringCapabilities<TKey, TPayload> capabilities,
       DeadLetteringData<TKey, TPayload> data,

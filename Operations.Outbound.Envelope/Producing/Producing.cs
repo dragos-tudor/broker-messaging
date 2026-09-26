@@ -4,7 +4,7 @@ partial class EnvelopeFuncs
 {
   static (
     ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>,
-    ProducingStates,
+    string,
     Exception?)
     ProduceEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
@@ -31,7 +31,7 @@ partial class EnvelopeFuncs
 
   static (
     ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>,
-    ProducingStates,
+    string,
     Exception?)
     ProduceEnvelopeError<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
@@ -40,7 +40,7 @@ partial class EnvelopeFuncs
 
   internal static (
     ProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>,
-    ProducingStates,
+    string,
     Exception?)
     ProduceEnvelope<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,

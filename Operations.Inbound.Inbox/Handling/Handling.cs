@@ -3,7 +3,7 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  static async Task<(HandlingData<TKey, TPayload>, HandlingStates, Exception?)>
+  static async Task<(HandlingData<TKey, TPayload>, string, Exception?)>
     HandleInboxMessageSuccessAsync<TKey, TPayload>(
       HandlingCapabilities<TKey, TPayload> capabilities,
       HandlingData<TKey, TPayload>  data,
@@ -17,13 +17,13 @@ partial class InboxFuncs
         (data with { Model = model }, HandlingStates.Success, null);
     }
 
-  static (HandlingData<TKey, TPayload>, HandlingStates, Exception?)
+  static (HandlingData<TKey, TPayload>, string, Exception?)
     HandleInboxMessageError<TKey, TPayload>(
       HandlingData<TKey, TPayload> data,
       Exception exception) =>
     (data, HandlingStates.Error, exception);
 
-  internal static Task<(HandlingData<TKey, TPayload>, HandlingStates, Exception?)>
+  internal static Task<(HandlingData<TKey, TPayload>, string, Exception?)>
     HandleInboxMessageAsync<TKey, TPayload>(
       HandlingCapabilities<TKey, TPayload> capabilities,
       HandlingData<TKey, TPayload> data,

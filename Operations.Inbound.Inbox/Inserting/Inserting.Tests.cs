@@ -5,7 +5,7 @@ public partial class InboxTests
   [TestMethod]
   [DataRow(true, InsertingStates.Success)]
   [DataRow(false, InsertingStates.Idempotent)]
-  public async Task insert_inbox_message__persistence_result_varies__returns_matching_state(bool inserted, Enum expectedState)
+  public async Task insert_inbox_message__persistence_result_varies__returns_matching_state(bool inserted, string expectedState)
   {
     var capabilities = Fixture.Create<InsertingCapabilities<string, string>>();
     var message = Fixture.Create<IInboxMessage<string, string>>();

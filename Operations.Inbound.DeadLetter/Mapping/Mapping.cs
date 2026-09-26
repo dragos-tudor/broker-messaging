@@ -2,7 +2,7 @@ namespace Operations.Inbound.DeadLetter;
 
 partial class DeadLetterFuncs
 {
-  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, MappingStates, Exception?)
+  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
     MapDeadLetterMessageSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
       MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data)
@@ -12,13 +12,13 @@ partial class DeadLetterFuncs
     return (data with { DeadLetterEnvelope = envelope }, MappingStates.Success, null);
   }
 
-  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, MappingStates, Exception?)
+  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
     MapDeadLetterMessageError<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
       Exception exception) =>
     (data, MappingStates.Error, exception);
 
-  internal static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, MappingStates, Exception?)
+  internal static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
     MapDeadLetterMessage<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
       MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data) =>

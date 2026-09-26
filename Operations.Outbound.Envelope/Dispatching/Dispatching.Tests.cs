@@ -7,7 +7,7 @@ public partial class EnvelopeTests
   [DataRow(false, DispatchingStates.NotAck)]
   public void dispatch_envelope__produce_result_acknowledgement_varies__returns_matching_state(
     bool acknowledged,
-    Enum expectedState)
+    string expectedState)
   {
     var capabilities = Fixture.Create<DispatchingCapabilities>();
     var inputData = new DispatchingData(

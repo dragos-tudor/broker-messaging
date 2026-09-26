@@ -4,7 +4,7 @@ partial class EnvelopeFuncs
 {
   static (
     DispatchingData,
-    DispatchingStates,
+    string,
     Exception?)
     DispatchEnvelopeSuccess(
       DispatchingCapabilities capabilities,
@@ -17,13 +17,13 @@ partial class EnvelopeFuncs
       : (data, DispatchingStates.NotAck, null);
   }
 
-  static (DispatchingData, DispatchingStates, Exception?)
+  static (DispatchingData, string, Exception?)
     DispatchEnvelopeError(
       DispatchingData data,
       Exception exception) =>
     (data, DispatchingStates.Error, exception);
 
-  internal static (DispatchingData, DispatchingStates, Exception?)
+  internal static (DispatchingData, string, Exception?)
     DispatchEnvelope(
       DispatchingCapabilities capabilities,
       DispatchingData data) =>

@@ -4,7 +4,7 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static (ValidatingData<TKey, TPayload>, ValidatingStates, Exception?)
+  static (ValidatingData<TKey, TPayload>, string, Exception?)
     ValidateOutboxMessageSuccess<TKey, TPayload>(
       ValidatingCapabilities capabilities,
       ValidatingData<TKey, TPayload> data)
@@ -16,13 +16,13 @@ partial class OutboxFuncs
         : (data, ValidatingStates.InvalidError, Funcs.CreateValidationException(error));
     }
 
-  static (ValidatingData<TKey, TPayload>, ValidatingStates, Exception?)
+  static (ValidatingData<TKey, TPayload>, string, Exception?)
     ValidateOutboxMessageError<TKey, TPayload>(
       ValidatingData<TKey, TPayload> data,
       Exception exception) =>
     (data, ValidatingStates.Error, exception);
 
-  internal static (ValidatingData<TKey, TPayload>, ValidatingStates, Exception?)
+  internal static (ValidatingData<TKey, TPayload>, string, Exception?)
     ValidateOutboxMessage<TKey, TPayload>(
       ValidatingCapabilities capabilities,
       ValidatingData<TKey, TPayload> data) =>

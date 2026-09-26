@@ -2,7 +2,7 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static async Task<(TransactingData<TKey, TPayload>, TransactingStates, Exception?)>
+  static async Task<(TransactingData<TKey, TPayload>, string, Exception?)>
     TransactOutboxMessageSuccessAsync<TKey, TPayload, TSession>(
       TransactingCapabilities<TKey, TPayload, TSession> capabilities,
       TransactingData<TKey, TPayload> data,
@@ -20,13 +20,13 @@ partial class OutboxFuncs
       return (data, TransactingStates.Success, null);
     }
 
-  static (TransactingData<TKey, TPayload>, TransactingStates, Exception?)
+  static (TransactingData<TKey, TPayload>, string, Exception?)
     TransactOutboxMessageError<TKey, TPayload>(
       TransactingData<TKey, TPayload> data,
       Exception exception) =>
     (data, TransactingStates.Error, exception);
 
-  internal static Task<(TransactingData<TKey, TPayload>, TransactingStates, Exception?)>
+  internal static Task<(TransactingData<TKey, TPayload>, string, Exception?)>
     TransactOutboxMessageAsync<TKey, TPayload, TSession>(
       TransactingCapabilities<TKey, TPayload, TSession> capabilities,
       TransactingData<TKey, TPayload> data,

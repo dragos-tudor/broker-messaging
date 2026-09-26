@@ -2,7 +2,7 @@ namespace Operations.Inbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static async Task<(ConfirmingData<TKey, TValue, TMetadata, TConfirmation>, ConfirmingStates, Exception?)>
+  static async Task<(ConfirmingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)>
     ConfirmEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation>(
       ConfirmingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
       ConfirmingData<TKey, TValue, TMetadata, TConfirmation> data,
@@ -15,13 +15,13 @@ partial class EnvelopeFuncs
       return (data, ConfirmingStates.Success, null);
     }
 
-  static (ConfirmingData<TKey, TValue, TMetadata, TConfirmation>, ConfirmingStates, Exception?)
+  static (ConfirmingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)
     ConfirmEnvelopeError<TKey, TValue, TMetadata, TConfirmation>(
       ConfirmingData<TKey, TValue, TMetadata, TConfirmation> data,
       Exception exception) =>
     (data, ConfirmingStates.Error, exception);
 
-  internal static Task<(ConfirmingData<TKey, TValue, TMetadata, TConfirmation>, ConfirmingStates, Exception?)>
+  internal static Task<(ConfirmingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)>
     ConfirmEnvelope<TKey, TValue, TMetadata, TConfirmation>(
       ConfirmingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
       ConfirmingData<TKey, TValue, TMetadata, TConfirmation> data,
@@ -33,7 +33,7 @@ partial class EnvelopeFuncs
       ConfirmEnvelopeError,
       ct);
 
-  internal static async Task<(ConfirmingData<TKey, TValue, TMetadata, TConfirmation>, ConfirmingFinalStates, Exception?)>
+  internal static async Task<(ConfirmingData<TKey, TValue, TMetadata, TConfirmation>, string, Exception?)>
     ConfirmFinalEnvelope<TKey, TValue, TMetadata, TConfirmation>(
       ConfirmingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
       ConfirmingData<TKey, TValue, TMetadata, TConfirmation> data,
@@ -45,6 +45,6 @@ partial class EnvelopeFuncs
       (var confirmedData, ConfirmingStates.Error, var exception) =>
         (confirmedData, ConfirmingFinalStates.Error, exception),
       (var confirmedData, _, var exception) =>
-        (confirmedData, default, exception)
+        (confirmedData, ConfirmingFinalStates.Success, exception)
     };
 }

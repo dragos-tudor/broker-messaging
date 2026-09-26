@@ -4,7 +4,7 @@ partial class EnvelopeFuncs
 {
   static async Task<(
     PublishingData<TKey, TValue, TMetadata, TConfirmation>,
-    PublishingStates,
+    string,
     Exception?)>
     PublishEnvelopeSuccessAsync<TKey, TValue, TMetadata, TConfirmation>(
       PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
@@ -20,7 +20,7 @@ partial class EnvelopeFuncs
 
   static (
     PublishingData<TKey, TValue, TMetadata, TConfirmation>,
-    PublishingStates,
+    string,
     Exception?)
     PublishEnvelopeError<TKey, TValue, TMetadata, TConfirmation>(
       PublishingData<TKey, TValue, TMetadata, TConfirmation> data,
@@ -29,7 +29,7 @@ partial class EnvelopeFuncs
 
   internal static Task<(
     PublishingData<TKey, TValue, TMetadata, TConfirmation>,
-    PublishingStates,
+    string,
     Exception?)>
     PublishEnvelopeAsync<TKey, TValue, TMetadata, TConfirmation>(
       PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
