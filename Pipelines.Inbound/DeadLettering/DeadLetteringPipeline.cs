@@ -1,4 +1,3 @@
-
 using Operations.Inbound.Inbox;
 using DeadLetter = Operations.Inbound.DeadLetter;
 
@@ -6,9 +5,9 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static DeadLetteringDecision AdvanceDeadLetteringPipeline(
-    DeadLetteringSignal signal,
-    InboundPipelineConfig _) => signal switch
+  internal static string AdvanceDeadLetteringPipeline(
+    string signal,
+    PipelineConfig _) => signal switch
   {
     DeadLetteringEntries.Start => DeadLetteringActions.Converting,
 
@@ -22,10 +21,9 @@ partial class InboundFuncs
     AbandoningStates.Success => TerminalActions.Exit,
     AbandoningStates.Error => TerminalActions.Exit,
 
-    ClosingStates.Success => InboundPipelineTypes.Publishing,
+    ClosingStates.Success => PipelineTypes.Publishing,
     ClosingStates.Error => TerminalActions.Exit,
 
     _ => TerminalActions.Unknown
   };
 }
-

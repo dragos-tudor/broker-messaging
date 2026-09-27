@@ -4,7 +4,7 @@ partial class EnvelopeFuncs
 {
   static (object?[], string, Exception?)
     ProduceEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
       object?[] data)
   {
     var envelope = RequireEnvelope(GetEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
@@ -34,11 +34,11 @@ partial class EnvelopeFuncs
 
   internal static (object?[], string, Exception?)
     ProduceEnvelope<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
       object?[] data) =>
     TryCatch(
       capabilities,
       data,
-      ProduceEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>,
+      ProduceEnvelopeSuccess,
       ProduceEnvelopeError);
 }

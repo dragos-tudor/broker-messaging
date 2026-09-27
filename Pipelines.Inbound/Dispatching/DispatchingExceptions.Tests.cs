@@ -7,32 +7,26 @@ public partial class InboundTests
   [TestMethod]
   public void dispatching_exception__not_ack_without_exception__sets_default_last_error()
   {
-    var message = new DeadLetterMessage<string, string>
-    {
-      MessageId = Guid.NewGuid(), MessageKey = "key", Payload = "payload", OriginatedAt = DateTime.UtcNow,
-      Type = "type", FailureReason = "reason", TransportMessageId = "transport", LastError = "old error"
-    };
-    var data = new InboundPipelineData<string, byte[], object, string, string> { DeadLetterMessage = message };
-    DispatchingSignal signal = DispatchingStates.NotAck;
+    var data = CreateData();
+    var message = Fixture.Create<DeadLetterMessage<string, string>>();
+    var signal = DispatchingStates.NotAck;
+    SetDeadLetterMessage(data, message);
 
-    PropagateDispatchingException<IInboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+    PropagateDispatchingException<string, string>
       (data, signal, null);
 
-    message.LastError.ShouldBe("Broker message was not acknowledged");
+    message.LastError.ShouldBe(BrokerMessageException);
   }
 
   [TestMethod]
   public void dispatching_exception__not_ack_with_exception__sets_exception_message()
   {
-    var message = new DeadLetterMessage<string, string>
-    {
-      MessageId = Guid.NewGuid(), MessageKey = "key", Payload = "payload", OriginatedAt = DateTime.UtcNow,
-      Type = "type", FailureReason = "reason", TransportMessageId = "transport"
-    };
-    var data = new InboundPipelineData<string, byte[], object, string, string> { DeadLetterMessage = message };
-    DispatchingSignal signal = DispatchingStates.NotAck;
+    var data = CreateData();
+    var message = Fixture.Create<DeadLetterMessage<string, string>>();
+    var signal = DispatchingStates.NotAck;
+    SetDeadLetterMessage(data, message);
 
-    PropagateDispatchingException<IInboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
+    PropagateDispatchingException<string, string>
       (data, signal, new InvalidOperationException("broker rejected"));
 
     message.LastError.ShouldBe("broker rejected");

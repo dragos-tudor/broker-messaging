@@ -1,4 +1,3 @@
-
 using Operations.Inbound.DeadLetter;
 using Operations.Inbound.DeadLetterEnvelope;
 
@@ -6,9 +5,9 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static DispatchingDecision AdvanceDispatchingPipeline(
-    DispatchingSignal signal,
-    InboundPipelineConfig _) => signal switch
+  internal static string AdvanceDispatchingPipeline(
+    string signal,
+    PipelineConfig _) => signal switch
   {
     DispatchingEntries.Start => DispatchingActions.Dispatching,
 
@@ -29,4 +28,3 @@ partial class InboundFuncs
     _ => TerminalActions.Unknown
   };
 }
-

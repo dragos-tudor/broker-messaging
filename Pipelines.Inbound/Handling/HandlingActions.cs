@@ -1,10 +1,10 @@
-
 namespace Pipelines.Inbound;
 
-internal enum HandlingActions
+internal static class HandlingActions
 {
-  Handling,
-  Transacting,
-  Scheduling,
-  Abandoning
+  const string Scope = $"{nameof(HandlingActions)}";
+  internal const string Handling = $"{Scope}.{nameof(Handling)}";
+  internal const string Transacting = $"{Scope}.{nameof(Transacting)}";
+  internal const string Scheduling = $"{Scope}.{nameof(Scheduling)}";
+  internal const string Abandoning = $"{Scope}.{nameof(Abandoning)}";
 }

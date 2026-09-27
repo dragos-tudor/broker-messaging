@@ -1,8 +1,8 @@
-
 namespace Pipelines.Inbound;
 
-internal enum DeadLetteringEntries {
-  None = 0,
-  Start,
-  End
+internal static class DeadLetteringEntries
+{
+  const string Scope = $"{nameof(DeadLetteringEntries)}";
+  internal const string Start = $"{Scope}.{nameof(Start)}";
+  internal const string End = $"{Scope}.{nameof(End)}";
 }

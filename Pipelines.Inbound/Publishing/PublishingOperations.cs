@@ -1,26 +1,21 @@
-using Operations.Inbound.DeadLetter;
-using Operations.Inbound.DeadLetterEnvelope;
 
 namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static Task<(TData, PublishingSignal, Exception?)>
-    ExecutePublishingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      PublishingDecision decision,
-      TServices services,
-      TData data,
-      CancellationToken ct = default)
-    where TServices : IPublishingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
-    where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
-      decision switch
-      {
-        PublishingActions.Mapping => MapDeadLetterMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data).FromResult<TData, MappingStates, PublishingSignal>(static state => state),
-        PublishingActions.Publishing => PublishDeadLetterEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(services, data, ct).FromResult<TData, PublishingStates, PublishingSignal>(static state => state),
-        PublishingActions.Producing => ProduceDeadLetterEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data).FromResult<TData, ProducingStates, PublishingSignal>(static state => state),
-        PublishingActions.Scheduling => ScheduleDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, SchedulingStates, PublishingSignal>(static state => state),
-        PublishingActions.Abandoning => AbandonDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, AbandoningStates, PublishingSignal>(static state => state),
-        PublishingActions.Closing => CloseDeadLetterMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, ClosingStates, PublishingSignal>(static state => state),
-        _ => ToResult<TData, PublishingSignal>(data, PublishingEntries.End)
-      };
+  internal static Task<(object?[], string, Exception?)>
+    ExecutePublishingOperationAsync<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      string decision,
+      PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+      object?[] data,
+      CancellationToken ct = default) => decision switch
+  {
+    PublishingActions.Mapping => ToTask(MapDeadLetterMessage(capabilities.Mapping, data)),
+    PublishingActions.Publishing => PublishDeadLetterEnvelopeAsync(capabilities.Publishing, data, ct),
+    PublishingActions.Producing => ToTask(ProduceDeadLetterEnvelope(capabilities.Producing, data)),
+    PublishingActions.Scheduling => ScheduleDeadLetterMessageAsync(capabilities.Scheduling, data, ct),
+    PublishingActions.Abandoning => AbandonDeadLetterMessageAsync(capabilities.Abandoning, data, ct),
+    PublishingActions.Closing => CloseDeadLetterMessageAsync(capabilities.Closing, data, ct),
+    _ => ToTask((data, PublishingEntries.End, default(Exception?)))
+  };
 }

@@ -1,9 +1,8 @@
-
 namespace Pipelines.Inbound;
 
-internal enum DispatchingEntries
+internal static class DispatchingEntries
 {
-  None = 0,
-  Start,
-  End
+  const string Scope = $"{nameof(DispatchingEntries)}";
+  internal const string Start = $"{Scope}.{nameof(Start)}";
+  internal const string End = $"{Scope}.{nameof(End)}";
 }

@@ -1,9 +1,8 @@
-
 namespace Pipelines.Inbound;
 
-internal enum HandlingEntries
+internal static class HandlingEntries
 {
-  None = 0,
-  Start,
-  End
+  const string Scope = $"{nameof(HandlingEntries)}";
+  internal const string Start = $"{Scope}.{nameof(Start)}";
+  internal const string End = $"{Scope}.{nameof(End)}";
 }

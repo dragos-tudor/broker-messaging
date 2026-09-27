@@ -1,42 +1,37 @@
+using Operations.Inbound.Inbox;
 using Inbox = Operations.Inbound.Inbox;
 
 namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunHandlingPipeline(HandlingSignal[] path, HandlingDecision end) =>
-    RunHandlingPipeline(path, end, new InboundPipelineConfig());
+  static void RunHandlingPipeline(string[] path, string end) =>
+    RunHandlingPipeline(path, end, new PipelineConfig());
 
-  static void RunHandlingPipeline(HandlingSignal[] path, HandlingDecision end, InboundPipelineConfig config)
+  static void RunHandlingPipeline(string[] path, string end, PipelineConfig config)
   {
-    HandlingSignal[] possibleSignals = [HandlingEntries.Start];
+    string[] possibleSignals = [HandlingEntries.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");
 
       var decision = AdvanceHandlingPipeline(signal, config);
-      if (path[^1].Value == signal.Value)
+      if (path[^1] == signal)
       {
         decision.ShouldBe(end);
         return;
       }
 
-      possibleSignals = decision switch
-      {
-        HandlingActions action => [.. GetHandlingPossibleSignals(action)],
-        _ => []
-      };
+      possibleSignals = [.. GetHandlingPossibleSignals(decision)];
     }
   }
 
-  static IEnumerable<HandlingSignal> GetHandlingPossibleSignals(HandlingActions action) =>
-    action switch
-    {
-      HandlingActions.Handling => [.. Enum.GetValues<Inbox.HandlingStates>()],
-      HandlingActions.Transacting => [.. Enum.GetValues<Inbox.TransactingStates>()],
-      HandlingActions.Scheduling => [.. Enum.GetValues<Inbox.SchedulingStates>()],
-      HandlingActions.Abandoning => [.. Enum.GetValues<Inbox.AbandoningStates>()],
-      _ => throw new InvalidOperationException($"Invalid handling action {action}"),
-    };
+  static IEnumerable<string> GetHandlingPossibleSignals(string action) => action switch
+  {
+    HandlingActions.Handling => [HandlingStates.Success, HandlingStates.DomainError, HandlingStates.Error],
+    HandlingActions.Transacting => [TransactingStates.Success, TransactingStates.Error],
+    HandlingActions.Scheduling => [SchedulingStates.Exhausted, SchedulingStates.NotExhausted, SchedulingStates.Error],
+    HandlingActions.Abandoning => [AbandoningStates.Success, AbandoningStates.Error],
+    _ => throw new InvalidOperationException($"Invalid handling action {action}")
+  };
 }
-

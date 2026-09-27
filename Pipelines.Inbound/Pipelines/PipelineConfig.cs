@@ -1,7 +1,7 @@
 
 namespace Pipelines.Inbound;
 
-public record InboundPipelineConfig
+public record PipelineConfig
 {
   public bool HandleAfterCapture { get; init; }
   public bool UseBrokerPublisher { get; init; }

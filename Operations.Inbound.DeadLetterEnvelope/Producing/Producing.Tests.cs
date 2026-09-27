@@ -9,7 +9,7 @@ public partial class DeadLetterEnvelopeTests
     bool enqueued,
     string expectedState)
   {
-    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
+    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string, string>>();
     var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
     var inputData = CreateProducingData(envelope, message);
@@ -20,7 +20,7 @@ public partial class DeadLetterEnvelopeTests
       .Returns(enqueued);
 
     var (data, state, exception) =
-      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope<string, byte[], object, string, string>(
+      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope(
         capabilities,
         inputData);
 
@@ -37,7 +37,7 @@ public partial class DeadLetterEnvelopeTests
   [TestMethod]
   public void produce_dead_letter_envelope__callback_dispatches_exact_result()
   {
-    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
+    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string, string>>();
     var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
     var inputData = CreateProducingData(envelope, message);
@@ -51,7 +51,7 @@ public partial class DeadLetterEnvelopeTests
       .Returns(true);
 
     var (data, state, exception) =
-      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope<string, byte[], object, string, string>(
+      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope(
         capabilities,
         inputData);
 
@@ -76,14 +76,14 @@ public partial class DeadLetterEnvelopeTests
   [TestMethod]
   public void produce_dead_letter_envelope__envelope_missing__returns_error_with_exception()
   {
-    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
+    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string, string>>();
     var inputData =
       CreateProducingData<string, byte[], object, string, string>(
         null,
         Fixture.Create<IDeadLetterMessage<string, string>>());
 
     var (data, state, exception) =
-      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope<string, byte[], object, string, string>(
+      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope(
         capabilities,
         inputData);
 
@@ -98,14 +98,14 @@ public partial class DeadLetterEnvelopeTests
   [TestMethod]
   public void produce_dead_letter_envelope__message_missing__returns_error_with_exception()
   {
-    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
+    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string, string>>();
     var inputData =
       CreateProducingData<string, byte[], object, string, string>(
         Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>(),
         null);
 
     var (data, state, exception) =
-      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope<string, byte[], object, string, string>(
+      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope(
         capabilities,
         inputData);
 
@@ -120,7 +120,7 @@ public partial class DeadLetterEnvelopeTests
   [TestMethod]
   public void produce_dead_letter_envelope__producer_throws__returns_error_with_exception()
   {
-    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string>>();
+    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string, string>>();
     var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
     var inputData = CreateProducingData(envelope, message);
@@ -132,7 +132,7 @@ public partial class DeadLetterEnvelopeTests
       .Throws(expectedException);
 
     var (data, state, exception) =
-      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope<string, byte[], object, string, string>(
+      DeadLetterEnvelopeFuncs.ProduceDeadLetterEnvelope(
         capabilities,
         inputData);
 

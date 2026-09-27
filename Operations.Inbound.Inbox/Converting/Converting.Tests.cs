@@ -5,13 +5,13 @@ public partial class InboxTests
   [TestMethod]
   public void convert_inbox_message__message_exists__returns_success_and_sets_dead_letter()
   {
-    var capabilities = Fixture.Create<ConvertingCapabilities>();
+    var capabilities = Fixture.Create<ConvertingCapabilities<string, string>>();
     var message = Fixture.Create<IInboxMessage<string, string>>();
     var inputData = CreateInboxData(message);
     var createdAt = Fixture.Create<DateTime>();
     capabilities.GetUtcDateTime().Returns(createdAt);
 
-    var (data, state, exception) = InboxFuncs.ConvertInboxMessage<string, string>(capabilities, inputData);
+    var (data, state, exception) = InboxFuncs.ConvertInboxMessage(capabilities, inputData);
 
     GetDeadLetterMessage<string, string>(data).ShouldNotBeNull();
     GetDeadLetterMessage<string, string>(data)!.FailureReason.ShouldBe(GetInboxMessage<string, string>(inputData)!.FailureReason);
@@ -23,10 +23,10 @@ public partial class InboxTests
   [TestMethod]
   public void convert_inbox_message__message_missing__returns_error()
   {
-    var capabilities = Fixture.Create<ConvertingCapabilities>();
+    var capabilities = Fixture.Create<ConvertingCapabilities<string, string>>();
     var inputData = CreateInboxData<string, string>();
 
-    var (data, state, exception) = InboxFuncs.ConvertInboxMessage<string, string>(capabilities, inputData);
+    var (data, state, exception) = InboxFuncs.ConvertInboxMessage(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(ConvertingStates.Error);

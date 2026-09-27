@@ -5,7 +5,7 @@ partial class InboxFuncs
 {
   static (object?[], string, Exception?)
     ConvertInboxMessageSuccess<TKey, TPayload>(
-      ConvertingCapabilities capabilities,
+      ConvertingCapabilities<TKey, TPayload> capabilities,
       object?[] data)
   {
     var message = RequireInboxMessage(GetInboxMessage<TKey, TPayload>(data));
@@ -22,13 +22,12 @@ partial class InboxFuncs
 
   internal static (object?[], string, Exception?)
     ConvertInboxMessage<TKey, TPayload>(
-      ConvertingCapabilities capabilities,
+      ConvertingCapabilities<TKey, TPayload> capabilities,
       object?[] data) =>
     TryCatch(
       capabilities,
       data,
-      (currentCapabilities, currentData) =>
-        ConvertInboxMessageSuccess<TKey, TPayload>(currentCapabilities, currentData),
+      ConvertInboxMessageSuccess,
       ConvertInboxMessageError
     );
 }

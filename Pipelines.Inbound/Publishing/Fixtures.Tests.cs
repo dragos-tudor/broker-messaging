@@ -1,34 +1,32 @@
-using DeadLetter = Operations.Inbound.DeadLetter;
-using DeadLetterEnvelope = Operations.Inbound.DeadLetterEnvelope;
+using Operations.Inbound.DeadLetter;
+using Operations.Inbound.DeadLetterEnvelope;
 
 namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunPublishingPipeline(PublishingSignal[] path, PublishingDecision end) =>
-    RunPublishingPipeline(path, end, new InboundPipelineConfig());
+  static void RunPublishingPipeline(string[] path, string end) => RunPublishingPipeline(path, end, new PipelineConfig());
 
-  static void RunPublishingPipeline(PublishingSignal[] path, PublishingDecision end, InboundPipelineConfig config)
+  static void RunPublishingPipeline(string[] path, string end, PipelineConfig config)
   {
-    PublishingSignal[] possibleSignals = [PublishingEntries.Start];
+    string[] possibleSignals = [PublishingEntries.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal);
       var decision = AdvancePublishingPipeline(signal, config);
-      if (path[^1].Value == signal.Value) { decision.ShouldBe(end); return; }
-      possibleSignals = decision switch { PublishingActions action => [.. GetPublishingPossibleSignals(action)], _ => [] };
+      if (path[^1] == signal) { decision.ShouldBe(end); return; }
+      possibleSignals = [.. GetPublishingPossibleSignals(decision)];
     }
   }
 
-  static IEnumerable<PublishingSignal> GetPublishingPossibleSignals(PublishingActions action) => action switch
+  static IEnumerable<string> GetPublishingPossibleSignals(string action) => action switch
   {
-    PublishingActions.Mapping => [.. Enum.GetValues<DeadLetter.MappingStates>()],
-    PublishingActions.Publishing => [.. Enum.GetValues<DeadLetterEnvelope.PublishingStates>()],
-    PublishingActions.Producing => [.. Enum.GetValues<DeadLetterEnvelope.ProducingStates>()],
-    PublishingActions.Scheduling => [.. Enum.GetValues<DeadLetter.SchedulingStates>()],
-    PublishingActions.Abandoning => [.. Enum.GetValues<DeadLetter.AbandoningStates>()],
-    PublishingActions.Closing => [.. Enum.GetValues<DeadLetter.ClosingStates>()],
+    PublishingActions.Mapping => [MappingStates.Success, MappingStates.Error],
+    PublishingActions.Publishing => [PublishingStates.Success, PublishingStates.Error],
+    PublishingActions.Producing => [ProducingStates.Enqueue, ProducingStates.NotEnqueue, ProducingStates.Error],
+    PublishingActions.Scheduling => [SchedulingStates.Exhausted, SchedulingStates.NotExhausted, SchedulingStates.Error],
+    PublishingActions.Abandoning => [AbandoningStates.Success, AbandoningStates.Error],
+    PublishingActions.Closing => [ClosingStates.Success, ClosingStates.Error],
     _ => throw new InvalidOperationException($"Invalid publishing action {action}")
   };
 }
-

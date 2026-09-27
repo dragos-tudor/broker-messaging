@@ -6,24 +6,21 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static Task<(TData, CapturingSignal, Exception?)>
-    ExecuteCapturingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      CapturingDecision decision,
-      TServices services,
-      TData data,
-      CancellationToken ct = default
-    )
-    where TServices : ICapturingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
-    where TData : ICapturingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
-      decision switch
-      {
-        CapturingActions.Capturing => CaptureEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(services, data, ct).FromResult<TData, CapturingStates, CapturingSignal>(static states => states),
-        CapturingActions.Verifying => VerifyEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(services, data).FromResult<TData, VerifyingStates, CapturingSignal>(static states => states),
-        CapturingActions.Mapping => MapEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data).FromResult<TData, MappingStates, CapturingSignal>(static states => states),
-        CapturingActions.Validating => ValidateInboxMessage<TServices, TData, TKey, TPayload>(services, data).FromResult<TData, ValidatingStates, CapturingSignal>(static states => states),
-        CapturingActions.Inserting => InsertInboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, InsertingStates, CapturingSignal>(static states => states),
-        CapturingActions.Confirming => ConfirmEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(services, data, ct).FromResult<TData, ConfirmingStates, CapturingSignal>(static states => states),
-        CapturingActions.ConfirmingFinal => ConfirmFinalEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(services, data, ct).FromResult<TData, ConfirmingFinalStates, CapturingSignal>(static states => states),
-        _ => ToResult<TData, CapturingSignal>(data, CapturingEntries.End)
-      };
+  internal static Task<(object?[], string, Exception?)>
+    ExecuteCapturingOperationAsync<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      string decision,
+      CapturingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+      object?[] data,
+      CancellationToken ct = default) =>
+    decision switch
+    {
+      CapturingActions.Capturing => CaptureEnvelope(capabilities.Capturing, data, ct),
+      CapturingActions.Verifying => ToTask(VerifyEnvelope(capabilities.Verifying, data)),
+      CapturingActions.Mapping => ToTask(MapEnvelope(capabilities.Mapping, data)),
+      CapturingActions.Validating => ToTask(ValidateInboxMessage(capabilities.Validating, data)),
+      CapturingActions.Inserting => InsertInboxMessageAsync(capabilities.Inserting, data, ct),
+      CapturingActions.Confirming => ConfirmEnvelope(capabilities.Confirming, data, ct),
+      CapturingActions.ConfirmingFinal => ConfirmFinalEnvelope(capabilities.Confirming, data, ct),
+      _ => ToTask((data, CapturingEntries.End, default(Exception?)))
+    };
 }

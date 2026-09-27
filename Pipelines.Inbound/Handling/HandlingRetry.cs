@@ -1,18 +1,15 @@
-
 using Operations.Inbound.Inbox;
 
 namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static bool CanFastRetryHandling(
-    HandlingSignal signal) =>
+  internal static bool CanFastRetryHandling(string signal) =>
     signal switch
     {
       HandlingStates.Error => true,
       SchedulingStates.Error => true,
       AbandoningStates.Error => true,
-
       _ => false
     };
 }

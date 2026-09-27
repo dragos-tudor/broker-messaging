@@ -6,8 +6,7 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static bool CanFastRetryCapturing(
-    CapturingSignal signal) =>
+  internal static bool CanFastRetryCapturing(string signal) =>
     signal switch
     {
       CapturingStates.Error => true,

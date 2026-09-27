@@ -1,9 +1,9 @@
-
 namespace Pipelines.Inbound;
 
-internal enum RedirectingActions
+internal static class RedirectingActions
 {
-  Converting,
-  Redirecting,
-  ConfirmingFinal
+  const string Scope = $"{nameof(RedirectingActions)}";
+  internal const string Converting = $"{Scope}.{nameof(Converting)}";
+  internal const string Redirecting = $"{Scope}.{nameof(Redirecting)}";
+  internal const string ConfirmingFinal = $"{Scope}.{nameof(ConfirmingFinal)}";
 }

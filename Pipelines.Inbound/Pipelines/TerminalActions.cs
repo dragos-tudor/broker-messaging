@@ -1,10 +1,10 @@
 
 namespace Pipelines.Inbound;
 
-internal enum TerminalActions
+internal static class TerminalActions
 {
-  None = 0,
-  Exit,
-  Unrecoverable,
-  Unknown
+  const string Scope = $"{nameof(TerminalActions)}";
+  internal const string Exit = $"{Scope}{nameof(Exit)}";
+  internal const string Unrecoverable = $"{Scope}{nameof(Unrecoverable)}";
+  internal const string Unknown = $"{Scope}{nameof(Unknown)}";
 }

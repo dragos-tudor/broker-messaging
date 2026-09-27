@@ -4,7 +4,7 @@ partial class DeadLetterEnvelopeFuncs
 {
   static (object?[], string, Exception?)
     ProduceDeadLetterEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
       object?[] data)
   {
       var envelope = RequireDeadLetterEnvelope(GetDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
@@ -35,14 +35,11 @@ partial class DeadLetterEnvelopeFuncs
 
   internal static (object?[], string, Exception?)
     ProduceDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+      ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
       object?[] data) =>
     TryCatch(
       capabilities,
       data,
-      (currentCapabilities, currentData) =>
-        ProduceDeadLetterEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-          currentCapabilities,
-          currentData),
+      ProduceDeadLetterEnvelopeSuccess,
       ProduceDeadLetterEnvelopeError);
 }

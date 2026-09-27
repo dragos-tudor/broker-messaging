@@ -1,46 +1,39 @@
-using Inbox = Operations.Inbound.Inbox;
-using DeadLetter = Operations.Inbound.DeadLetter;
+using Operations.Inbound.Inbox;
 
 namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunDeadLetteringPipeline(DeadLetteringSignal[] path, DeadLetteringDecision end) =>
-    RunDeadLetteringPipeline(path, end, new InboundPipelineConfig());
+  static void RunDeadLetteringPipeline(string[] path, string end) =>
+    RunDeadLetteringPipeline(path, end, new PipelineConfig());
 
   static void RunDeadLetteringPipeline(
-    DeadLetteringSignal[] path,
-    DeadLetteringDecision end,
-    InboundPipelineConfig config)
+    string[] path,
+    string end,
+    PipelineConfig config)
   {
-    DeadLetteringSignal[] possibleSignals = [DeadLetteringEntries.Start];
+    string[] possibleSignals = [DeadLetteringEntries.Start];
     foreach (var signal in path)
     {
       possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");
 
       var decision = AdvanceDeadLetteringPipeline(signal, config);
-      if (path[^1].Value == signal.Value)
+      if (path[^1] == signal)
       {
         decision.ShouldBe(end);
         return;
       }
 
-      possibleSignals = decision switch
-      {
-        DeadLetteringActions action => [.. GetDeadLetteringPossibleSignals(action)],
-        _ => []
-      };
+      possibleSignals = [.. GetDeadLetteringPossibleSignals(decision)];
     }
   }
 
-  static IEnumerable<DeadLetteringSignal> GetDeadLetteringPossibleSignals(DeadLetteringActions action) =>
-    action switch
-    {
-      DeadLetteringActions.Converting => [.. Enum.GetValues<Inbox.ConvertingStates>()],
-      DeadLetteringActions.Inserting => [.. Enum.GetValues<DeadLetter.InsertingStates>()],
-      DeadLetteringActions.Abandoning => [.. Enum.GetValues<Inbox.AbandoningStates>()],
-      DeadLetteringActions.Closing => [.. Enum.GetValues<Inbox.ClosingStates>()],
-      _ => throw new InvalidOperationException($"Invalid dead-lettering action {action}"),
-    };
+  static IEnumerable<string> GetDeadLetteringPossibleSignals(string action) => action switch
+  {
+    DeadLetteringActions.Converting => [ConvertingStates.Success, ConvertingStates.Error],
+    DeadLetteringActions.Inserting => [InsertingStates.Success, InsertingStates.Idempotent, InsertingStates.Error],
+    DeadLetteringActions.Abandoning => [AbandoningStates.Success, AbandoningStates.Error],
+    DeadLetteringActions.Closing => [ClosingStates.Success, ClosingStates.Error],
+    _ => throw new InvalidOperationException($"Invalid deadlettering action {action}")
+  };
 }
-

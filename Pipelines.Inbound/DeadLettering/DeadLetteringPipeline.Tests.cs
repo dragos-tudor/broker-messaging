@@ -8,31 +8,31 @@ partial class InboundTests
   [TestMethod]
   public void dead_lettering__happy_path__publishing()
   {
-    DeadLetteringSignal[] path = [
+    string[] path = [
       DeadLetteringEntries.Start,
       ConvertingStates.Success,
       DeadLetter.InsertingStates.Success,
       ClosingStates.Success
     ];
-    RunDeadLetteringPipeline(path, InboundPipelineTypes.Publishing);
+    RunDeadLetteringPipeline(path, PipelineTypes.Publishing);
   }
 
   [TestMethod]
   public void dead_lettering__idempotent_insert__publishing()
   {
-    DeadLetteringSignal[] path = [
+    string[] path = [
       DeadLetteringEntries.Start,
       ConvertingStates.Success,
       DeadLetter.InsertingStates.Idempotent,
       ClosingStates.Success
     ];
-    RunDeadLetteringPipeline(path, InboundPipelineTypes.Publishing);
+    RunDeadLetteringPipeline(path, PipelineTypes.Publishing);
   }
 
   [TestMethod]
   public void dead_lettering__converting_error__abandon_and_exit()
   {
-    DeadLetteringSignal[] path = [
+    string[] path = [
       DeadLetteringEntries.Start,
       ConvertingStates.Error,
       AbandoningStates.Success
@@ -43,7 +43,7 @@ partial class InboundTests
   [TestMethod]
   public void dead_lettering__converting_error_and_abandoning_error__exit()
   {
-    DeadLetteringSignal[] path = [
+    string[] path = [
       DeadLetteringEntries.Start,
       ConvertingStates.Error,
       AbandoningStates.Error
@@ -54,7 +54,7 @@ partial class InboundTests
   [TestMethod]
   public void dead_lettering__inserting_error__exit()
   {
-    DeadLetteringSignal[] path = [
+    string[] path = [
       DeadLetteringEntries.Start,
       ConvertingStates.Success,
       DeadLetter.InsertingStates.Error
@@ -65,7 +65,7 @@ partial class InboundTests
   [TestMethod]
   public void dead_lettering__closing_error__exit()
   {
-    DeadLetteringSignal[] path = [
+    string[] path = [
       DeadLetteringEntries.Start,
       ConvertingStates.Success,
       DeadLetter.InsertingStates.Success,

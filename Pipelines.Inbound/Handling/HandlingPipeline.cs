@@ -1,13 +1,12 @@
-
 using Operations.Inbound.Inbox;
 
 namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static HandlingDecision AdvanceHandlingPipeline(
-    HandlingSignal signal,
-    InboundPipelineConfig _) => signal switch
+  internal static string AdvanceHandlingPipeline(
+    string signal,
+    PipelineConfig _) => signal switch
   {
     HandlingEntries.Start => HandlingActions.Handling,
 
@@ -28,4 +27,3 @@ partial class InboundFuncs
     _ => TerminalActions.Unknown
   };
 }
-

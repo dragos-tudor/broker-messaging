@@ -1,32 +1,31 @@
-using DeadLetter = Operations.Inbound.DeadLetter;
-using DeadLetterEnvelope = Operations.Inbound.DeadLetterEnvelope;
+using Operations.Inbound.DeadLetter;
+using Operations.Inbound.DeadLetterEnvelope;
 
 namespace Pipelines.Inbound;
 
 partial class InboundTests
 {
-  static void RunDispatchingPipeline(DispatchingSignal[] path, DispatchingDecision end) =>
-    RunDispatchingPipeline(path, end, new InboundPipelineConfig());
+  static void RunDispatchingPipeline(string[] path, string end) => RunDispatchingPipeline(path, end, new PipelineConfig());
 
-  static void RunDispatchingPipeline(DispatchingSignal[] path, DispatchingDecision end, InboundPipelineConfig config)
+  static void RunDispatchingPipeline(string[] path, string end, PipelineConfig config)
   {
-    DispatchingSignal[] possibleSignals = [DispatchingEntries.Start];
+    string[] possibleSignals = [DispatchingEntries.Start];
     foreach (var signal in path)
     {
-      possibleSignals.ShouldContain(signal);
+      possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");
       var decision = AdvanceDispatchingPipeline(signal, config);
-      if (path[^1].Value == signal.Value) { decision.ShouldBe(end); return; }
-      possibleSignals = decision switch { DispatchingActions action => [.. GetDispatchingPossibleSignals(action)], _ => [] };
+
+      if (path[^1] == signal) { decision.ShouldBe(end); return; }
+      possibleSignals = [.. GetDispatchingPossibleSignals(decision)];
     }
   }
 
-  static IEnumerable<DispatchingSignal> GetDispatchingPossibleSignals(DispatchingActions action) => action switch
+  static IEnumerable<string> GetDispatchingPossibleSignals(string action) => action switch
   {
-    DispatchingActions.Dispatching => [.. Enum.GetValues<DeadLetterEnvelope.DispatchingStates>()],
-    DispatchingActions.Scheduling => [.. Enum.GetValues<DeadLetter.SchedulingStates>()],
-    DispatchingActions.Abandoning => [.. Enum.GetValues<DeadLetter.AbandoningStates>()],
-    DispatchingActions.Closing => [.. Enum.GetValues<DeadLetter.ClosingStates>()],
+    DispatchingActions.Dispatching => [DispatchingStates.Ack, DispatchingStates.NotAck, DispatchingStates.Error],
+    DispatchingActions.Scheduling => [SchedulingStates.Exhausted, SchedulingStates.NotExhausted, SchedulingStates.Error],
+    DispatchingActions.Abandoning => [AbandoningStates.Success, AbandoningStates.Error],
+    DispatchingActions.Closing => [ClosingStates.Success, ClosingStates.Error],
     _ => throw new InvalidOperationException($"Invalid dispatching action {action}")
   };
 }
-

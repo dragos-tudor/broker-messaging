@@ -1,4 +1,3 @@
-
 using Operations.Inbound.DeadLetter;
 using Operations.Inbound.DeadLetterEnvelope;
 
@@ -6,14 +5,14 @@ namespace Pipelines.Inbound;
 
 partial class InboundFuncs
 {
-  internal static PublishingDecision AdvancePublishingPipeline(
-    PublishingSignal signal,
-    InboundPipelineConfig config) => signal switch
+  internal static string AdvancePublishingPipeline(
+    string signal,
+    PipelineConfig config) => signal switch
   {
     PublishingEntries.Start => PublishingActions.Mapping,
 
     MappingStates.Success => config.UseBrokerPublisher ?
-      PublishingActions.Publishing:
+      PublishingActions.Publishing :
       PublishingActions.Producing,
     MappingStates.Error => PublishingActions.Abandoning,
 
@@ -37,4 +36,3 @@ partial class InboundFuncs
     _ => TerminalActions.Unknown
   };
 }
-
