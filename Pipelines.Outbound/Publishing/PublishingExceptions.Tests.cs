@@ -8,16 +8,12 @@ public partial class OutboundTests
   [TestMethod]
   public void publishing_exception__mapping_error__sets_outbox_last_error()
   {
-    var message = new OutboxMessage<string, string>
-    {
-      MessageId = Guid.NewGuid(), MessageKey = "key", Payload = "payload", CreatedAt = DateTime.UtcNow,
-      Type = "type", LastError = "old error"
-    };
-    var data = new OutboundPipelineData<string, byte[], object, string, string> { OutboxMessage = message };
-    PublishingSignal signal = MappingStates.Error;
+    var message = Fixture.Create<OutboxMessage<string, string>>();
+    message.LastError = "old error";
+    var data = CreateData();
+    SetOutboxMessage(data, message);
 
-    PropagatePublishingException<IOutboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
-      (data, signal, new InvalidOperationException("mapping failed"));
+    PropagatePublishingException<string, string>(data, MappingStates.Error, new InvalidOperationException("mapping failed"));
 
     message.LastError.ShouldBe("mapping failed");
   }
@@ -25,23 +21,14 @@ public partial class OutboundTests
   [TestMethod]
   [DataRow(ProducingStates.Error)]
   [DataRow(PublishingStates.Error)]
-  public void publishing_exception__technical_publish_error__sets_outbox_last_error(Enum state)
+  public void publishing_exception__technical_publish_error__sets_outbox_last_error(string signal)
   {
-    var message = new OutboxMessage<string, string>
-    {
-      MessageId = Guid.NewGuid(), MessageKey = "key", Payload = "payload", CreatedAt = DateTime.UtcNow,
-      Type = "type", LastError = "old error"
-    };
-    var data = new OutboundPipelineData<string, byte[], object, string, string> { OutboxMessage = message };
-    PublishingSignal signal = state switch
-    {
-      ProducingStates producingState => producingState,
-      PublishingStates publishingState => publishingState,
-      _ => throw new ArgumentOutOfRangeException(nameof(state))
-    };
+    var message = Fixture.Create<OutboxMessage<string, string>>();
+    message.LastError = "old error";
+    var data = CreateData();
+    SetOutboxMessage(data, message);
 
-    PropagatePublishingException<IOutboundPipelineData<string, byte[], object, string, string>, string, byte[], object, string, string>
-      (data, signal, new InvalidOperationException("broker failed"));
+    PropagatePublishingException<string, string>(data, signal, new InvalidOperationException("broker failed"));
 
     message.LastError.ShouldBe("broker failed");
   }

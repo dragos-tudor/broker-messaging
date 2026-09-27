@@ -1,9 +1,6 @@
-
 namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static bool CanFastRetryPersisting(
-    PersistingSignal signal) =>
-    false;
+  internal static bool CanFastRetryPersisting(string signal) => false;
 }

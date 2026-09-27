@@ -1,9 +1,7 @@
-
 namespace Pipelines.Outbound;
 
-public readonly ref struct OutboundPipelineConfig
+public record OutboundPipelineConfig
 {
-  internal bool UseBrokerPublisher { get; init; }
-  internal bool PublishAfterPersist { get; init; }
+  public bool UseBrokerPublisher { get; init; }
+  public bool PublishAfterPersist { get; init; }
 }
-

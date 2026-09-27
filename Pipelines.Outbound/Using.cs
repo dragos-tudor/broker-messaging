@@ -7,6 +7,7 @@ global using Transport.Envelope;
 global using Pipelines.Outbound;
 global using static Operations.Outbound.Envelope.EnvelopeFuncs;
 global using static Operations.Outbound.Outbox.OutboxFuncs;
+global using static Persistence.OutboxMessage.OutboxMessageFuncs;
 global using static Pipelines.Outbound.OutboundFuncs;
 using System.Runtime.CompilerServices;
 

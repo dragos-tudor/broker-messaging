@@ -1,34 +1,33 @@
-using Outbox = Operations.Outbound.Outbox;
-using Envelope = Operations.Outbound.Envelope;
+using Operations.Outbound.Outbox;
+using Operations.Outbound.Envelope;
 
 namespace Pipelines.Outbound;
 
 partial class OutboundTests
 {
-  static void RunPublishingPipeline(PublishingSignal[] path, PublishingDecision end) =>
+  static void RunPublishingPipeline(string[] path, string end) =>
     RunPublishingPipeline(path, end, new OutboundPipelineConfig());
 
-  static void RunPublishingPipeline(PublishingSignal[] path, PublishingDecision end, OutboundPipelineConfig config = default)
+  static void RunPublishingPipeline(string[] path, string end, OutboundPipelineConfig config)
   {
-    PublishingSignal[] possibleSignals = [PublishingEntries.Start];
+    string[] possibleSignals = [PublishingEntries.Start];
     foreach (var signal in path)
     {
-      possibleSignals.ShouldContain(signal);
+      possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");
       var decision = AdvancePublishingPipeline(signal, config);
-      if (path[^1].Value == signal.Value) { decision.ShouldBe(end); return; }
-      possibleSignals = decision switch { PublishingActions action => [.. GetPublishingPossibleSignals(action)], _ => [] };
+      if (path[^1] == signal) { decision.ShouldBe(end); return; }
+      possibleSignals = [.. GetPublishingPossibleSignals(decision)];
     }
   }
 
-  static IEnumerable<PublishingSignal> GetPublishingPossibleSignals(PublishingActions action) => action switch
+  static IEnumerable<string> GetPublishingPossibleSignals(string action) => action switch
   {
-    PublishingActions.Mapping => [.. Enum.GetValues<Outbox.MappingStates>()],
-    PublishingActions.Publishing => [.. Enum.GetValues<Envelope.PublishingStates>()],
-    PublishingActions.Producing => [.. Enum.GetValues<Envelope.ProducingStates>()],
-    PublishingActions.Scheduling => [.. Enum.GetValues<Outbox.SchedulingStates>()],
-    PublishingActions.Abandoning => [.. Enum.GetValues<Outbox.AbandoningStates>()],
-    PublishingActions.Closing => [.. Enum.GetValues<Outbox.ClosingStates>()],
+    PublishingActions.Mapping => [MappingStates.Success, MappingStates.Error],
+    PublishingActions.Publishing => [PublishingStates.Success, PublishingStates.Error],
+    PublishingActions.Producing => [ProducingStates.Enqueue, ProducingStates.NotEnqueue, ProducingStates.Error],
+    PublishingActions.Scheduling => [SchedulingStates.Exhausted, SchedulingStates.NotExhausted, SchedulingStates.Error],
+    PublishingActions.Abandoning => [AbandoningStates.Success, AbandoningStates.Error],
+    PublishingActions.Closing => [ClosingStates.Success, ClosingStates.Error],
     _ => throw new InvalidOperationException($"Invalid publishing action {action}")
   };
 }
-

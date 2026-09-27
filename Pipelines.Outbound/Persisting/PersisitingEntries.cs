@@ -1,9 +1,8 @@
-
 namespace Pipelines.Outbound;
 
-internal enum PersistingEntries
+internal static class PersistingEntries
 {
-  None = 0,
-  Start,
-  End
+  const string Scope = $"{nameof(PersistingEntries)}";
+  internal const string Start = $"{Scope}.{nameof(Start)}";
+  internal const string End = $"{Scope}.{nameof(End)}";
 }

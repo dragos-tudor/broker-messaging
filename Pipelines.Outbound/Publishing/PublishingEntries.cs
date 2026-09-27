@@ -1,9 +1,8 @@
-
 namespace Pipelines.Outbound;
 
-internal enum PublishingEntries
+internal static class PublishingEntries
 {
-  None = 0,
-  Start,
-  End
+  const string Scope = $"{nameof(PublishingEntries)}";
+  internal const string Start = $"{Scope}.{nameof(Start)}";
+  internal const string End = $"{Scope}.{nameof(End)}";
 }

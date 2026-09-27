@@ -1,10 +1,9 @@
-
 namespace Pipelines.Outbound;
 
-public enum OutboundPipelineTypes
+public static class OutboundPipelineTypes
 {
-  None = 0,
-  Persisting,
-  Publishing,
-  Dispatching
+  const string Scope = $"{nameof(OutboundPipelineTypes)}";
+  public const string Persisting = $"{Scope}.{nameof(Persisting)}";
+  public const string Publishing = $"{Scope}.{nameof(Publishing)}";
+  public const string Dispatching = $"{Scope}.{nameof(Dispatching)}";
 }

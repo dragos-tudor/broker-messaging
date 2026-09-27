@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="../Operations.Outbound.Outbox/Operations.Outbound.Outbox.csproj" />
     <ProjectReference Include="../Operations.Outbound.Envelope/Operations.Outbound.Envelope.csproj" />
+    <ProjectReference Include="../Observability.Instrumentation/Observability.Instrumentation.csproj" />
   </ItemGroup>
 
 </Project>

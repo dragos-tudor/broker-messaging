@@ -1,26 +1,21 @@
-using Operations.Outbound.Outbox;
-using Operations.Outbound.Envelope;
 
 namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static Task<(TData, PublishingSignal, Exception?)>
-    ExecutePublishingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      PublishingDecision decision,
-      TServices services,
-      TData data,
-      CancellationToken ct = default)
-    where TServices : IPublishingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
-    where TData : IPublishingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
-      decision switch
-      {
-        PublishingActions.Mapping => MapOutboxMessage<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data).FromResult<TData, MappingStates, PublishingSignal>(static state => state),
-        PublishingActions.Producing => ProduceEnvelope<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(services, data).FromResult<TData, ProducingStates, PublishingSignal>(static state => state),
-        PublishingActions.Publishing => PublishEnvelopeAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation>(services, data, ct).FromResult<TData, PublishingStates, PublishingSignal>(static state => state),
-        PublishingActions.Scheduling => ScheduleOutboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, SchedulingStates, PublishingSignal>(static state => state),
-        PublishingActions.Abandoning => AbandonOutboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, AbandoningStates, PublishingSignal>(static state => state),
-        PublishingActions.Closing => CloseOutboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, ClosingStates, PublishingSignal>(static state => state),
-        _ => throw new InvalidOperationException($"Invalid execute operation decision {decision}")
-      };
+  internal static Task<(object?[], string, Exception?)>
+    ExecutePublishingOperationAsync<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+      object?[] data,
+      string decision,
+      CancellationToken ct = default) => decision switch
+  {
+    PublishingActions.Mapping => ToTask(MapOutboxMessage(capabilities.Mapping, data)),
+    PublishingActions.Producing => ToTask(ProduceEnvelope(capabilities.Producing, data)),
+    PublishingActions.Publishing => PublishEnvelopeAsync(capabilities.Publishing, data, ct),
+    PublishingActions.Scheduling => ScheduleOutboxMessageAsync(capabilities.Scheduling, data, ct),
+    PublishingActions.Abandoning => AbandonOutboxMessageAsync(capabilities.Abandoning, data, ct),
+    PublishingActions.Closing => CloseOutboxMessageAsync(capabilities.Closing, data, ct),
+    _ => throw new InvalidOperationException($"Invalid execute operation decision {decision}")
+  };
 }

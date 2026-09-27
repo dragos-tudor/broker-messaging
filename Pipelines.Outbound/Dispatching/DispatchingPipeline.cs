@@ -1,4 +1,3 @@
-
 using Operations.Outbound.Outbox;
 using Operations.Outbound.Envelope;
 
@@ -6,8 +5,8 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static DispatchingDecision AdvanceDispatchingPipeline(
-    DispatchingSignal signal,
+  internal static string AdvanceDispatchingPipeline(
+    string signal,
     OutboundPipelineConfig _) => signal switch
   {
     DispatchingEntries.Start => DispatchingActions.Dispatching,
@@ -29,4 +28,3 @@ partial class OutboundFuncs
     _ => TerminalActions.Unknown
   };
 }
-

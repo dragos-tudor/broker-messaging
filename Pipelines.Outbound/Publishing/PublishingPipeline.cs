@@ -1,4 +1,3 @@
-
 using Operations.Outbound.Outbox;
 using Operations.Outbound.Envelope;
 
@@ -6,14 +5,14 @@ namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static PublishingDecision AdvancePublishingPipeline(
-    PublishingSignal signal,
+  internal static string AdvancePublishingPipeline(
+    string signal,
     OutboundPipelineConfig config) => signal switch
   {
     PublishingEntries.Start => PublishingActions.Mapping,
 
-    MappingStates.Success => config.UseBrokerPublisher?
-      PublishingActions.Publishing:
+    MappingStates.Success => config.UseBrokerPublisher ?
+      PublishingActions.Publishing :
       PublishingActions.Producing,
     MappingStates.Error => PublishingActions.Abandoning,
 
@@ -37,4 +36,3 @@ partial class OutboundFuncs
     _ => TerminalActions.Unknown
   };
 }
-

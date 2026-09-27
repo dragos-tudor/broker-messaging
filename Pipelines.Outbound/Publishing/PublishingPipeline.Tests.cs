@@ -7,73 +7,73 @@ partial class OutboundTests
 {
   [TestMethod] public void publishing__happy_path_with_broker_publisher__exit()
   {
-    PublishingSignal[] path = [PublishingEntries.Start, MappingStates.Success, PublishingStates.Success, ClosingStates.Success];
+    string[] path = [PublishingEntries.Start, MappingStates.Success, PublishingStates.Success, ClosingStates.Success];
     RunPublishingPipeline(path, TerminalActions.Exit, new() { UseBrokerPublisher = true });
   }
 
   [TestMethod] public void publishing__publishing_error_and_scheduling_not_exhausted__exit()
   {
-    PublishingSignal[] path = [PublishingEntries.Start, MappingStates.Success, PublishingStates.Error, SchedulingStates.NotExhausted];
+    string[] path = [PublishingEntries.Start, MappingStates.Success, PublishingStates.Error, SchedulingStates.NotExhausted];
     RunPublishingPipeline(path, TerminalActions.Exit, new() { UseBrokerPublisher = true });
   }
 
   [TestMethod] public void publishing__publishing_error_and_scheduling_exhausted__exit()
   {
-    PublishingSignal[] path = [PublishingEntries.Start, MappingStates.Success, PublishingStates.Error, SchedulingStates.Exhausted, AbandoningStates.Success];
+    string[] path = [PublishingEntries.Start, MappingStates.Success, PublishingStates.Error, SchedulingStates.Exhausted, AbandoningStates.Success];
     RunPublishingPipeline(path, TerminalActions.Exit, new() { UseBrokerPublisher = true });
   }
 
   [TestMethod] public void publishing__publishing_error_and_scheduling_error__exit()
   {
-    PublishingSignal[] path = [PublishingEntries.Start, MappingStates.Success, PublishingStates.Error, SchedulingStates.Error];
+    string[] path = [PublishingEntries.Start, MappingStates.Success, PublishingStates.Error, SchedulingStates.Error];
     RunPublishingPipeline(path, TerminalActions.Exit, new() { UseBrokerPublisher = true });
   }
 
   [TestMethod] public void publishing__publishing_success_and_closing_error__exit()
   {
-    PublishingSignal[] path = [PublishingEntries.Start, MappingStates.Success, PublishingStates.Success, ClosingStates.Error];
+    string[] path = [PublishingEntries.Start, MappingStates.Success, PublishingStates.Success, ClosingStates.Error];
     RunPublishingPipeline(path, TerminalActions.Exit, new() { UseBrokerPublisher = true });
   }
 
   [TestMethod] public void publishing__producing_enqueue__exit()
   {
-    PublishingSignal[] path = [PublishingEntries.Start, MappingStates.Success, ProducingStates.Enqueue];
+    string[] path = [PublishingEntries.Start, MappingStates.Success, ProducingStates.Enqueue];
     RunPublishingPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod] public void publishing__producing_not_enqueue__exit()
   {
-    PublishingSignal[] path = [PublishingEntries.Start, MappingStates.Success, ProducingStates.NotEnqueue];
+    string[] path = [PublishingEntries.Start, MappingStates.Success, ProducingStates.NotEnqueue];
     RunPublishingPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod] public void publishing__producing_error_and_scheduling_not_exhausted__exit()
   {
-    PublishingSignal[] path = [PublishingEntries.Start, MappingStates.Success, ProducingStates.Error, SchedulingStates.NotExhausted];
+    string[] path = [PublishingEntries.Start, MappingStates.Success, ProducingStates.Error, SchedulingStates.NotExhausted];
     RunPublishingPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod] public void publishing__producing_error_and_scheduling_exhausted__exit()
   {
-    PublishingSignal[] path = [PublishingEntries.Start, MappingStates.Success, ProducingStates.Error, SchedulingStates.Exhausted, AbandoningStates.Success];
+    string[] path = [PublishingEntries.Start, MappingStates.Success, ProducingStates.Error, SchedulingStates.Exhausted, AbandoningStates.Success];
     RunPublishingPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod] public void publishing__producing_error_and_scheduling_error__exit()
   {
-    PublishingSignal[] path = [PublishingEntries.Start, MappingStates.Success, ProducingStates.Error, SchedulingStates.Error];
+    string[] path = [PublishingEntries.Start, MappingStates.Success, ProducingStates.Error, SchedulingStates.Error];
     RunPublishingPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod] public void publishing__mapping_error__abandon_and_exit()
   {
-    PublishingSignal[] path = [PublishingEntries.Start, MappingStates.Error, AbandoningStates.Success];
+    string[] path = [PublishingEntries.Start, MappingStates.Error, AbandoningStates.Success];
     RunPublishingPipeline(path, TerminalActions.Exit);
   }
 
   [TestMethod] public void publishing__mapping_error_and_abandoning_error__exit()
   {
-    PublishingSignal[] path = [PublishingEntries.Start, MappingStates.Error, AbandoningStates.Error];
+    string[] path = [PublishingEntries.Start, MappingStates.Error, AbandoningStates.Error];
     RunPublishingPipeline(path, TerminalActions.Exit);
   }
 }

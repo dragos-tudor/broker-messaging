@@ -1,32 +1,31 @@
-using Outbox = Operations.Outbound.Outbox;
-using Envelope = Operations.Outbound.Envelope;
+using Operations.Outbound.Outbox;
+using Operations.Outbound.Envelope;
 
 namespace Pipelines.Outbound;
 
 partial class OutboundTests
 {
-  static void RunDispatchingPipeline(DispatchingSignal[] path, DispatchingDecision end) =>
+  static void RunDispatchingPipeline(string[] path, string end) =>
     RunDispatchingPipeline(path, end, new OutboundPipelineConfig());
 
-  static void RunDispatchingPipeline(DispatchingSignal[] path, DispatchingDecision end, OutboundPipelineConfig config)
+  static void RunDispatchingPipeline(string[] path, string end, OutboundPipelineConfig config)
   {
-    DispatchingSignal[] possibleSignals = [DispatchingEntries.Start];
+    string[] possibleSignals = [DispatchingEntries.Start];
     foreach (var signal in path)
     {
-      possibleSignals.ShouldContain(signal);
+      possibleSignals.ShouldContain(signal, $"{signal} is not valid. Expected one of: {string.Join(", ", possibleSignals)}");
       var decision = AdvanceDispatchingPipeline(signal, config);
-      if (path[^1].Value == signal.Value) { decision.ShouldBe(end); return; }
-      possibleSignals = decision switch { DispatchingActions action => [.. GetDispatchingPossibleSignals(action)], _ => [] };
+      if (path[^1] == signal) { decision.ShouldBe(end); return; }
+      possibleSignals = [.. GetDispatchingPossibleSignals(decision)];
     }
   }
 
-  static IEnumerable<DispatchingSignal> GetDispatchingPossibleSignals(DispatchingActions action) => action switch
+  static IEnumerable<string> GetDispatchingPossibleSignals(string action) => action switch
   {
-    DispatchingActions.Dispatching => [.. Enum.GetValues<Envelope.DispatchingStates>()],
-    DispatchingActions.Scheduling => [.. Enum.GetValues<Outbox.SchedulingStates>()],
-    DispatchingActions.Abandoning => [.. Enum.GetValues<Outbox.AbandoningStates>()],
-    DispatchingActions.Closing => [.. Enum.GetValues<Outbox.ClosingStates>()],
+    DispatchingActions.Dispatching => [DispatchingStates.Ack, DispatchingStates.NotAck, DispatchingStates.Error],
+    DispatchingActions.Scheduling => [SchedulingStates.Exhausted, SchedulingStates.NotExhausted, SchedulingStates.Error],
+    DispatchingActions.Abandoning => [AbandoningStates.Success, AbandoningStates.Error],
+    DispatchingActions.Closing => [ClosingStates.Success, ClosingStates.Error],
     _ => throw new InvalidOperationException($"Invalid dispatching action {action}")
   };
 }
-

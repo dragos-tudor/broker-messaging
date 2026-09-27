@@ -1,24 +1,19 @@
-using Operations.Outbound.Outbox;
-using Operations.Outbound.Envelope;
 
 namespace Pipelines.Outbound;
 
 partial class OutboundFuncs
 {
-  internal static Task<(TData, DispatchingSignal, Exception?)>
-    ExecuteDispatchingOperationAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      DispatchingDecision decision,
-      TServices services,
-      TData data,
-      CancellationToken ct = default)
-      where TServices : IDispatchingServices<TKey, TValue, TMetadata, TConfirmation, TPayload>
-      where TData : IDispatchingData<TKey, TValue, TMetadata, TConfirmation, TPayload> =>
-        decision switch
-        {
-          DispatchingActions.Dispatching => DispatchEnvelope(services, data).FromResult<TData, DispatchingStates, DispatchingSignal>(static state => state),
-          DispatchingActions.Scheduling => ScheduleOutboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, SchedulingStates, DispatchingSignal>(static state => state),
-          DispatchingActions.Abandoning => AbandonOutboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, AbandoningStates, DispatchingSignal>(static state => state),
-          DispatchingActions.Closing => CloseOutboxMessageAsync<TServices, TData, TKey, TPayload>(services, data, ct).FromResult<TData, ClosingStates, DispatchingSignal>(static state => state),
-          _ => throw new InvalidOperationException($"Invalid execute operation decision {decision}")
-        };
+  internal static Task<(object?[], string, Exception?)>
+    ExecuteDispatchingOperationAsync<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+      DispatchingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+      object?[] data,
+      string decision,
+      CancellationToken ct = default) => decision switch
+  {
+    DispatchingActions.Dispatching => ToTask(DispatchEnvelope(capabilities.Dispatching, data)),
+    DispatchingActions.Scheduling => ScheduleOutboxMessageAsync(capabilities.Scheduling, data, ct),
+    DispatchingActions.Abandoning => AbandonOutboxMessageAsync(capabilities.Abandoning, data, ct),
+    DispatchingActions.Closing => CloseOutboxMessageAsync(capabilities.Closing, data, ct),
+    _ => throw new InvalidOperationException($"Invalid execute operation decision {decision}")
+  };
 }
