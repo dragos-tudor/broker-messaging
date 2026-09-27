@@ -4,28 +4,29 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static (ValidatingData<TKey, TPayload>, string, Exception?)
+  static (object?[], string, Exception?)
     ValidateOutboxMessageSuccess<TKey, TPayload>(
-      ValidatingCapabilities capabilities,
-      ValidatingData<TKey, TPayload> data)
-    {
-      var message = RequireOutboxMessage(data.OutboxMessage);
-      var error = Funcs.ValidateOutboxMessage(message);
-      return error is null
-        ? (data, ValidatingStates.Success, null)
-        : (data, ValidatingStates.InvalidError, Funcs.CreateValidationException(error));
-    }
+      ValidatingCapabilities<TKey, TPayload> capabilities,
+      object?[] data)
+  {
+    var message = RequireOutboxMessage(GetOutboxMessage<TKey, TPayload>(data));
+    var error = Funcs.ValidateOutboxMessage(message);
 
-  static (ValidatingData<TKey, TPayload>, string, Exception?)
-    ValidateOutboxMessageError<TKey, TPayload>(
-      ValidatingData<TKey, TPayload> data,
+    return error is null ?
+      (data, ValidatingStates.Success, null) :
+      (data, ValidatingStates.InvalidError, CreateValidationException(error));
+  }
+
+  static (object?[], string, Exception?)
+    ValidateOutboxMessageError(
+      object?[] data,
       Exception exception) =>
     (data, ValidatingStates.Error, exception);
 
-  internal static (ValidatingData<TKey, TPayload>, string, Exception?)
+  internal static (object?[], string, Exception?)
     ValidateOutboxMessage<TKey, TPayload>(
-      ValidatingCapabilities capabilities,
-      ValidatingData<TKey, TPayload> data) =>
+      ValidatingCapabilities<TKey, TPayload> capabilities,
+      object?[] data) =>
     TryCatch(
       capabilities,
       data,

@@ -8,24 +8,24 @@ public partial class OutboxTests
     var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
     var message = Fixture.Create<IOutboxMessage<string, string>>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
-    var inputData = new MappingData<string, byte[], object, string, string>(message, default);
-    capabilities.FromOutboxMessage(inputData.OutboxMessage!, message.CreatedAt).Returns(envelope);
+    var inputData = CreateOutboxMappingData<string, byte[], object, string, string>(message);
+    capabilities.FromOutboxMessage(GetOutboxMessage<string, string>(inputData)!, message.CreatedAt).Returns(envelope);
 
-    var (data, state, exception) = OutboxFuncs.MapOutboxMessage(capabilities, inputData);
+    var (data, state, exception) = MapOutboxMessage(capabilities, inputData);
 
-    data.Envelope.ShouldBeSameAs(envelope);
+    GetEnvelope<string, byte[], object, string>(data).ShouldBeSameAs(envelope);
     state.ShouldBe(MappingStates.Success);
     exception.ShouldBeNull();
-    capabilities.FromOutboxMessage.Received(1)(inputData.OutboxMessage!, message.CreatedAt);
+    capabilities.FromOutboxMessage.Received(1)(GetOutboxMessage<string, string>(inputData)!, message.CreatedAt);
   }
 
   [TestMethod]
   public void map_outbox_message__message_missing__returns_error()
   {
     var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
-    var inputData = new MappingData<string, byte[], object, string, string>(default, default);
+    var inputData = CreateOutboxMappingData<string, byte[], object, string, string>(default);
 
-    var (data, state, exception) = OutboxFuncs.MapOutboxMessage(capabilities, inputData);
+    var (data, state, exception) = MapOutboxMessage(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(MappingStates.Error);
@@ -38,15 +38,15 @@ public partial class OutboxTests
   {
     var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
     var message = Fixture.Create<IOutboxMessage<string, string>>();
-    var inputData = new MappingData<string, byte[], object, string, string>(message, default);
+    var inputData = CreateOutboxMappingData<string, byte[], object, string, string>(message);
     var expectedException = new InvalidOperationException("mapping failed");
-    capabilities.FromOutboxMessage(inputData.OutboxMessage!, message.CreatedAt).Throws(expectedException);
+    capabilities.FromOutboxMessage(GetOutboxMessage<string, string>(inputData)!, message.CreatedAt).Throws(expectedException);
 
-    var (data, state, exception) = OutboxFuncs.MapOutboxMessage(capabilities, inputData);
+    var (data, state, exception) = MapOutboxMessage(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(MappingStates.Error);
     exception.ShouldBeSameAs(expectedException);
-    capabilities.FromOutboxMessage.Received(1)(inputData.OutboxMessage!, message.CreatedAt);
+    capabilities.FromOutboxMessage.Received(1)(GetOutboxMessage<string, string>(inputData)!, message.CreatedAt);
   }
 }

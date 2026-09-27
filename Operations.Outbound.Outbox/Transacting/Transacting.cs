@@ -2,34 +2,34 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static async Task<(TransactingData<TKey, TPayload>, string, Exception?)>
+  static async Task<(object?[], string, Exception?)>
     TransactOutboxMessageSuccessAsync<TKey, TPayload, TSession>(
       TransactingCapabilities<TKey, TPayload, TSession> capabilities,
-      TransactingData<TKey, TPayload> data,
+      object?[] data,
       CancellationToken ct = default)
     where TSession : ISessionService
-    {
-      var message = RequireOutboxMessage(data.OutboxMessage);
-      var model = RequireDomainModel(data.Model);
+  {
+    var message = RequireOutboxMessage(GetOutboxMessage<TKey, TPayload>(data));
+    var model = RequireDomainModel(GetDomainModel(data));
 
-      using var session = capabilities.GetSession();
-      await capabilities.PersistDomainModelAsync(session, model, ct);
-      await capabilities.InsertOutboxMessageAsync(session, message, ct);
-      await session.CompleteAsync(ct);
+    using var session = capabilities.GetSession();
+    await capabilities.PersistDomainModelAsync(session, model, ct);
+    await capabilities.InsertOutboxMessageAsync(session, message, ct);
+    await session.CompleteAsync(ct);
 
-      return (data, TransactingStates.Success, null);
-    }
+    return (data, TransactingStates.Success, null);
+  }
 
-  static (TransactingData<TKey, TPayload>, string, Exception?)
-    TransactOutboxMessageError<TKey, TPayload>(
-      TransactingData<TKey, TPayload> data,
+  static (object?[], string, Exception?)
+    TransactOutboxMessageError(
+      object?[] data,
       Exception exception) =>
     (data, TransactingStates.Error, exception);
 
-  internal static Task<(TransactingData<TKey, TPayload>, string, Exception?)>
+  internal static Task<(object?[], string, Exception?)>
     TransactOutboxMessageAsync<TKey, TPayload, TSession>(
       TransactingCapabilities<TKey, TPayload, TSession> capabilities,
-      TransactingData<TKey, TPayload> data,
+      object?[] data,
       CancellationToken ct = default)
     where TSession : ISessionService =>
     TryCatch(

@@ -7,16 +7,16 @@ public partial class OutboxTests
   {
     var capabilities = Fixture.Create<AbandoningCapabilities<string, string>>();
     var message = Fixture.Create<IOutboxMessage<string, string>>();
-    var inputData = new AbandoningData<string, string>(message);
+    var inputData = CreateOutboxData(message);
     var expectedUpdate = new AbandoningUpdate(OutboxMessageStatus.Abandoned, message.LastError);
-    capabilities.UpdateOutboxMessageAsync(inputData.OutboxMessage!, expectedUpdate, default).Returns(Task.CompletedTask);
+    capabilities.UpdateOutboxMessageAsync(GetOutboxMessage<string, string>(inputData)!, expectedUpdate, default).Returns(Task.CompletedTask);
 
-    var (data, state, exception) = await OutboxFuncs.AbandonOutboxMessageAsync(capabilities, inputData);
+    var (data, state, exception) = await AbandonOutboxMessageAsync(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(AbandoningStates.Success);
     exception.ShouldBeNull();
-    capabilities.UpdateOutboxMessageAsync.Received(1)(inputData.OutboxMessage!, expectedUpdate, default);
+    capabilities.UpdateOutboxMessageAsync.Received(1)(GetOutboxMessage<string, string>(inputData)!, expectedUpdate, default);
   }
 
   [TestMethod]
@@ -24,16 +24,16 @@ public partial class OutboxTests
   {
     var capabilities = Fixture.Create<AbandoningCapabilities<string, string>>();
     var message = Fixture.Create<IOutboxMessage<string, string>>();
-    var inputData = new AbandoningData<string, string>(message);
+    var inputData = CreateOutboxData(message);
     var expectedUpdate = new AbandoningUpdate(OutboxMessageStatus.Abandoned, message.LastError);
     var expectedException = new InvalidOperationException("abandon failed");
-    capabilities.UpdateOutboxMessageAsync(inputData.OutboxMessage!, expectedUpdate, default).ThrowsAsync(expectedException);
+    capabilities.UpdateOutboxMessageAsync(GetOutboxMessage<string, string>(inputData)!, expectedUpdate, default).ThrowsAsync(expectedException);
 
-    var (data, state, exception) = await OutboxFuncs.AbandonOutboxMessageAsync(capabilities, inputData);
+    var (data, state, exception) = await AbandonOutboxMessageAsync(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(AbandoningStates.Error);
     exception.ShouldBeSameAs(expectedException);
-    capabilities.UpdateOutboxMessageAsync.Received(1)(inputData.OutboxMessage!, expectedUpdate, default);
+    capabilities.UpdateOutboxMessageAsync.Received(1)(GetOutboxMessage<string, string>(inputData)!, expectedUpdate, default);
   }
 }

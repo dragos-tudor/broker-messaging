@@ -7,16 +7,16 @@ public partial class OutboxTests
   {
     var capabilities = Fixture.Create<ClosingCapabilities<string, string>>();
     var message = Fixture.Create<IOutboxMessage<string, string>>();
-    var inputData = new ClosingData<string, string>(message);
+    var inputData = CreateOutboxData(message);
     var expectedUpdate = new ClosingUpdate(OutboxMessageStatus.Published);
-    capabilities.UpdateOutboxMessageAsync(inputData.OutboxMessage!, expectedUpdate, default).Returns(Task.CompletedTask);
+    capabilities.UpdateOutboxMessageAsync(GetOutboxMessage<string, string>(inputData)!, expectedUpdate, default).Returns(Task.CompletedTask);
 
-    var (data, state, exception) = await OutboxFuncs.CloseOutboxMessageAsync(capabilities, inputData);
+    var (data, state, exception) = await CloseOutboxMessageAsync(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(ClosingStates.Success);
     exception.ShouldBeNull();
-    capabilities.UpdateOutboxMessageAsync.Received(1)(inputData.OutboxMessage!, expectedUpdate, default);
+    capabilities.UpdateOutboxMessageAsync.Received(1)(GetOutboxMessage<string, string>(inputData)!, expectedUpdate, default);
   }
 
   [TestMethod]
@@ -24,16 +24,16 @@ public partial class OutboxTests
   {
     var capabilities = Fixture.Create<ClosingCapabilities<string, string>>();
     var message = Fixture.Create<IOutboxMessage<string, string>>();
-    var inputData = new ClosingData<string, string>(message);
+    var inputData = CreateOutboxData(message);
     var expectedUpdate = new ClosingUpdate(OutboxMessageStatus.Published);
     var expectedException = new InvalidOperationException("close failed");
-    capabilities.UpdateOutboxMessageAsync(inputData.OutboxMessage!, expectedUpdate, default).ThrowsAsync(expectedException);
+    capabilities.UpdateOutboxMessageAsync(GetOutboxMessage<string, string>(inputData)!, expectedUpdate, default).ThrowsAsync(expectedException);
 
-    var (data, state, exception) = await OutboxFuncs.CloseOutboxMessageAsync(capabilities, inputData);
+    var (data, state, exception) = await CloseOutboxMessageAsync(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(ClosingStates.Error);
     exception.ShouldBeSameAs(expectedException);
-    capabilities.UpdateOutboxMessageAsync.Received(1)(inputData.OutboxMessage!, expectedUpdate, default);
+    capabilities.UpdateOutboxMessageAsync.Received(1)(GetOutboxMessage<string, string>(inputData)!, expectedUpdate, default);
   }
 }

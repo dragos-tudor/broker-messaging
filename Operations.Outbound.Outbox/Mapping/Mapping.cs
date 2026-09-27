@@ -2,26 +2,28 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxFuncs
 {
-  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
+  static (object?[], string, Exception?)
     MapOutboxMessageSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
-      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data)
-    {
-      var message = RequireOutboxMessage(data.OutboxMessage);
-      var envelope = capabilities.FromOutboxMessage(message, message.CreatedAt);
-      return (data with { Envelope = envelope }, MappingStates.Success, null);
-    }
+      object?[] data)
+  {
+    var message = RequireOutboxMessage(GetOutboxMessage<TKey, TPayload>(data));
 
-  static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
-    MapOutboxMessageError<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data,
+    var envelope = capabilities.FromOutboxMessage(message, message.CreatedAt);
+    SetEnvelope(data, envelope);
+    return (data, MappingStates.Success, null);
+  }
+
+  static (object?[], string, Exception?)
+    MapOutboxMessageError(
+      object?[] data,
       Exception exception) =>
     (data, MappingStates.Error, exception);
 
-  internal static (MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>, string, Exception?)
+  internal static (object?[], string, Exception?)
     MapOutboxMessage<TKey, TValue, TMetadata, TConfirmation, TPayload>(
       MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
-      MappingData<TKey, TValue, TMetadata, TConfirmation, TPayload> data) =>
+      object?[] data) =>
     TryCatch(
       capabilities,
       data,
