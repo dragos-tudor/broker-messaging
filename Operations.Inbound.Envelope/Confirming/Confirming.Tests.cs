@@ -5,7 +5,7 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task confirm_envelope__confirmer_succeeds__returns_success()
   {
-    object?[] inputData = [null, null, null, null, null];
+    var inputData = CreateData();
     var capabilities = Fixture.Create<ConfirmingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
     SetEnvelope(inputData, envelope);
@@ -27,7 +27,7 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task confirm_envelope__envelope_missing__returns_error()
   {
-    object?[] inputData = [null, null, null, null, null];
+    var inputData = CreateData();
     var capabilities = Fixture.Create<ConfirmingCapabilities<string, byte[], object, string>>();
 
     var (data, state, exception) =
@@ -43,7 +43,7 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task confirm_envelope__confirmer_throws__returns_error_with_exception()
   {
-    object?[] inputData = [null, null, null, null, null];
+    var inputData = CreateData();
     var capabilities = Fixture.Create<ConfirmingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
     SetEnvelope(inputData, envelope);
@@ -66,7 +66,7 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task confirm_final_envelope__confirmer_succeeds__returns_final_success()
   {
-    object?[] inputData = [null, null, null, null, null];
+    var inputData = CreateData();
     var capabilities = Fixture.Create<ConfirmingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
     SetEnvelope(inputData, envelope);
@@ -88,7 +88,7 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task confirm_final_envelope__envelope_missing__returns_final_error()
   {
-    object?[] inputData = [null, null, null, null, null];
+    var inputData = CreateData();
     var capabilities = Fixture.Create<ConfirmingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
 
@@ -105,7 +105,7 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task confirm_final_envelope__confirmer_throws__returns_final_error_with_exception()
   {
-    object?[] inputData = [null, null, null, null, null];
+    var inputData = CreateData();
     var capabilities = Fixture.Create<ConfirmingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
     SetEnvelope(inputData, envelope);

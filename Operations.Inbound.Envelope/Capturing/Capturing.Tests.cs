@@ -5,7 +5,7 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task capture_envelope__reader_returns_envelope__returns_success_and_sets_data()
   {
-    object?[] inputData = [null, null, null, null, null];
+    var inputData = CreateData();
     var capabilities = Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
 
@@ -25,7 +25,7 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task capture_envelope__reader_returns_null__returns_not_captured()
   {
-    object?[] inputData = [null, null, null, null, null];
+    var inputData = CreateData();
     var capabilities = Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
 
@@ -45,7 +45,7 @@ public partial class EnvelopeTests
   [TestMethod]
   public async Task capture_envelope__reader_throws__returns_error_with_exception()
   {
-    object?[] inputData = [null, null, null, null, null];
+    var inputData = CreateData();
     var capabilities = Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
 
     var expectedException = new InvalidOperationException("read failed");

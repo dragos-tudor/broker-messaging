@@ -8,7 +8,7 @@ public partial class DeadLetterTests
     var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
     var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
-    var inputData = CreateData(message);
+    var inputData = CreateDeadLetterData(message);
     capabilities.FromDeadLetterMessage(GetDeadLetterMessage<string, string>(inputData)!, message.OriginatedAt).Returns(envelope);
 
     var (data, state, exception) = DeadLetterFuncs.MapDeadLetterMessage(capabilities, inputData);
@@ -23,7 +23,7 @@ public partial class DeadLetterTests
   public void map_dead_letter_message__message_missing__returns_error()
   {
     var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
-    var inputData = CreateData<string, string>(default);
+    var inputData = CreateDeadLetterData<string, string>(default);
 
     var (data, state, exception) = DeadLetterFuncs.MapDeadLetterMessage(capabilities, inputData);
 
@@ -38,7 +38,7 @@ public partial class DeadLetterTests
   {
     var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = CreateData(message);
+    var inputData = CreateDeadLetterData(message);
     var expectedException = new InvalidOperationException("mapping failed");
     capabilities.FromDeadLetterMessage(GetDeadLetterMessage<string, string>(inputData)!, message.OriginatedAt).Throws(expectedException);
 

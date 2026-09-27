@@ -7,7 +7,7 @@ public partial class DeadLetterEnvelopeTests
   {
     var capabilities = Fixture.Create<RedirectingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
-    var inputData = CreateEnvelopeData(envelope);
+    var inputData = CreateDeadLetterEnvelopeData(envelope);
 
     capabilities.PublishDeadLetterEnvelopeAsync(
         GetDeadLetterEnvelope<string, byte[], object, string>(inputData)!,
@@ -31,7 +31,7 @@ public partial class DeadLetterEnvelopeTests
   public async Task redirect_dead_letter_envelope__envelope_missing__returns_error_with_exception()
   {
     var capabilities = Fixture.Create<RedirectingCapabilities<string, byte[], object, string>>();
-    var inputData = CreateEnvelopeData<string, byte[], object, string>(null);
+    var inputData = CreateDeadLetterEnvelopeData<string, byte[], object, string>(null);
 
     var (data, state, exception) =
       await DeadLetterEnvelopeFuncs.RedirectDeadLetterEnvelopeAsync(
@@ -51,7 +51,7 @@ public partial class DeadLetterEnvelopeTests
   {
     var capabilities = Fixture.Create<RedirectingCapabilities<string, byte[], object, string>>();
     var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
-    var inputData = CreateEnvelopeData(envelope);
+    var inputData = CreateDeadLetterEnvelopeData(envelope);
     var expectedException = new InvalidOperationException("redirect failed");
 
     capabilities.PublishDeadLetterEnvelopeAsync(

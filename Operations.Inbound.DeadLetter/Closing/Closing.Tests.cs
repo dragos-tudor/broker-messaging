@@ -7,7 +7,7 @@ public partial class DeadLetterTests
   {
     var capabilities = Fixture.Create<ClosingCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = CreateData(message);
+    var inputData = CreateDeadLetterData(message);
     var expectedUpdate = new ClosingUpdate(DeadLetterMessageStatus.Published);
     capabilities.UpdateDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default).Returns(Task.CompletedTask);
 
@@ -24,7 +24,7 @@ public partial class DeadLetterTests
   {
     var capabilities = Fixture.Create<ClosingCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = CreateData(message);
+    var inputData = CreateDeadLetterData(message);
     var expectedUpdate = new ClosingUpdate(DeadLetterMessageStatus.Published);
     var expectedException = new InvalidOperationException("close failed");
     capabilities.UpdateDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default).ThrowsAsync(expectedException);

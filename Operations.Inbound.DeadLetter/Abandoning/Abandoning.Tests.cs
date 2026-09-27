@@ -7,7 +7,7 @@ public partial class DeadLetterTests
   {
     var capabilities = Fixture.Create<AbandoningCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = CreateData(message);
+    var inputData = CreateDeadLetterData(message);
     var expectedUpdate = new AbandoningUpdate(DeadLetterMessageStatus.Abandoned, message.LastError, null);
     capabilities.UpdateDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default).Returns(Task.CompletedTask);
 
@@ -24,7 +24,7 @@ public partial class DeadLetterTests
   {
     var capabilities = Fixture.Create<AbandoningCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = CreateData(message);
+    var inputData = CreateDeadLetterData(message);
     var expectedUpdate = new AbandoningUpdate(DeadLetterMessageStatus.Abandoned, message.LastError, null);
     var expectedException = new InvalidOperationException("abandon failed");
     capabilities.UpdateDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default).ThrowsAsync(expectedException);

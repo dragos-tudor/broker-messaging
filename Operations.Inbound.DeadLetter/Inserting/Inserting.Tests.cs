@@ -9,7 +9,7 @@ public partial class DeadLetterTests
   {
     var capabilities = Fixture.Create<InsertingCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = CreateData(message);
+    var inputData = CreateDeadLetterData(message);
     capabilities.InsertDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, default).Returns(inserted);
 
     var (data, state, exception) = await DeadLetterFuncs.InsertDeadLetterMessageAsync(capabilities, inputData);
@@ -25,7 +25,7 @@ public partial class DeadLetterTests
   {
     var capabilities = Fixture.Create<InsertingCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
-    var inputData = CreateData(message);
+    var inputData = CreateDeadLetterData(message);
     var expectedException = new InvalidOperationException("insert failed");
     capabilities.InsertDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, default).ThrowsAsync(expectedException);
 

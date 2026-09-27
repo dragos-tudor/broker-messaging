@@ -5,7 +5,7 @@ public partial class EnvelopeTests
   [TestMethod]
   public void convert_envelope__mapper_returns_dead_letter_envelope__returns_success()
   {
-    object?[] inputData = [null, null, null, null, null];
+    var inputData = CreateData();
     var capabilities = Fixture.Create<ConvertingCapabilities<string, byte[], object, string, string>>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
     var deadLetterEnvelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
@@ -34,7 +34,7 @@ public partial class EnvelopeTests
   [TestMethod]
   public void convert_envelope__inbox_message_failure_prefered_over_envelope_failure__returns_success()
   {
-    object?[] inputData = [null, null, null, null, null];
+    var inputData = CreateData();
     var capabilities = Fixture.Create<ConvertingCapabilities<string, byte[], object, string, string>>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
     var inboxMessage = Fixture.Create<IInboxMessage<string, string>>();
@@ -65,7 +65,7 @@ public partial class EnvelopeTests
   [TestMethod]
   public void convert_envelope__envelope_failure_reason_missing__returns_error()
   {
-    object?[] inputData = [null, null, null, null, null];
+    var inputData = CreateData();
     var capabilities = Fixture.Create<ConvertingCapabilities<string, byte[], object, string, string>>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
 

@@ -10,7 +10,7 @@ public partial class DeadLetterTests
     var capabilities = Fixture.Create<SchedulingCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
     message.RetryCount = 0;
-    var inputData = CreateData(message);
+    var inputData = CreateDeadLetterData(message);
     var options = Fixture.Build<DeadLetterRetryOptions>()
       .With(options => options.MaxRetryAttempts, maxRetries)
       .With(options => options.RetryBaseDelay, TimeSpan.Zero)
@@ -43,7 +43,7 @@ public partial class DeadLetterTests
     var capabilities = Fixture.Create<SchedulingCapabilities<string, string>>();
     var message = Fixture.Create<IDeadLetterMessage<string, string>>();
     message.RetryCount = 0;
-    var inputData = CreateData(message);
+    var inputData = CreateDeadLetterData(message);
     var options = Fixture.Build<DeadLetterRetryOptions>()
       .With(options => options.MaxRetryAttempts, 5)
       .With(options => options.RetryBaseDelay, TimeSpan.Zero)
