@@ -4,6 +4,6 @@ partial class DeadLetterEnvelopeFuncs
 {
   const int ProduceResultIndex = 4;
 
-  internal static ProduceResult? GetProduceResult(object?[] objects) =>
-    (ProduceResult?)objects[ProduceResultIndex];
+  internal static ProduceResult? GetProduceResult(object?[] data) =>
+    (ProduceResult?)data[ProduceResultIndex];
 }

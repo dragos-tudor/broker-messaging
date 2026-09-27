@@ -5,6 +5,6 @@ partial class InboxFuncs
 {
   const int DomainModelIndex = 5;
 
-  public static object? GetDomainModel<TKey, TPayload>(object?[] objects) =>
-    objects[DomainModelIndex];
+  public static object? GetDomainModel<TKey, TPayload>(object?[] data) =>
+    data[DomainModelIndex];
 }

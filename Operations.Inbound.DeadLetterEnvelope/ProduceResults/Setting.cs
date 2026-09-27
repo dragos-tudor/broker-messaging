@@ -3,8 +3,8 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 
 partial class DeadLetterEnvelopeFuncs
 {
-  internal static object SetProduceResult(object?[] objects, ProduceResult result) =>
-    objects[ProduceResultIndex] = result;
+  internal static object SetProduceResult(object?[] data, ProduceResult result) =>
+    data[ProduceResultIndex] = result;
 
   static bool SetProduceResultIsAcknowledged(
     ProduceResult result,

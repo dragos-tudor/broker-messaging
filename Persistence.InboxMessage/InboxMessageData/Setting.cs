@@ -3,6 +3,6 @@ namespace Persistence.InboxMessage;
 
 partial class InboxMessageFuncs
 {
-  public static object SetInboxMessage<TKey, TPayload>(object?[] objects, IInboxMessage<TKey, TPayload> message) =>
-    objects[InboxMessageIndex] = message;
+  public static object SetInboxMessage<TKey, TPayload>(object?[] data, IInboxMessage<TKey, TPayload> message) =>
+    data[InboxMessageIndex] = message;
 }

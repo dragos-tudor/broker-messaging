@@ -5,6 +5,6 @@ partial class InboxMessageFuncs
 {
   const int InboxMessageIndex = 2;
 
-  public static IInboxMessage<TKey, TPayload>? GetInboxMessage<TKey, TPayload>(object?[] objects) =>
-    (IInboxMessage<TKey, TPayload>?)objects[InboxMessageIndex];
+  public static IInboxMessage<TKey, TPayload>? GetInboxMessage<TKey, TPayload>(object?[] data) =>
+    (IInboxMessage<TKey, TPayload>?)data[InboxMessageIndex];
 }
