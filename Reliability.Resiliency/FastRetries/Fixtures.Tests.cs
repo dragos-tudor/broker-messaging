@@ -9,26 +9,19 @@ partial class ResiliencyTests
     Retry
   }
 
-  static IFastRetryOptionsService CreateServices(FastRetryOptions options)
-  {
-    var services = Substitute.For<IFastRetryOptionsService>();
-    services.GetFastRetryOptions().Returns(options);
-    return services;
-  }
-
-  static Func<string, IFastRetryOptionsService, string, CancellationToken, Task<(string, RetrySignal, Exception?)>>
+  static Func<string, object, string, CancellationToken, Task<(string, RetrySignal, Exception?)>>
     CreateExecuteOperation(params (string, RetrySignal, Exception?)[] results) =>
       CreateExecuteOperation(null, results);
 
-  static Func<string, IFastRetryOptionsService, string, CancellationToken, Task<(string, RetrySignal, Exception?)>>
+  static Func<string, object, string, CancellationToken, Task<(string, RetrySignal, Exception?)>>
     CreateExecuteOperation(
       Action? beforeExecute,
       params (string, RetrySignal, Exception?)[] results)
   {
-    var executeOperation = Substitute.For<Func<string, IFastRetryOptionsService, string, CancellationToken, Task<(string, RetrySignal, Exception?)>>>();
+    var executeOperation = Substitute.For<Func<string, object, string, CancellationToken, Task<(string, RetrySignal, Exception?)>>>();
     var resultIndex = 0;
     executeOperation(
-      Arg.Any<string>(), Arg.Any<IFastRetryOptionsService>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+      Arg.Any<string>(), Arg.Any<object>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
       .Returns(_ =>
       {
         beforeExecute?.Invoke();

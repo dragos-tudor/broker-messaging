@@ -6,11 +6,11 @@ partial class ResiliencyFuncs
   static readonly TimeSpan SafeClosingInterval = TimeSpan.FromSeconds(3);
 
   internal static async Task RunPeriodicJobAsync(
+    JobCapabilities capabilities,
     string jobName,
     TimeSpan timerInterval,
     TimeSpan lockInterval,
     Func<CancellationToken, Task> work,
-    IPeriodicJobServices services,
     CancellationToken ct = default)
   {
     using var timer = new PeriodicTimer(timerInterval);
@@ -27,7 +27,7 @@ partial class ResiliencyFuncs
         using var lockCts = CancellationTokenSource.
           CreateLinkedTokenSource(ct, workCts.Token);
 
-        await using var exclusiveLockHandler = await services.
+        await using var exclusiveLockHandler = await capabilities.
           TryAcquireLockAsync(jobName, lockInterval, lockCts.Token);
 
         if (exclusiveLockHandler is not null)
@@ -40,7 +40,7 @@ partial class ResiliencyFuncs
       catch (OperationCanceledException) { continue; }
       catch (Exception exception)
       {
-        services.InstrumentJobException(jobName, exception);
+        capabilities.InstrumentJobException(jobName, exception);
       }
     }
   }
