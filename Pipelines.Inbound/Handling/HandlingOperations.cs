@@ -6,9 +6,9 @@ partial class InboundFuncs
 {
   internal static Task<(object?[], string, Exception?)>
     ExecuteHandlingOperationAsync<TKey, TPayload, TSession>(
-      string decision,
       HandlingCapabilities<TKey, TPayload, TSession> capabilities,
       object?[] data,
+      string decision,
       CancellationToken ct = default)
     where TSession : ISessionService =>
     decision switch

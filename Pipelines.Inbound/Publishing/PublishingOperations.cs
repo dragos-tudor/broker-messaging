@@ -5,9 +5,9 @@ partial class InboundFuncs
 {
   internal static Task<(object?[], string, Exception?)>
     ExecutePublishingOperationAsync<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      string decision,
       PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
       object?[] data,
+      string decision,
       CancellationToken ct = default) => decision switch
   {
     PublishingActions.Mapping => ToTask(MapDeadLetterMessage(capabilities.Mapping, data)),
