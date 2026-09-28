@@ -1,61 +1,91 @@
-
-using Services = Routing.Inbound.IInboundRoutingServices<string, string, string, string, byte[], System.IDisposable>;
-using Data = Routing.Inbound.IInboundRoutingData<string, string, string, string, byte[]>;
-
 namespace Routing.Inbound;
 
 partial class InboundTests
 {
   [TestMethod]
-  public async Task route_inbound_pipelines__terminal_decision__returns_action()
+  public async Task route_pipelines__terminal_decision__returns_routing_result()
   {
-    var services = CreateServices();
+    var capabilities = Fixture.Create<RoutingCapabilities<ISessionService>>();
     var data = CreateData();
-    var routePipeline = Substitute.For<Func<Services, Data, InboundPipelineTypes, CancellationToken, Task<(Data, InboundRoutingDecision)>>>();
-    routePipeline(services, data, InboundPipelineTypes.Handling, CancellationToken.None)
-      .Returns(Task.FromResult((data, (InboundRoutingDecision)TerminalActions.Unrecoverable)));
+    RoutePipeline<ISessionService> routePipeline = (_, currentData, pipelineType, signal, _) =>
+      Task.FromResult((currentData, signal ?? "finished", TerminalActions.Unrecoverable));
 
-    var result = await RouteInboundPipelinesAsync<Services, Data, string, string, string, string, byte[], IDisposable>(
-      services, data, InboundPipelineTypes.Handling, routePipeline);
+    var (resultData, result) = await RoutePipelinesAsync(capabilities, routePipeline, data, PipelineTypes.Handling);
 
-    result.ShouldBe(TerminalActions.Unrecoverable);
-    routePipeline.Received(1).Invoke(services, data, InboundPipelineTypes.Handling, CancellationToken.None);
+    resultData.ShouldBe(data);
+    result.ShouldBe(new RoutingResult(PipelineTypes.Handling, "finished", TerminalActions.Unrecoverable));
   }
 
   [TestMethod]
-  public async Task route_inbound_pipelines__pipeline_decision__passes_updated_data_to_next_pipeline()
+  public async Task route_pipelines__pipeline_decision__passes_updated_data_to_next_pipeline()
   {
-    var services = CreateServices();
+    var capabilities = Fixture.Create<RoutingCapabilities<ISessionService>>();
     var initialData = CreateData();
     var updatedData = CreateData();
-    var routePipeline = Substitute.For<Func<Services, Data, InboundPipelineTypes, CancellationToken, Task<(Data, InboundRoutingDecision)>>>();
-    routePipeline(services, initialData, InboundPipelineTypes.Capturing, CancellationToken.None)
-      .Returns(Task.FromResult((updatedData, (InboundRoutingDecision)InboundPipelineTypes.Handling)));
-    routePipeline(services, updatedData, InboundPipelineTypes.Handling, CancellationToken.None)
-      .Returns(Task.FromResult((updatedData, (InboundRoutingDecision)TerminalActions.Exit)));
+    var routes = new List<(string Pipeline, object?[] Data)>();
+    RoutePipeline<ISessionService> routePipeline = (_, data, pipelineType, _, _) =>
+    {
+      routes.Add((pipelineType, data));
+      return Task.FromResult(pipelineType == PipelineTypes.Capturing
+        ? (updatedData, "captured", PipelineTypes.Handling)
+        : (updatedData, "handled", TerminalActions.Exit));
+    };
 
-    var result = await RouteInboundPipelinesAsync<Services, Data, string, string, string, string, byte[], IDisposable>(
-      services, initialData, InboundPipelineTypes.Capturing, routePipeline);
+    var (resultData, result) = await RoutePipelinesAsync(capabilities, routePipeline, initialData, PipelineTypes.Capturing);
 
-    result.ShouldBe(TerminalActions.Exit);
-    routePipeline.Received(1).Invoke(services, initialData, InboundPipelineTypes.Capturing, CancellationToken.None);
-    routePipeline.Received(1).Invoke(services, updatedData, InboundPipelineTypes.Handling, CancellationToken.None);
+    resultData.ShouldBe(updatedData);
+    result.ShouldBe(new RoutingResult(PipelineTypes.Handling, "handled", TerminalActions.Exit));
+    routes.ShouldBe([(PipelineTypes.Capturing, initialData), (PipelineTypes.Handling, updatedData)]);
   }
 
   [TestMethod]
-  public async Task route_inbound_pipelines__cancelled_before_start__returns_exit_without_routing()
+  public async Task route_pipeline__unknown_pipeline__returns_unknown_terminal_decision()
   {
-    var services = CreateServices();
+    var capabilities = Fixture.Create<RoutingCapabilities<ISessionService>>();
     var data = CreateData();
-    var routePipeline = Substitute.For<Func<Services, Data, InboundPipelineTypes, CancellationToken, Task<(Data, InboundRoutingDecision)>>>();
-    using var cancellationSource = new CancellationTokenSource();
-    await cancellationSource.CancelAsync();
 
-    var result = await RouteInboundPipelinesAsync<Services, Data, string, string, string, string, byte[], IDisposable>(
-      services, data, InboundPipelineTypes.Capturing, routePipeline, cancellationSource.Token);
+    var result = await RoutePipelineAsync(capabilities, data, "UnknownPipeline", "entry");
 
-    result.ShouldBe(TerminalActions.Exit);
-    routePipeline.DidNotReceive().Invoke(
-      Arg.Any<Services>(), Arg.Any<Data>(), Arg.Any<InboundPipelineTypes>(), Arg.Any<CancellationToken>());
+    result.ShouldBe((data, "entry", TerminalActions.Unknown));
+  }
+
+  [TestMethod]
+  public async Task route_pipeline__known_pipeline_types__uses_each_canonical_entry()
+  {
+    var capabilities = Fixture.Create<RoutingCapabilities<ISessionService>>();
+    var data = CreateData();
+    using var cancellation = new CancellationTokenSource();
+    await cancellation.CancelAsync();
+    var routes = new (string Pipeline, string Entry)[]
+    {
+      (PipelineTypes.Capturing, CapturingEntries.Start),
+      (PipelineTypes.Redirecting, RedirectingEntries.Start),
+      (PipelineTypes.Handling, HandlingEntries.Start),
+      (PipelineTypes.DeadLettering, DeadLetteringEntries.Start),
+      (PipelineTypes.Publishing, PublishingEntries.Start),
+      (PipelineTypes.Dispatching, DispatchingEntries.Start)
+    };
+
+    foreach (var (pipeline, entry) in routes)
+    {
+      var result = await RoutePipelineAsync(capabilities, data, pipeline, ct: cancellation.Token);
+      result.ShouldBe((data, entry, TerminalActions.Exit));
+    }
+  }
+
+  [TestMethod]
+  public async Task route_pipelines__cancelled_before_start__returns_data_without_result()
+  {
+    var capabilities = Fixture.Create<RoutingCapabilities<ISessionService>>();
+    var data = CreateData();
+    var routePipeline = Substitute.For<RoutePipeline<ISessionService>>();
+    using var cancellation = new CancellationTokenSource();
+    await cancellation.CancelAsync();
+
+    var (resultData, result) = await RoutePipelinesAsync(capabilities, routePipeline, data, PipelineTypes.Capturing, ct: cancellation.Token);
+
+    resultData.ShouldBe(data);
+    result.ShouldBeNull();
+    routePipeline.DidNotReceive().Invoke(Arg.Any<RoutingCapabilities<ISessionService>>(), Arg.Any<object?[]>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<CancellationToken>());
   }
 }

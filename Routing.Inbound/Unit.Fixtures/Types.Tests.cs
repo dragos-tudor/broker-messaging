@@ -1,21 +1,10 @@
-
 namespace Routing.Inbound;
 
-public enum TestStates { Initial, Retry, Completed }
-
-internal readonly union TestSignal(TestStates);
-
-internal readonly union TestDecision(InboundPipelineTypes, TerminalActions) : IInboundDecision
+internal static class TestSignals
 {
-  public InboundPipelineTypes GetPipelineType() => this switch
-  {
-    InboundPipelineTypes pipelineType => pipelineType,
-    _ => InboundPipelineTypes.None
-  };
-
-  public TerminalActions GetTerminalAction() => this switch
-  {
-    TerminalActions terminalAction => terminalAction,
-    _ => TerminalActions.None
-  };
+  internal const string Initial = "Initial";
+  internal const string Retry = "Retry";
+  internal const string Completed = "Completed";
+  internal const string Operation = "Operation";
+  internal const string NextPipeline = "PipelineTypes.Capturing";
 }

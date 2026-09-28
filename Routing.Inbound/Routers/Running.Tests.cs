@@ -1,168 +1,120 @@
-
-using Services = Routing.Inbound.IInboundRoutingServices<string, string, string, string, byte[], System.IDisposable>;
-using Data = Routing.Inbound.IInboundRoutingData<string, string, string, string, byte[]>;
-
 namespace Routing.Inbound;
 
 partial class InboundTests
 {
   [TestMethod]
-  public async Task run_inbound_pipeline__pipeline_decision__returns_pipeline_type_without_executing_operation()
+  public async Task run_pipeline__pipeline_decision__returns_pipeline_type_without_executing_operation()
   {
-    var services = CreateServices();
     var data = CreateData();
-    var advancePipeline = CreateAdvancePipeline(InboundPipelineTypes.Capturing);
-    var executeOperation = CreateExecuteOperation();
-    var propagateException = CreatePropagateException();
-    var canFastRetry = CreateCanFastRetry();
+    var advance = Substitute.For<AdvancePipeline>();
+    advance(TestSignals.Initial, Arg.Any<PipelineConfig>()).Returns(TestSignals.NextPipeline);
+    var execute = Substitute.For<ExecuteOperationAsync<string>>();
+    var propagate = Substitute.For<PropagateException>();
+    var canRetry = Substitute.For<CanFastRetry>();
+    var functions = CreateFunctions(advance, execute, propagate, canRetry);
 
-    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, byte[], IDisposable, TestSignal, TestDecision>(
-      services, data, TestStates.Initial, advancePipeline, executeOperation, propagateException, canFastRetry);
+    var result = await RunPipelineAsync(CreateRunningCapabilities(), "capabilities", functions, data, TestSignals.Initial);
 
-    result.ShouldBe((data, InboundPipelineTypes.Capturing));
-    advancePipeline.Received(1).Invoke(TestStates.Initial, Arg.Any<InboundPipelineConfig>());
-    executeOperation.DidNotReceive().Invoke(Arg.Any<TestDecision>(), Arg.Any<Services>(), Arg.Any<Data>(), Arg.Any<CancellationToken>());
-    propagateException.DidNotReceive().Invoke(Arg.Any<Data>(), Arg.Any<TestSignal>(), Arg.Any<Exception?>());
-    services.Received(1).InstrumentPipeline(services, (TestSignal)TestStates.Initial, (TestDecision)InboundPipelineTypes.Capturing);
+    result.ShouldBe((data, TestSignals.Initial, TestSignals.NextPipeline));
+    execute.DidNotReceive().Invoke(Arg.Any<string>(), Arg.Any<object?[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
   }
 
   [TestMethod]
-  public async Task run_inbound_pipeline__terminal_action__returns_without_executing_operation()
+  public async Task run_pipeline__terminal_decision__returns_without_executing_operation()
   {
-    var services = CreateServices();
     var data = CreateData();
-    var advancePipeline = CreateAdvancePipeline(TerminalActions.Unrecoverable);
-    var executeOperation = CreateExecuteOperation();
-    var propagateException = CreatePropagateException();
-    var canFastRetry = CreateCanFastRetry();
+    var advance = Substitute.For<AdvancePipeline>();
+    advance(Arg.Any<string>(), Arg.Any<PipelineConfig>()).Returns(TerminalActions.Unrecoverable);
+    var execute = Substitute.For<ExecuteOperationAsync<string>>();
+    var functions = CreateFunctions(advance, execute, Substitute.For<PropagateException>(), Substitute.For<CanFastRetry>());
 
-    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, byte[], IDisposable, TestSignal, TestDecision>(
-      services, data, TestStates.Initial, advancePipeline, executeOperation, propagateException, canFastRetry);
+    var result = await RunPipelineAsync(CreateRunningCapabilities(), "capabilities", functions, data, TestSignals.Initial);
 
-    result.ShouldBe((data, TerminalActions.Unrecoverable));
-    executeOperation.DidNotReceive().Invoke(Arg.Any<TestDecision>(), Arg.Any<Services>(), Arg.Any<Data>(), Arg.Any<CancellationToken>());
-    propagateException.DidNotReceive().Invoke(Arg.Any<Data>(), Arg.Any<TestSignal>(), Arg.Any<Exception?>());
+    result.ShouldBe((data, TestSignals.Initial, TerminalActions.Unrecoverable));
+    execute.DidNotReceive().Invoke(Arg.Any<string>(), Arg.Any<object?[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
   }
 
   [TestMethod]
-  public async Task run_inbound_pipeline__operation_result__continues_with_updated_data_and_signal()
+  public async Task run_pipeline__operation_result__continues_with_updated_data_and_signal()
   {
-    var services = CreateServices();
     var initialData = CreateData();
     var updatedData = CreateData();
-    var operationDecision = TerminalActions.None;
-    var advancePipeline = CreateAdvancePipeline(operationDecision, TerminalActions.Exit);
-    var executeOperation = CreateExecuteOperation((updatedData, TestStates.Completed, null));
-    var propagateException = CreatePropagateException();
-    var canFastRetry = CreateCanFastRetry();
+    var advance = Substitute.For<AdvancePipeline>();
+    advance(TestSignals.Initial, Arg.Any<PipelineConfig>()).Returns(TestSignals.Operation);
+    advance(TestSignals.Completed, Arg.Any<PipelineConfig>()).Returns(TerminalActions.Exit);
+    var execute = Substitute.For<ExecuteOperationAsync<string>>();
+    execute("capabilities", initialData, TestSignals.Operation, Arg.Any<CancellationToken>())
+      .Returns(Task.FromResult((updatedData, TestSignals.Completed, (Exception?)null)));
+    var propagate = Substitute.For<PropagateException>();
+    var functions = CreateFunctions(advance, execute, propagate, Substitute.For<CanFastRetry>());
 
-    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, byte[], IDisposable, TestSignal, TestDecision>(
-      services, initialData, TestStates.Initial, advancePipeline, executeOperation, propagateException, canFastRetry);
+    var result = await RunPipelineAsync(CreateRunningCapabilities(), "capabilities", functions, initialData, TestSignals.Initial);
 
-    result.ShouldBe((updatedData, TerminalActions.Exit));
-    advancePipeline.Received(1).Invoke(TestStates.Initial, Arg.Any<InboundPipelineConfig>());
-    executeOperation.Received(1).Invoke(operationDecision, services, initialData, CancellationToken.None);
-    propagateException.Received(1).Invoke(updatedData, TestStates.Completed, null);
-    advancePipeline.Received(1).Invoke(TestStates.Completed, Arg.Any<InboundPipelineConfig>());
-    services.Received(1).InstrumentOperation(services, updatedData, (TestSignal)TestStates.Completed, null);
+    result.ShouldBe((updatedData, TestSignals.Completed, TerminalActions.Exit));
+    propagate.Received(1).Invoke(updatedData, TestSignals.Completed, null);
   }
 
   [TestMethod]
-  public async Task run_inbound_pipeline__retry_then_success__returns_final_operation_result()
+  public async Task run_pipeline__fast_retry_then_success__returns_final_operation_result()
   {
-    var services = CreateServices(new FastRetryOptions { RetryBaseDelay = TimeSpan.Zero });
     var initialData = CreateData();
     var retriedData = CreateData();
     var completedData = CreateData();
-    var operationDecision = TerminalActions.None;
-    var advancePipeline = CreateAdvancePipeline(operationDecision, TerminalActions.Exit);
-    var executeOperation = CreateExecuteOperation(
-      (retriedData, TestStates.Retry, null),
-      (completedData, TestStates.Completed, null));
-    var propagateException = CreatePropagateException();
-    var canFastRetry = CreateCanFastRetry();
+    var advance = Substitute.For<AdvancePipeline>();
+    advance(TestSignals.Initial, Arg.Any<PipelineConfig>()).Returns(TestSignals.Operation);
+    advance(TestSignals.Completed, Arg.Any<PipelineConfig>()).Returns(TerminalActions.Exit);
+    var execute = Substitute.For<ExecuteOperationAsync<string>>();
+    execute("capabilities", initialData, TestSignals.Operation, Arg.Any<CancellationToken>())
+      .Returns(Task.FromResult((retriedData, TestSignals.Retry, (Exception?)null)));
+    execute("capabilities", retriedData, TestSignals.Operation, Arg.Any<CancellationToken>())
+      .Returns(Task.FromResult((completedData, TestSignals.Completed, (Exception?)null)));
+    var canRetry = Substitute.For<CanFastRetry>();
+    canRetry(TestSignals.Retry).Returns(true);
+    var delayedRetry = Substitute.For<IsFastRetryDelayedAsync>();
+    delayedRetry(Arg.Any<int>(), Arg.Any<FastRetryOptions>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult(true), Task.FromResult(false));
+    var running = CreateRunningCapabilities() with { IsFastRetryDelayedAsync = delayedRetry };
+    var functions = CreateFunctions(advance, execute, Substitute.For<PropagateException>(), canRetry);
 
-    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, byte[], IDisposable, TestSignal, TestDecision>(
-      services, initialData, TestStates.Initial, advancePipeline, executeOperation, propagateException, canFastRetry);
+    var result = await RunPipelineAsync(running, "capabilities", functions, initialData, TestSignals.Initial);
 
-    result.ShouldBe((completedData, TerminalActions.Exit));
-    advancePipeline.Received(1).Invoke(TestStates.Completed, Arg.Any<InboundPipelineConfig>());
-    executeOperation.Received(1).Invoke(operationDecision, services, initialData, CancellationToken.None);
-    executeOperation.Received(1).Invoke(operationDecision, services, retriedData, CancellationToken.None);
-    propagateException.Received(1).Invoke(completedData, TestStates.Completed, null);
-    services.Received(1).InstrumentOperation(services, completedData, (TestSignal)TestStates.Completed, null);
+    result.ShouldBe((completedData, TestSignals.Completed, TerminalActions.Exit));
+    execute.Received(2).Invoke("capabilities", Arg.Any<object?[]>(), TestSignals.Operation, Arg.Any<CancellationToken>());
   }
 
   [TestMethod]
-  public async Task run_inbound_pipeline__operation_returns_exception__propagates_and_instruments_error()
+  public async Task run_pipeline__operation_exception__propagates_and_instruments_error()
   {
-    var services = CreateServices();
-    var initialData = CreateData();
-    var updatedData = CreateData();
-    var expectedException = new InvalidOperationException("operation failed");
-    var operationDecision = TerminalActions.None;
-    var advancePipeline = CreateAdvancePipeline(operationDecision, TerminalActions.Exit);
-    var executeOperation = CreateExecuteOperation((updatedData, TestStates.Completed, expectedException));
-    var propagateException = CreatePropagateException();
-    var canFastRetry = CreateCanFastRetry();
-
-    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, byte[], IDisposable, TestSignal, TestDecision>(
-      services, initialData, TestStates.Initial, advancePipeline, executeOperation, propagateException, canFastRetry);
-
-    result.ShouldBe((updatedData, TerminalActions.Exit));
-    propagateException.Received(1).Invoke(updatedData, TestStates.Completed, expectedException);
-    services.Received(1).InstrumentOperation(services, updatedData, (TestSignal)TestStates.Completed, expectedException);
-  }
-
-  [TestMethod]
-  public async Task run_inbound_pipeline__cancelled_before_start__returns_exit_without_callbacks()
-  {
-    var services = CreateServices();
     var data = CreateData();
-    var advancePipeline = CreateAdvancePipeline();
-    var executeOperation = CreateExecuteOperation();
-    var propagateException = CreatePropagateException();
-    var canFastRetry = CreateCanFastRetry();
-    using var cancellationSource = new CancellationTokenSource();
-    await cancellationSource.CancelAsync();
+    var exception = new InvalidOperationException("failed");
+    var advance = Substitute.For<AdvancePipeline>();
+    advance(TestSignals.Initial, Arg.Any<PipelineConfig>()).Returns(TestSignals.Operation);
+    advance(TestSignals.Completed, Arg.Any<PipelineConfig>()).Returns(TerminalActions.Exit);
+    var execute = Substitute.For<ExecuteOperationAsync<string>>();
+    execute(Arg.Any<string>(), Arg.Any<object?[]>(), TestSignals.Operation, Arg.Any<CancellationToken>())
+      .Returns(Task.FromResult((data, TestSignals.Completed, (Exception?)exception)));
+    var propagate = Substitute.For<PropagateException>();
+    var instrumentOperation = Substitute.For<InstrumentOperation>();
+    var running = CreateRunningCapabilities() with { InstrumentOperation = instrumentOperation };
+    var functions = CreateFunctions(advance, execute, propagate, Substitute.For<CanFastRetry>());
 
-    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, byte[], IDisposable, TestSignal, TestDecision>(
-      services, data, TestStates.Initial, advancePipeline, executeOperation, propagateException, canFastRetry, cancellationSource.Token);
+    await RunPipelineAsync(running, "capabilities", functions, data, TestSignals.Initial);
 
-    result.ShouldBe((data, TerminalActions.Exit));
-    services.Received(1).GetInboundPipelineConfig();
-    advancePipeline.DidNotReceive().Invoke(Arg.Any<TestSignal>(), Arg.Any<InboundPipelineConfig>());
-    executeOperation.DidNotReceive().Invoke(Arg.Any<TestDecision>(), Arg.Any<Services>(), Arg.Any<Data>(), Arg.Any<CancellationToken>());
-    services.DidNotReceive().InstrumentPipeline(services, Arg.Any<TestSignal>(), Arg.Any<TestDecision>());
+    propagate.Received(1).Invoke(data, TestSignals.Completed, exception);
+    instrumentOperation.Received(1).Invoke(TestSignals.Completed, Arg.Any<string>(), Arg.Any<PipelineContext>(), exception);
   }
 
   [TestMethod]
-  public async Task run_inbound_pipeline__cancelled_during_operation__returns_updated_data_and_exit()
+  public async Task run_pipeline__cancelled_before_start__returns_without_advancing()
   {
-    var services = CreateServices();
-    var initialData = CreateData();
-    var updatedData = CreateData();
-    var operationDecision = TerminalActions.None;
-    var advancePipeline = CreateAdvancePipeline(operationDecision);
-    using var cancellationSource = new CancellationTokenSource();
-    var executeOperation = Substitute.For<Func<TestDecision, Services, Data, CancellationToken, Task<(Data, TestSignal, Exception?)>>>();
-    executeOperation(operationDecision, services, initialData, cancellationSource.Token)
-      .Returns(_ =>
-      {
-        cancellationSource.CancelAsync();
-        return Task.FromResult((updatedData, (TestSignal)TestStates.Retry, (Exception?)null));
-      });
-    var propagateException = CreatePropagateException();
-    var canFastRetry = CreateCanFastRetry();
+    var data = CreateData();
+    var advance = Substitute.For<AdvancePipeline>();
+    using var cancellation = new CancellationTokenSource();
+    await cancellation.CancelAsync();
+    var functions = CreateFunctions(advance, Substitute.For<ExecuteOperationAsync<string>>(), Substitute.For<PropagateException>(), Substitute.For<CanFastRetry>());
 
-    var result = await RunInboundPipelineAsync<Services, Data, string, string, string, string, byte[], IDisposable, TestSignal, TestDecision>(
-      services, initialData, TestStates.Initial, advancePipeline, executeOperation, propagateException, canFastRetry, cancellationSource.Token);
+    var result = await RunPipelineAsync(CreateRunningCapabilities(), "capabilities", functions, data, TestSignals.Initial, cancellation.Token);
 
-    result.ShouldBe((updatedData, TerminalActions.Exit));
-    advancePipeline.DidNotReceive().Invoke(TestStates.Retry, Arg.Any<InboundPipelineConfig>());
-    executeOperation.Received(1).Invoke(operationDecision, services, initialData, cancellationSource.Token);
-    propagateException.Received(1).Invoke(updatedData, TestStates.Retry, null);
-    canFastRetry.DidNotReceive().Invoke(Arg.Any<TestSignal>());
-    services.Received(1).InstrumentOperation(services, updatedData, (TestSignal)TestStates.Retry, null);
+    result.ShouldBe((data, TestSignals.Initial, TerminalActions.Exit));
+    advance.DidNotReceive().Invoke(Arg.Any<string>(), Arg.Any<PipelineConfig>());
   }
 }

@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="../Pipelines.Inbound/Pipelines.Inbound.csproj" />
     <ProjectReference Include="../Reliability.Resiliency/Reliability.Resiliency.csproj" />
+    <ProjectReference Include="../Observability.Instrumentation/Observability.Instrumentation.csproj" />
   </ItemGroup>
 
 </Project>

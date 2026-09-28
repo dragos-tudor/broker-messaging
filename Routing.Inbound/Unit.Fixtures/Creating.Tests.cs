@@ -1,51 +1,27 @@
-using Services = Routing.Inbound.IInboundRoutingServices<string, string, string, string, byte[], System.IDisposable>;
-using Data = Routing.Inbound.IInboundRoutingData<string, string, string, string, byte[]>;
+using AutoFixture.AutoNSubstitute;
 
 namespace Routing.Inbound;
 
 partial class InboundTests
 {
-  static Data CreateData() => Substitute.For<Data>();
-
-  static Services CreateServices(FastRetryOptions? options = null)
+  static readonly IFixture Fixture = new Fixture().Customize(new AutoNSubstituteCustomization
   {
-    var services = Substitute.For<Services>();
-    services.GetInboundPipelineConfig().Returns(new InboundPipelineConfig());
-    services.GetFastRetryOptions().Returns(options ?? new FastRetryOptions());
-    return services;
-  }
+    ConfigureMembers = true,
+    GenerateDelegates = true
+  });
 
-  static Func<TestSignal, InboundPipelineConfig, TestDecision> CreateAdvancePipeline(params TestDecision[] decisions)
-  {
-    var advancePipeline = Substitute.For<Func<TestSignal, InboundPipelineConfig, TestDecision>>();
-    var decisionIndex = 0;
-    advancePipeline(Arg.Any<TestSignal>(), Arg.Any<InboundPipelineConfig>())
-      .Returns(_ => decisions[decisionIndex++]);
-    return advancePipeline;
-  }
+  static object?[] CreateData() => new object?[6];
 
-  static Func<TestDecision, Services, Data, CancellationToken, Task<(Data, TestSignal, Exception?)>>
-    CreateExecuteOperation(params (Data, TestSignal, Exception?)[] results)
-  {
-    var executeOperation = Substitute.For<Func<TestDecision, Services, Data, CancellationToken, Task<(Data, TestSignal, Exception?)>>>();
-    var resultIndex = 0;
-    executeOperation(Arg.Any<TestDecision>(), Arg.Any<Services>(), Arg.Any<Data>(), Arg.Any<CancellationToken>())
-      .Returns(_ => Task.FromResult(results[resultIndex++]));
-    return executeOperation;
-  }
+  static RunningCapabilities CreateRunningCapabilities(FastRetryOptions? options = null) => new(
+    () => new PipelineConfig(),
+    () => options ?? new FastRetryOptions { MaxRetryAttempts = 2, RetryBaseDelay = TimeSpan.Zero },
+    (_, _, _) => Task.FromResult(true),
+    (_, _) => { },
+    (_, _, _, _) => { });
 
-  static Func<Data, TestSignal, Exception?, string?> CreatePropagateException()
-  {
-    var propagateException = Substitute.For<Func<Data, TestSignal, Exception?, string?>>();
-    propagateException(Arg.Any<Data>(), Arg.Any<TestSignal>(), Arg.Any<Exception?>()).Returns("propagated");
-    return propagateException;
-  }
-
-  static Func<TestSignal, bool> CreateCanFastRetry()
-  {
-    var canFastRetry = Substitute.For<Func<TestSignal, bool>>();
-    canFastRetry(Arg.Any<TestSignal>()).Returns(false);
-    canFastRetry(TestStates.Retry).Returns(true);
-    return canFastRetry;
-  }
+  static PipelineFunctions<string> CreateFunctions(
+    AdvancePipeline advancePipeline,
+    ExecuteOperationAsync<string> executeOperationAsync,
+    PropagateException propagateException,
+    CanFastRetry canFastRetry) => new(advancePipeline, executeOperationAsync, propagateException, canFastRetry);
 }

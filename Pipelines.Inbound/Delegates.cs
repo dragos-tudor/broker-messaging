@@ -9,7 +9,7 @@ public delegate bool CanFastRetry(string signal);
 
 public delegate PipelineConfig GetPipelineConfig();
 
-public delegate Task<(object?[], string, Exception?)> ExecuteOperation<TCapabilities>(
+public delegate Task<(object?[], string, Exception?)> ExecuteOperationAsync<TCapabilities>(
   TCapabilities capabilities,
   object?[] data,
   string decision,

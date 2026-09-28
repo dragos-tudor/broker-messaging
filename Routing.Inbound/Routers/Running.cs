@@ -3,45 +3,41 @@ namespace Routing.Inbound;
 
 partial class InboundFuncs
 {
-  internal static async Task<(TData, InboundRoutingDecision)>
-    RunInboundPipelineAsync<TServices, TData, TKey, TValue, TMetadata, TConfirmation, TPayload, TSession, TSignal, TDecision>(
-      TServices services,
-      TData data,
-      TSignal signal,
-      Func<TSignal, InboundPipelineConfig, TDecision> advancePipeline,
-      Func<TDecision, TServices, TData, CancellationToken, Task<(TData, TSignal, Exception?)>> executeOperation,
-      Func<TData, TSignal, Exception?, string?> propagateException,
-      Func<TSignal, bool> canFastRetry,
-      CancellationToken ct = default)
-    where TServices : IInboundRoutingServices<TKey, TValue, TMetadata, TConfirmation, TPayload, TSession>
-    where TData : IInboundRoutingData<TKey, TValue, TMetadata, TConfirmation, TPayload>
-    where TSignal: struct
-    where TDecision: struct, IInboundDecision
-    where TSession : IDisposable
+  internal static async Task<(object?[], string, string)> RunPipelineAsync<TCapabilities>(
+    RunningCapabilities capabilities,
+    TCapabilities pipelineCapabilities,
+    PipelineFunctions<TCapabilities> functions,
+    object?[] data,
+    string signal,
+    CancellationToken ct = default)
   {
-    var pipelineConfig = services.GetInboundPipelineConfig();
+    var options = capabilities.GetFastRetryOptions();
+    var config = capabilities.GetPipelineConfig();
+    var decision = TerminalActions.Exit;
+
     while (!ct.IsCancellationRequested)
     {
-      var decision = advancePipeline(signal, pipelineConfig);
-      services.InstrumentPipeline(services, signal, decision);
+      decision = functions.AdvancePipeline(signal, config);
+      capabilities.InstrumentPipeline(signal, CreatePipelineContext(data));
 
-      var pipelineType = decision.GetPipelineType();
-      if (pipelineType != InboundPipelineTypes.None)
-        return (data, pipelineType);
+      if (IsPipelineType(decision)) return (data, signal, decision);
+      if (IsTerminalAction(decision)) return (data, signal, decision);
 
-      var terminalAction = decision.GetTerminalAction();
-      if (terminalAction != TerminalActions.None)
-        return (data, terminalAction);
+      var (nextData, nextSignal, exception) = await functions.
+        ExecuteOperationAsync(pipelineCapabilities, data, decision, ct);
 
-      var (nextData, nextSignal, exception) = await
-        RunFastRetryAsync(services, data, decision, executeOperation, canFastRetry, DelayFastRetryAsync, ct);
-      propagateException(nextData, nextSignal, exception);
+      var retryCount = 0;
+      while(functions.CanFastRetry(nextSignal) && await capabilities.
+            IsFastRetryDelayedAsync(retryCount++, options, ct))
+        (nextData, nextSignal, exception) = await functions.
+          ExecuteOperationAsync(pipelineCapabilities, nextData, decision, ct);
 
-      services.InstrumentOperation(services, nextData, nextSignal, exception);
+      functions.PropagateException(nextData, nextSignal, exception);
+      capabilities.InstrumentOperation(nextSignal, decision, CreatePipelineContext(nextData), exception);
 
       data = nextData;
       signal = nextSignal;
     }
-    return (data, TerminalActions.Exit);
+    return (data, signal, decision);
   }
 }

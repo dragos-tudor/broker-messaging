@@ -1,4 +1,3 @@
-
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
 global using Shouldly;
 global using NSubstitute;
@@ -14,11 +13,4 @@ namespace Routing.Inbound;
 public partial class InboundTests;
 
 [TestClass]
-public partial class IntegrationTests
-{
-  static readonly IFixture Fixture = new Fixture().Customize(new AutoNSubstituteCustomization()
-  {
-    ConfigureMembers = true,
-    GenerateDelegates = true
-  });
-}
+public partial class IntegrationTests;
