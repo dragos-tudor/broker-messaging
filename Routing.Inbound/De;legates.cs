@@ -3,11 +3,11 @@ namespace Routing.Inbound;
 
 public delegate void InstrumentPipeline(
   string signal,
+  string decision,
   PipelineContext context);
 
 public delegate void InstrumentOperation(
   string signal,
-  string decision,
   PipelineContext context,
   Exception? exception);
 

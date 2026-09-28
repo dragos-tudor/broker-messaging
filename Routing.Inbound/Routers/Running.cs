@@ -18,7 +18,7 @@ partial class InboundFuncs
     while (!ct.IsCancellationRequested)
     {
       decision = functions.AdvancePipeline(signal, config);
-      capabilities.InstrumentPipeline(signal, CreatePipelineContext(data));
+      capabilities.InstrumentPipeline(signal, decision, CreatePipelineContext(data));
 
       if (IsPipelineType(decision)) return (data, signal, decision);
       if (IsTerminalAction(decision)) return (data, signal, decision);
@@ -33,7 +33,7 @@ partial class InboundFuncs
           ExecuteOperationAsync(pipelineCapabilities, nextData, decision, ct);
 
       functions.PropagateException(nextData, nextSignal, exception);
-      capabilities.InstrumentOperation(nextSignal, decision, CreatePipelineContext(nextData), exception);
+      capabilities.InstrumentOperation(nextSignal, CreatePipelineContext(nextData), exception);
 
       data = nextData;
       signal = nextSignal;

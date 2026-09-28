@@ -16,8 +16,8 @@ partial class InboundTests
     () => new PipelineConfig(),
     () => options ?? new FastRetryOptions { MaxRetryAttempts = 2, RetryBaseDelay = TimeSpan.Zero },
     (_, _, _) => Task.FromResult(true),
-    (_, _) => { },
-    (_, _, _, _) => { });
+    (_, _, _) => { },
+    (_, _, _) => { });
 
   static PipelineFunctions<string> CreateFunctions(
     AdvancePipeline advancePipeline,

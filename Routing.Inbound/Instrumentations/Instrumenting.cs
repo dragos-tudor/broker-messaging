@@ -6,11 +6,12 @@ partial class InboundFuncs
   internal static void InstrumentPipeline(
     InstrumentationCapabilities capabilities,
     string signal,
-
+    string decision,
     PipelineContext context) =>
       LogPipeline(
         capabilities.GetLogger(),
         signal,
+        decision,
         context.TransportId,
         context.CorrelationId,
         context.InboxMessageId,
@@ -19,25 +20,22 @@ partial class InboundFuncs
   internal static void InstrumentOperation(
     InstrumentationCapabilities capabilities,
     string signal,
-    string decision,
     PipelineContext context,
     Exception? exception)
   {
     if (exception is null)
-      InstrumentSuccessOperation(capabilities, signal, decision, context);
+      InstrumentSuccessOperation(capabilities, signal, context);
     if (exception is not null)
-      InstrumentErrorOperation(capabilities, signal, decision, context, exception);
+      InstrumentErrorOperation(capabilities, signal, context, exception);
   }
 
   static void InstrumentSuccessOperation(
     InstrumentationCapabilities capabilities,
     string signal,
-    string decision,
     PipelineContext context) =>
     LogOperation(
       capabilities.GetLogger(),
       signal,
-      decision,
       context.TransportId,
       context.CorrelationId,
       context.InboxMessageId,
@@ -46,13 +44,11 @@ partial class InboundFuncs
   static void InstrumentErrorOperation(
     InstrumentationCapabilities capabilities,
     string signal,
-    string decision,
     PipelineContext context,
     Exception exception) =>
     LogOperationError(
       capabilities.GetLogger(),
       signal,
-      decision,
       context.TransportId,
       context.CorrelationId,
       context.InboxMessageId,

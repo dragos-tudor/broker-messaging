@@ -100,7 +100,7 @@ partial class InboundTests
     await RunPipelineAsync(running, "capabilities", functions, data, TestSignals.Initial);
 
     propagate.Received(1).Invoke(data, TestSignals.Completed, exception);
-    instrumentOperation.Received(1).Invoke(TestSignals.Completed, Arg.Any<string>(), Arg.Any<PipelineContext>(), exception);
+    instrumentOperation.Received(1).Invoke(TestSignals.Completed, Arg.Any<PipelineContext>(), exception);
   }
 
   [TestMethod]
