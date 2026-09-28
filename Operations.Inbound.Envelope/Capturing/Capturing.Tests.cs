@@ -6,16 +6,16 @@ public partial class EnvelopeTests
   public async Task capture_envelope__reader_returns_envelope__returns_success_and_sets_data()
   {
     var inputData = CreateData();
-    var capabilities = Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
-    var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
+    var capabilities = Fixture.Create<CapturingCapabilities>();
+    var envelope = Fixture.Create<IEnvelope>();
 
     capabilities.ReadEnvelope(default)
       .Returns(Task.FromResult(envelope));
 
     var (data, state, exception) =
-      await CaptureEnvelope(capabilities, inputData);
+      await CaptureEnvelopeAsync(capabilities, inputData);
 
-    GetEnvelope<string, byte[], object, string>(data).ShouldBe(envelope);
+    GetEnvelope(data).ShouldBe(envelope);
     state.ShouldBe(CapturingStates.Success);
     exception.ShouldBeNull();
 
@@ -26,14 +26,14 @@ public partial class EnvelopeTests
   public async Task capture_envelope__reader_returns_null__returns_not_captured()
   {
     var inputData = CreateData();
-    var capabilities = Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
-    var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
+    var capabilities = Fixture.Create<CapturingCapabilities>();
+    var envelope = Fixture.Create<IEnvelope>();
 
     capabilities.ReadEnvelope(default)
-      .Returns(Task.FromResult<IEnvelope<string, byte[], object, string>>(null!));
+      .Returns(Task.FromResult<IEnvelope>(null!));
 
     var (data, state, exception) =
-      await CaptureEnvelope(capabilities, inputData);
+      await CaptureEnvelopeAsync(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(CapturingStates.NotCaptured);
@@ -46,14 +46,14 @@ public partial class EnvelopeTests
   public async Task capture_envelope__reader_throws__returns_error_with_exception()
   {
     var inputData = CreateData();
-    var capabilities = Fixture.Create<CapturingCapabilities<string, byte[], object, string>>();
+    var capabilities = Fixture.Create<CapturingCapabilities>();
 
     var expectedException = new InvalidOperationException("read failed");
     capabilities.ReadEnvelope(default)
       .ThrowsAsync(expectedException);
 
     var (data, state, exception) =
-      await CaptureEnvelope(capabilities, inputData);
+      await CaptureEnvelopeAsync(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(CapturingStates.Error);

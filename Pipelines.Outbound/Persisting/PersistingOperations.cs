@@ -5,8 +5,8 @@ namespace Pipelines.Outbound;
 partial class OutboundFuncs
 {
   internal static Task<(object?[], string, Exception?)>
-    ExecutePersistingOperationAsync<TKey, TPayload, TSession>(
-      PersistingCapabilities<TKey, TPayload, TSession> capabilities,
+    ExecutePersistingOperationAsync<TSession>(
+      PersistingCapabilities<TSession> capabilities,
       object?[] data,
       string decision,
       CancellationToken ct = default)

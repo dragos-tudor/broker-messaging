@@ -14,7 +14,7 @@ public partial class InboundTests
     var signal = PublishingStates.Error;
     SetDeadLetterMessage(data, message);
 
-    PropagatePublishingException<string, string>
+    PropagatePublishingException
       (data, signal, new InvalidOperationException("publish failed"));
 
     message.LastError.ShouldBe("publish failed");
@@ -30,7 +30,7 @@ public partial class InboundTests
     SetDeadLetterMessage(data, message);
 
     message.LastError = "existing error";
-    PropagatePublishingException<string, string>
+    PropagatePublishingException
       (data, signal, new InvalidOperationException("schedule failed"));
 
     message.LastError.ShouldBe("existing error");

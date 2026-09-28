@@ -3,12 +3,12 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 partial class DeadLetterEnvelopeFuncs
 {
   static async Task<(object?[], string, Exception?)>
-    PublishDeadLetterEnvelopeSuccessAsync<TKey, TValue, TMetadata, TConfirmation>(
-      PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+    PublishDeadLetterEnvelopeSuccessAsync(
+      PublishingCapabilities capabilities,
       object?[] data,
       CancellationToken ct = default)
     {
-      var envelope = RequireDeadLetterEnvelope(GetDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
+      var envelope = RequireDeadLetterEnvelope(GetDeadLetterEnvelope(data));
 
       await capabilities.PublishDeadLetterEnvelopeAsync(envelope, ct);
 
@@ -22,8 +22,8 @@ partial class DeadLetterEnvelopeFuncs
     (data, PublishingStates.Error, exception);
 
   internal static Task<(object?[], string, Exception?)>
-    PublishDeadLetterEnvelopeAsync<TKey, TValue, TMetadata, TConfirmation>(
-      PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+    PublishDeadLetterEnvelopeAsync(
+      PublishingCapabilities capabilities,
       object?[] data,
       CancellationToken ct = default) =>
     TryCatch(

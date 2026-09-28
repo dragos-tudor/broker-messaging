@@ -5,7 +5,7 @@ public partial class InboxTests
   [TestMethod]
   public async Task transact_inbox_message__transaction_succeeds__returns_success()
   {
-    var capabilities = Fixture.Create<TransactingCapabilities<string, string, ISessionService>>();
+    var capabilities = Fixture.Create<TransactingCapabilities<ISessionService>>();
     var session = Substitute.For<ISessionService>();
     var message = Fixture.Create<IInboxMessage<string, string>>();
     var model = new object();
@@ -30,7 +30,7 @@ public partial class InboxTests
   [TestMethod]
   public async Task transact_inbox_message__domain_model_missing__returns_error()
   {
-    var capabilities = Fixture.Create<TransactingCapabilities<string, string, ISessionService>>();
+    var capabilities = Fixture.Create<TransactingCapabilities<ISessionService>>();
     var message = Fixture.Create<IInboxMessage<string, string>>();
     var inputData = CreateInboxData(message);
 

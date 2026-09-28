@@ -1,6 +1,5 @@
 namespace Operations.Outbound.Outbox;
 
-public sealed record ClosingCapabilities<TKey, TPayload>(
-  UpdateOutboxMessageAsync<TKey, TPayload, ClosingUpdate>
-    UpdateOutboxMessageAsync
+public sealed record ClosingCapabilities(
+  UpdateOutboxMessageAsync<ClosingUpdate> UpdateOutboxMessageAsync
 );

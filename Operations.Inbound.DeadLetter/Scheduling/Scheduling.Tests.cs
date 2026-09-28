@@ -7,8 +7,8 @@ public partial class DeadLetterTests
   [DataRow(0, SchedulingStates.Exhausted)]
   public async Task schedule_dead_letter_message__retry_limit_varies__returns_matching_state(int maxRetries, string expectedState)
   {
-    var capabilities = Fixture.Create<SchedulingCapabilities<string, string>>();
-    var message = Fixture.Create<IDeadLetterMessage<string, string>>();
+    var capabilities = Fixture.Create<SchedulingCapabilities>();
+    var message = Fixture.Create<IDeadLetterMessage>();
     message.RetryCount = 0;
     var inputData = CreateDeadLetterData(message);
     var options = Fixture.Build<DeadLetterRetryOptions>()
@@ -25,7 +25,7 @@ public partial class DeadLetterTests
       message.LastError);
     capabilities.GetDeadLetterRetryOptions().Returns(options);
     capabilities.GetUtcDateTime().Returns(now);
-    capabilities.UpdateDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default).Returns(Task.CompletedTask);
+    capabilities.UpdateDeadLetterMessageAsync(GetDeadLetterMessage(inputData)!, expectedUpdate, default).Returns(Task.CompletedTask);
 
     var (data, state, exception) = await DeadLetterFuncs.ScheduleDeadLetterMessageAsync(capabilities, inputData, default);
 
@@ -34,14 +34,14 @@ public partial class DeadLetterTests
     exception.ShouldBeNull();
     capabilities.GetDeadLetterRetryOptions.Received(1)();
     capabilities.GetUtcDateTime.Received(1)();
-    capabilities.UpdateDeadLetterMessageAsync.Received(1)(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default);
+    capabilities.UpdateDeadLetterMessageAsync.Received(1)(GetDeadLetterMessage(inputData)!, expectedUpdate, default);
   }
 
   [TestMethod]
   public async Task schedule_dead_letter_message__update_throws__returns_error_with_exception()
   {
-    var capabilities = Fixture.Create<SchedulingCapabilities<string, string>>();
-    var message = Fixture.Create<IDeadLetterMessage<string, string>>();
+    var capabilities = Fixture.Create<SchedulingCapabilities>();
+    var message = Fixture.Create<IDeadLetterMessage>();
     message.RetryCount = 0;
     var inputData = CreateDeadLetterData(message);
     var options = Fixture.Build<DeadLetterRetryOptions>()
@@ -59,13 +59,13 @@ public partial class DeadLetterTests
     var expectedException = new InvalidOperationException("schedule failed");
     capabilities.GetDeadLetterRetryOptions().Returns(options);
     capabilities.GetUtcDateTime().Returns(now);
-    capabilities.UpdateDeadLetterMessageAsync(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default).ThrowsAsync(expectedException);
+    capabilities.UpdateDeadLetterMessageAsync(GetDeadLetterMessage(inputData)!, expectedUpdate, default).ThrowsAsync(expectedException);
 
     var (data, state, exception) = await DeadLetterFuncs.ScheduleDeadLetterMessageAsync(capabilities, inputData, default);
 
     data.ShouldBe(inputData);
     state.ShouldBe(SchedulingStates.Error);
     exception.ShouldBeSameAs(expectedException);
-    capabilities.UpdateDeadLetterMessageAsync.Received(1)(GetDeadLetterMessage<string, string>(inputData)!, expectedUpdate, default);
+    capabilities.UpdateDeadLetterMessageAsync.Received(1)(GetDeadLetterMessage(inputData)!, expectedUpdate, default);
   }
 }

@@ -4,12 +4,12 @@ namespace Operations.Inbound.Envelope;
 partial class EnvelopeFuncs
 {
   static (object?[], string, Exception?)
-    ConvertEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      ConvertingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+    ConvertEnvelopeSuccess(
+      ConvertingCapabilities capabilities,
       object?[] data)
     {
-      var envelope = RequireEnvelope(GetEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
-      var message = GetInboxMessage<TKey, TPayload>(data);
+      var envelope = RequireEnvelope(GetEnvelope(data));
+      var message = GetInboxMessage(data);
       var failureReason = RequireFailureReason(envelope, message);
 
       var currentDate = capabilities.GetUtcDateTime();
@@ -27,8 +27,8 @@ partial class EnvelopeFuncs
     (data, ConvertingStates.Error, exception);
 
   internal static (object?[], string, Exception?)
-    ConvertEnvelope<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      ConvertingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+    ConvertEnvelope(
+      ConvertingCapabilities capabilities,
       object?[] data) =>
     TryCatch(
       capabilities,

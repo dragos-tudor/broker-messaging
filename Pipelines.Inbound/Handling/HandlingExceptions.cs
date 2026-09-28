@@ -4,14 +4,14 @@ namespace Pipelines.Inbound;
 
 public static partial class InboundFuncs
 {
-  internal static string? PropagateHandlingException<TKey, TPayload>(
+  internal static string? PropagateHandlingException(
     object?[] data,
     string signal,
     Exception? exception)
   {
     if (exception is null) return default;
     if (exception is OperationCanceledException) return default;
-    var message = GetInboxMessage<TKey, TPayload>(data);
+    var message = GetInboxMessage(data);
 
     return signal switch
     {

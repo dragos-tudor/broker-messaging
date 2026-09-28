@@ -3,8 +3,8 @@ namespace Operations.Outbound.Envelope;
 
 partial class EnvelopeTests
 {
-  static object?[] CreateEnvelopeData<TKey, TValue, TMetadata, TConfirmation>(
-    IEnvelope<TKey, TValue, TMetadata, TConfirmation>? envelope)
+  static object?[] CreateEnvelopeData(
+    IEnvelope? envelope)
   {
     object?[] data = new object?[4];
     if (envelope is not null)
@@ -12,9 +12,9 @@ partial class EnvelopeTests
     return data;
   }
 
-  static object?[] CreateProducingData<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    IEnvelope<TKey, TValue, TMetadata, TConfirmation>? envelope,
-    IOutboxMessage<TKey, TPayload>? message)
+  static object?[] CreateProducingData(
+    IEnvelope? envelope,
+    IOutboxMessage? message)
   {
     object?[] data = new object?[4];
     if (envelope is not null)

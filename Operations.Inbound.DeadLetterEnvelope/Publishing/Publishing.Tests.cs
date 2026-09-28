@@ -5,12 +5,12 @@ public partial class DeadLetterEnvelopeTests
   [TestMethod]
   public async Task publish_dead_letter_envelope__publisher_succeeds__returns_success()
   {
-    var capabilities = Fixture.Create<PublishingCapabilities<string, byte[], object, string>>();
-    var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
+    var capabilities = Fixture.Create<PublishingCapabilities>();
+    var envelope = Fixture.Create<IDeadLetterEnvelope>();
     var inputData = CreateDeadLetterEnvelopeData(envelope);
 
     capabilities.PublishDeadLetterEnvelopeAsync(
-        GetDeadLetterEnvelope<string, byte[], object, string>(inputData)!,
+        GetDeadLetterEnvelope(inputData)!,
         default)
       .Returns(Task.CompletedTask);
 
@@ -24,14 +24,14 @@ public partial class DeadLetterEnvelopeTests
     exception.ShouldBeNull();
 
     capabilities.PublishDeadLetterEnvelopeAsync
-      .Received(1)(GetDeadLetterEnvelope<string, byte[], object, string>(inputData)!, default);
+      .Received(1)(GetDeadLetterEnvelope(inputData)!, default);
   }
 
   [TestMethod]
   public async Task publish_dead_letter_envelope__envelope_missing__returns_error_with_exception()
   {
-    var capabilities = Fixture.Create<PublishingCapabilities<string, byte[], object, string>>();
-    var inputData = CreateDeadLetterEnvelopeData<string, byte[], object, string>(null);
+    var capabilities = Fixture.Create<PublishingCapabilities>();
+    var inputData = CreateDeadLetterEnvelopeData(null);
 
     var (data, state, exception) =
       await DeadLetterEnvelopeFuncs.PublishDeadLetterEnvelopeAsync(
@@ -49,13 +49,13 @@ public partial class DeadLetterEnvelopeTests
   [TestMethod]
   public async Task publish_dead_letter_envelope__publisher_throws__returns_error_with_exception()
   {
-    var capabilities = Fixture.Create<PublishingCapabilities<string, byte[], object, string>>();
-    var envelope = Fixture.Create<IDeadLetterEnvelope<string, byte[], object, string>>();
+    var capabilities = Fixture.Create<PublishingCapabilities>();
+    var envelope = Fixture.Create<IDeadLetterEnvelope>();
     var inputData = CreateDeadLetterEnvelopeData(envelope);
     var expectedException = new InvalidOperationException("publish failed");
 
     capabilities.PublishDeadLetterEnvelopeAsync(
-        GetDeadLetterEnvelope<string, byte[], object, string>(inputData)!,
+        GetDeadLetterEnvelope(inputData)!,
         default)
       .Throws(expectedException);
 
@@ -69,6 +69,6 @@ public partial class DeadLetterEnvelopeTests
     exception.ShouldBeSameAs(expectedException);
 
     capabilities.PublishDeadLetterEnvelopeAsync
-      .Received(1)(GetDeadLetterEnvelope<string, byte[], object, string>(inputData)!, default);
+      .Received(1)(GetDeadLetterEnvelope(inputData)!, default);
   }
 }

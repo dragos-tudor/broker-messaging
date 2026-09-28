@@ -1,6 +1,6 @@
 namespace Operations.Inbound.Inbox;
 
-public sealed record AbandoningCapabilities<TKey, TPayload>(
-  UpdateInboxMessageAsync<TKey, TPayload, AbandoningUpdate>
+public sealed record AbandoningCapabilities(
+  UpdateInboxMessageAsync<AbandoningUpdate>
     UpdateInboxMessageAsync
 );

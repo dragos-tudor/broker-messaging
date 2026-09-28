@@ -1,11 +1,11 @@
 namespace Transport.DeadLetterEnvelope;
 
-public delegate Task PublishDeadLetterEnvelopeAsync<TKey, TValue, TMetadata, TConfirmation>(
-  IDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation> envelope,
+public delegate Task PublishDeadLetterEnvelopeAsync(
+  IDeadLetterEnvelope envelope,
   CancellationToken ct = default
 );
 
-public delegate bool ProduceDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation>(
-  IDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation> envelope,
+public delegate bool ProduceDeadLetterEnvelope(
+  IDeadLetterEnvelope envelope,
   Action<bool, Exception?> dispatcher
 );

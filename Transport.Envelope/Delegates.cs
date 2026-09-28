@@ -1,21 +1,23 @@
 namespace Transport.Envelope;
 
-public delegate Task ConfirmEnvelope<TKey, TValue, TMetadata, TConfirmation>(
-  IEnvelope<TKey, TValue, TMetadata, TConfirmation> envelope,
+public delegate Task ConfirmEnvelope(
+  IEnvelope envelope,
   CancellationToken ct = default
 );
 
-public delegate Task PublishEnvelopeAsync<TKey, TValue, TMetadata, TConfirmation>(
-  IEnvelope<TKey, TValue, TMetadata, TConfirmation> envelope,
+public delegate Task PublishEnvelopeAsync(
+  IEnvelope envelope,
   CancellationToken ct = default
 );
 
-public delegate bool ProduceEnvelope<TKey, TValue, TMetadata, TConfirmation>(
-  IEnvelope<TKey, TValue, TMetadata, TConfirmation> envelope,
+public delegate bool ProduceEnvelope(
+  IEnvelope envelope,
   Action<bool, Exception?> dispatcher
 );
 
-public delegate Task<IEnvelope<TKey, TValue, TMetadata, TConfirmation>> ReadEnvelope<TKey, TValue, TMetadata, TConfirmation>(
+public delegate Task<IEnvelope> ReadEnvelope(
   CancellationToken ct = default
 );
+
+public delegate string? ValidateEnvelope(IEnvelope envelope);
 

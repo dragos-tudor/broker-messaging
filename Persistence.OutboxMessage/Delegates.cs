@@ -4,9 +4,9 @@ public delegate OutboxRetryOptions GetOutboxRetryOptions();
 
 public delegate TSession GetOutboxSession<TSession>() where TSession : IDisposable;
 
-public delegate Task<bool> InsertOutboxMessageSessionAsync<TKey, TPayload, TSession>(
+public delegate Task<bool> InsertOutboxMessageSessionAsync<TSession>(
   TSession session,
-  IOutboxMessage<TKey, TPayload> message,
+  IOutboxMessage message,
   CancellationToken ct = default
 )
 where TSession : IDisposable;
@@ -18,10 +18,11 @@ public delegate Task StoreDomainModelSessionAsync<TSession>(
 )
 where TSession : IDisposable;
 
-public delegate Task UpdateOutboxMessageAsync<TKey, TPayload, TParam>(
-  IOutboxMessage<TKey, TPayload> message,
+public delegate Task UpdateOutboxMessageAsync<TParam>(
+  IOutboxMessage message,
   TParam parameters,
   CancellationToken ct = default
 )
 where TParam : struct;
 
+public delegate string? ValidateOutboxMessage(IOutboxMessage message);

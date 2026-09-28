@@ -5,14 +5,14 @@ namespace Pipelines.Outbound;
 
 public static partial class OutboundFuncs
 {
-  internal static string? PropagatePublishingException<TKey, TPayload>(
+  internal static string? PropagatePublishingException(
     object?[] data,
     string signal,
     Exception? exception)
   {
     if (exception is null) return default;
     if (exception is OperationCanceledException) return default;
-    var message = GetOutboxMessage<TKey, TPayload>(data);
+    var message = GetOutboxMessage(data);
 
     return signal switch
     {

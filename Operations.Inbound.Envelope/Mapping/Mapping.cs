@@ -3,11 +3,11 @@ namespace Operations.Inbound.Envelope;
 partial class EnvelopeFuncs
 {
   static (object?[], string, Exception?)
-    MapEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+    MapEnvelopeSuccess(
+      MappingCapabilities capabilities,
       object?[] data)
     {
-      var envelope = RequireEnvelope(GetEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
+      var envelope = RequireEnvelope(GetEnvelope(data));
       var currentDate = capabilities.GetUtcDateTime();
 
       var message = capabilities.FromEnvelope(envelope, currentDate);
@@ -23,8 +23,8 @@ partial class EnvelopeFuncs
     (data, MappingStates.Error, exception);
 
   internal static (object?[], string, Exception?)
-    MapEnvelope<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+    MapEnvelope(
+      MappingCapabilities capabilities,
       object?[] data) =>
     TryCatch(
       capabilities,

@@ -3,12 +3,12 @@ namespace Operations.Inbound.DeadLetter;
 partial class DeadLetterFuncs
 {
   static async Task<(object?[], string, Exception?)>
-    ScheduleDeadLetterMessageSuccessAsync<TKey, TPayload>(
-      SchedulingCapabilities<TKey, TPayload> capabilities,
+    ScheduleDeadLetterMessageSuccessAsync(
+      SchedulingCapabilities capabilities,
       object?[] data,
       CancellationToken ct)
   {
-    var message = RequireDeadLetterMessage(GetDeadLetterMessage<TKey, TPayload>(data));
+    var message = RequireDeadLetterMessage(GetDeadLetterMessage(data));
     var options = capabilities.GetDeadLetterRetryOptions();
 
     var nextRetryCount = IncrementDeadLetterRetryCount(message.RetryCount);
@@ -29,8 +29,8 @@ partial class DeadLetterFuncs
     (data, SchedulingStates.Error, exception);
 
   internal static Task<(object?[], string, Exception?)>
-    ScheduleDeadLetterMessageAsync<TKey, TPayload>(
-      SchedulingCapabilities<TKey, TPayload> capabilities,
+    ScheduleDeadLetterMessageAsync(
+      SchedulingCapabilities capabilities,
       object?[] data,
       CancellationToken ct) =>
     TryCatch(

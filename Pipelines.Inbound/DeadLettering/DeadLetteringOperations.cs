@@ -4,8 +4,8 @@ namespace Pipelines.Inbound;
 partial class InboundFuncs
 {
   internal static Task<(object?[], string, Exception?)>
-    ExecuteDeadLetteringOperationAsync<TKey, TPayload>(
-      DeadLetteringCapabilities<TKey, TPayload> capabilities,
+    ExecuteDeadLetteringOperationAsync(
+      DeadLetteringCapabilities capabilities,
       object?[] data,
       string decision,
       CancellationToken ct = default) =>

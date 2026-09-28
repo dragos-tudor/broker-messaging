@@ -14,7 +14,7 @@ public partial class InboundTests
     SetInboxMessage(data, message);
 
     message.FailureReason = "reason";
-    PropagateDeadLetteringException<string, string>
+    PropagateDeadLetteringException
       (data, signal, new InvalidOperationException("conversion failed"));
 
     message.LastError.ShouldBe("conversion failed");
@@ -30,7 +30,7 @@ public partial class InboundTests
     SetInboxMessage(data, message);
 
     message.LastError = "existing error";
-    PropagateDeadLetteringException<string, string>
+    PropagateDeadLetteringException
       (data, signal, new InvalidOperationException("insert failed"));
 
     message.LastError.ShouldBe("existing error");

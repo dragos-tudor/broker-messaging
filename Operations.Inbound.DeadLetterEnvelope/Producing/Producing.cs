@@ -3,12 +3,12 @@ namespace Operations.Inbound.DeadLetterEnvelope;
 partial class DeadLetterEnvelopeFuncs
 {
   static (object?[], string, Exception?)
-    ProduceDeadLetterEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+    ProduceDeadLetterEnvelopeSuccess(
+      ProducingCapabilities capabilities,
       object?[] data)
   {
-      var envelope = RequireDeadLetterEnvelope(GetDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
-      var message = RequireDeadLetterMessage(GetDeadLetterMessage<TKey, TPayload>(data));
+      var envelope = RequireDeadLetterEnvelope(GetDeadLetterEnvelope(data));
+      var message = RequireDeadLetterMessage(GetDeadLetterMessage(data));
       var result = CreateProduceResult(message.MessageId);
 
       var isEnqueued =
@@ -34,8 +34,8 @@ partial class DeadLetterEnvelopeFuncs
     (data, ProducingStates.Error, exception);
 
   internal static (object?[], string, Exception?)
-    ProduceDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+    ProduceDeadLetterEnvelope(
+      ProducingCapabilities capabilities,
       object?[] data) =>
     TryCatch(
       capabilities,

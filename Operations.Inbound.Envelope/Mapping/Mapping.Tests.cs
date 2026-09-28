@@ -7,7 +7,7 @@ public partial class EnvelopeTests
   public void map_envelope__mapper_returns_message__returns_success_and_sets_data()
   {
     var inputData = CreateData();
-    var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
+    var capabilities = Fixture.Create<MappingCapabilities>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
     var message = Fixture.Create<IInboxMessage<string, string>>();
     SetEnvelope(inputData, envelope);
@@ -37,7 +37,7 @@ public partial class EnvelopeTests
   public void map_envelope__envelope_missing__returns_error_with_exception()
   {
     var inputData = CreateData();
-    var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
+    var capabilities = Fixture.Create<MappingCapabilities>();
 
     var (data, state, exception) = MapEnvelope(capabilities, inputData);
 
@@ -55,7 +55,7 @@ public partial class EnvelopeTests
   public void map_envelope__mapper_throws__returns_error_with_exception()
   {
     var inputData = CreateData();
-    var capabilities = Fixture.Create<MappingCapabilities<string, byte[], object, string, string>>();
+    var capabilities = Fixture.Create<MappingCapabilities>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
     SetEnvelope(inputData, envelope);
 

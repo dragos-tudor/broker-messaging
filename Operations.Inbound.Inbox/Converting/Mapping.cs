@@ -3,7 +3,7 @@ namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
-  internal static IDeadLetterMessage<TKey, TPayload> FromInboxMessage<TKey, TPayload>(
+  public static IDeadLetterMessage<TKey, TPayload> FromInboxMessage<TKey, TPayload>(
     IInboxMessage<TKey, TPayload> message,
     DateTime createdAt) =>
     new DeadLetterMessage<TKey, TPayload>(){

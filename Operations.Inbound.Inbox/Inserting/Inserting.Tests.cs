@@ -7,24 +7,24 @@ public partial class InboxTests
   [DataRow(false, InsertingStates.Idempotent)]
   public async Task insert_inbox_message__persistence_result_varies__returns_matching_state(bool inserted, string expectedState)
   {
-    var capabilities = Fixture.Create<InsertingCapabilities<string, string>>();
-    var message = Fixture.Create<IInboxMessage<string, string>>();
+    var capabilities = Fixture.Create<InsertingCapabilities>();
+    var message = Fixture.Create<IInboxMessage>();
     var inputData = CreateInboxData(message);
-    capabilities.InsertInboxMessageAsync(GetInboxMessage<string, string>(inputData)!, default).Returns(inserted);
+    capabilities.InsertInboxMessageAsync(GetInboxMessage(inputData)!, default).Returns(inserted);
 
     var (data, state, exception) = await InboxFuncs.InsertInboxMessageAsync(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(expectedState);
     exception.ShouldBeNull();
-    capabilities.InsertInboxMessageAsync.Received(1)(GetInboxMessage<string, string>(inputData)!, default);
+    capabilities.InsertInboxMessageAsync.Received(1)(GetInboxMessage(inputData)!, default);
   }
 
   [TestMethod]
   public async Task insert_inbox_message__message_missing__returns_error()
   {
-    var capabilities = Fixture.Create<InsertingCapabilities<string, string>>();
-    var inputData = CreateInboxData<string, string>();
+    var capabilities = Fixture.Create<InsertingCapabilities>();
+    var inputData = CreateInboxData();
 
     var (data, state, exception) = await InboxFuncs.InsertInboxMessageAsync(capabilities, inputData);
 

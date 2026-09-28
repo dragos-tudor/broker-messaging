@@ -7,7 +7,7 @@ partial class OutboundFuncs
 {
   internal static string AdvanceDispatchingPipeline(
     string signal,
-    OutboundPipelineConfig _) => signal switch
+    PipelineConfig _) => signal switch
   {
     DispatchingEntries.Start => DispatchingActions.Dispatching,
 

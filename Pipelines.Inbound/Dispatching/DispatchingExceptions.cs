@@ -6,10 +6,13 @@ public static partial class InboundFuncs
 {
   internal const string BrokerMessageException = "Broker message was not acknowledged";
 
-  internal static string? PropagateDispatchingException<TKey, TPayload>(object?[] data, string signal, Exception? exception)
+  internal static string? PropagateDispatchingException(
+    object?[] data,
+    string signal,
+    Exception? exception)
   {
     if (exception is OperationCanceledException) return default;
-    var message = GetDeadLetterMessage<TKey, TPayload>(data);
+    var message = GetDeadLetterMessage(data);
 
     return signal switch
     {

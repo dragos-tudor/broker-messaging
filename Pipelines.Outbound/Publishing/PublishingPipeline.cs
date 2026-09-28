@@ -7,7 +7,7 @@ partial class OutboundFuncs
 {
   internal static string AdvancePublishingPipeline(
     string signal,
-    OutboundPipelineConfig config) => signal switch
+    PipelineConfig config) => signal switch
   {
     PublishingEntries.Start => PublishingActions.Mapping,
 

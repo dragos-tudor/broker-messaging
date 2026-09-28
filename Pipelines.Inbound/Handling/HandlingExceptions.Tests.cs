@@ -13,7 +13,7 @@ public partial class InboundTests
     SetInboxMessage(data, message);
 
     message.FailureReason = "existing reason";
-    PropagateHandlingException<string, string>
+    PropagateHandlingException
       (data, signal, new InvalidOperationException("handler failed"));
 
     message.LastError.ShouldBe("handler failed");
@@ -29,7 +29,7 @@ public partial class InboundTests
     SetInboxMessage(data, message);
 
     message.LastError = "existing error";
-    PropagateHandlingException<string, string>
+    PropagateHandlingException
       (data, signal, new InvalidOperationException("business rejected"));
 
     message.FailureReason.ShouldBe("business rejected");
@@ -45,7 +45,7 @@ public partial class InboundTests
     SetInboxMessage(data, message);
 
     message.FailureReason = "existing reason";
-    PropagateHandlingException<string, string>
+    PropagateHandlingException
       (data, signal, new InvalidOperationException("transaction failed"));
 
     message.LastError.ShouldBe("transaction failed");
@@ -61,7 +61,7 @@ public partial class InboundTests
     SetInboxMessage(data, message);
 
     message.LastError = "existing error";
-    PropagateHandlingException<string, string>
+    PropagateHandlingException
       (data, signal, new InvalidOperationException("schedule update failed"));
 
     message.LastError.ShouldBe("existing error");

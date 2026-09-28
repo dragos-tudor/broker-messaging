@@ -1,3 +1,5 @@
 namespace Operations.Outbound.Outbox;
 
-public sealed record ValidatingCapabilities<TKey, TPayload>;
+public sealed record ValidatingCapabilities(
+  ValidateOutboxMessage ValidateOutboxMessage
+);

@@ -9,7 +9,7 @@ public partial class EnvelopeTests
     bool enqueued,
     string expectedState)
   {
-    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string, string>>();
+    var capabilities = Fixture.Create<ProducingCapabilities>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
     var message = Fixture.Create<IOutboxMessage<string, string>>();
     var inputData = CreateProducingData(envelope, message);
@@ -34,7 +34,7 @@ public partial class EnvelopeTests
   [TestMethod]
   public void produce_envelope__callback_dispatches_exact_result()
   {
-    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string, string>>();
+    var capabilities = Fixture.Create<ProducingCapabilities>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
     var message = Fixture.Create<IOutboxMessage<string, string>>();
     var inputData = CreateProducingData(envelope, message);
@@ -70,8 +70,8 @@ public partial class EnvelopeTests
   [TestMethod]
   public void produce_envelope__envelope_missing__returns_error()
   {
-    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string, string>>();
-    var inputData = CreateProducingData<string, byte[], object, string, string>(
+    var capabilities = Fixture.Create<ProducingCapabilities>();
+    var inputData = CreateProducingData(
       null,
       Fixture.Create<IOutboxMessage<string, string>>());
 
@@ -90,9 +90,9 @@ public partial class EnvelopeTests
   [TestMethod]
   public void produce_envelope__outbox_message_missing__returns_error()
   {
-    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string, string>>();
+    var capabilities = Fixture.Create<ProducingCapabilities>();
     var inputData =
-      CreateProducingData<string, byte[], object, string, string>(
+      CreateProducingData(
         Fixture.Create<IEnvelope<string, byte[], object, string>>(),
         null);
 
@@ -111,7 +111,7 @@ public partial class EnvelopeTests
   [TestMethod]
   public void produce_envelope__broker_throws__returns_error_with_exception()
   {
-    var capabilities = Fixture.Create<ProducingCapabilities<string, byte[], object, string, string>>();
+    var capabilities = Fixture.Create<ProducingCapabilities>();
     var envelope = Fixture.Create<IEnvelope<string, byte[], object, string>>();
     var message = Fixture.Create<IOutboxMessage<string, string>>();
     var inputData = CreateProducingData(envelope, message);

@@ -13,7 +13,7 @@ partial class OutboundTests
   [TestMethod] public void persisting__happy_path_and_publish_after_persist__publishing()
   {
     string[] path = [PersistingEntries.Start, ValidatingStates.Success, TransactingStates.Success];
-    RunPersistingPipeline(path, OutboundPipelineTypes.Publishing, new() { PublishAfterPersist = true });
+    RunPersistingPipeline(path, PipelineTypes.Publishing, new() { PublishAfterPersist = true });
   }
 
   [TestMethod] public void persisting__validating_invalid__exit()

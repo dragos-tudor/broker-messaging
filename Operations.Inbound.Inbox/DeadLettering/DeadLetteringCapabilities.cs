@@ -1,6 +1,6 @@
 namespace Operations.Inbound.Inbox;
 
-public sealed record DeadLetteringCapabilities<TKey, TPayload>(
-  UpdateInboxMessageAsync<TKey, TPayload, DeadLetteringUpdate>
+public sealed record DeadLetteringCapabilities(
+  UpdateInboxMessageAsync< DeadLetteringUpdate>
     UpdateInboxMessageAsync
 );

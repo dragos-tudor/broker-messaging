@@ -3,11 +3,11 @@ using Operations.Outbound.Envelope;
 
 namespace Pipelines.Outbound;
 
-public sealed record PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-  MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> Mapping,
-  ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> Producing,
-  PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation> Publishing,
-  SchedulingCapabilities<TKey, TPayload> Scheduling,
-  AbandoningCapabilities<TKey, TPayload> Abandoning,
-  ClosingCapabilities<TKey, TPayload> Closing
+public sealed record PublishingCapabilities(
+  MappingCapabilities Mapping,
+  ProducingCapabilities Producing,
+  Operations.Outbound.Envelope.PublishingCapabilities Publishing,
+  SchedulingCapabilities Scheduling,
+  AbandoningCapabilities Abandoning,
+  ClosingCapabilities Closing
 );

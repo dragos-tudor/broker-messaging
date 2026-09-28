@@ -5,9 +5,9 @@ namespace Pipelines.Outbound;
 partial class OutboundTests
 {
   static void RunPersistingPipeline(string[] path, string end) =>
-    RunPersistingPipeline(path, end, new OutboundPipelineConfig());
+    RunPersistingPipeline(path, end, new PipelineConfig());
 
-  static void RunPersistingPipeline(string[] path, string end, OutboundPipelineConfig config)
+  static void RunPersistingPipeline(string[] path, string end, PipelineConfig config)
   {
     string[] possibleSignals = [PersistingEntries.Start];
     foreach (var signal in path)

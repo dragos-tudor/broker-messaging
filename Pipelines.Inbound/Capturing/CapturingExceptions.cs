@@ -5,7 +5,7 @@ namespace Pipelines.Inbound;
 
 public static partial class InboundFuncs
 {
-  internal static string? PropagateCapturingException<TKey, TValue, TMetadata, TConfirmation, TPayload>(
+  internal static string? PropagateCapturingException(
     object?[] data,
     string signal,
     Exception? exception)
@@ -13,8 +13,8 @@ public static partial class InboundFuncs
     if (exception is null) return default;
     if (exception is OperationCanceledException) return default;
 
-    var envelope = GetEnvelope<TKey, TValue, TMetadata, TConfirmation>(data);
-    var message = GetInboxMessage<TKey, TPayload>(data);
+    var envelope = GetEnvelope(data);
+    var message = GetInboxMessage(data);
 
     return signal switch
     {

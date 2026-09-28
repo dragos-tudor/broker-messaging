@@ -4,12 +4,12 @@ namespace Operations.Inbound.Inbox;
 partial class InboxFuncs
 {
   static async Task<(object?[], string, Exception?)>
-    DeadLetterInboxMessageSuccessAsync<TKey, TPayload>(
-      DeadLetteringCapabilities<TKey, TPayload> capabilities,
+    DeadLetterInboxMessageSuccessAsync(
+      DeadLetteringCapabilities capabilities,
       object?[] data,
       CancellationToken ct = default)
     {
-      var message = RequireInboxMessage(GetInboxMessage<TKey, TPayload>(data));
+      var message = RequireInboxMessage(GetInboxMessage(data));
       var lastError = message.LastError;
       var @params = new DeadLetteringUpdate(InboxMessageStatus.DeadLettering, lastError);
 
@@ -24,8 +24,8 @@ partial class InboxFuncs
     (data, DeadLetteringStates.Error, exception);
 
   internal static Task<(object?[], string, Exception?)>
-    DeadLetterInboxMessageAsync<TKey, TPayload>(
-      DeadLetteringCapabilities<TKey, TPayload> capabilities,
+    DeadLetterInboxMessageAsync(
+      DeadLetteringCapabilities capabilities,
       object?[] data,
       CancellationToken ct = default) =>
     TryCatch(

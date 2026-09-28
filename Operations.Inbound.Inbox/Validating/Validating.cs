@@ -1,19 +1,18 @@
-using Funcs = Persistence.InboxMessage.InboxMessageFuncs;
 
 namespace Operations.Inbound.Inbox;
 
 partial class InboxFuncs
 {
   static (object?[], string, Exception?)
-    ValidateInboxMessageSuccess<TKey, TPayload>(
-      ValidatingCapabilities<TKey, TPayload> capabilities,
+    ValidateInboxMessageSuccess(
+      ValidatingCapabilities capabilities,
       object?[] data)
     {
-      var message = RequireInboxMessage(GetInboxMessage<TKey, TPayload>(data));
+      var message = RequireInboxMessage(GetInboxMessage(data));
 
-      var error = Funcs.ValidateInboxMessage(message);
+      var error = capabilities.ValidateInboxMessage(message);
       return error is not null?
-        (data, ValidatingStates.InvalidError, Funcs.CreateValidationException(error)):
+        (data, ValidatingStates.InvalidError, CreateValidationException(error)):
         (data, ValidatingStates.Success, null);
     }
 
@@ -24,8 +23,8 @@ partial class InboxFuncs
     (data, ValidatingStates.Error, exception);
 
   internal static (object?[], string, Exception?)
-    ValidateInboxMessage<TKey, TPayload>(
-      ValidatingCapabilities<TKey, TPayload> capabilities,
+    ValidateInboxMessage(
+      ValidatingCapabilities capabilities,
       object?[] data) =>
     TryCatch(
       capabilities,

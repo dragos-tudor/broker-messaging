@@ -3,12 +3,12 @@ namespace Operations.Outbound.Outbox;
 partial class OutboxFuncs
 {
   static async Task<(object?[], string, Exception?)>
-    ScheduleOutboxMessageSuccessAsync<TKey, TPayload>(
-      SchedulingCapabilities<TKey, TPayload> capabilities,
+    ScheduleOutboxMessageSuccessAsync(
+      SchedulingCapabilities capabilities,
       object?[] data,
       CancellationToken ct = default)
   {
-    var message = RequireOutboxMessage(GetOutboxMessage<TKey, TPayload>(data));
+    var message = RequireOutboxMessage(GetOutboxMessage(data));
     var options = capabilities.GetOutboxRetryOptions();
 
     var nextRetryCount = IncrementOutboxRetryCount(message.RetryCount);
@@ -17,7 +17,9 @@ partial class OutboxFuncs
     var parameters = new SchedulingUpdate(nextRetryCount, nextAttemptAt, nextStatus, message.LastError);
 
     await capabilities.UpdateOutboxMessageAsync(message, parameters, ct);
-    return nextStatus == OutboxMessageStatus.Processing ? (data, SchedulingStates.NotExhausted, null) : (data, SchedulingStates.Exhausted, null);
+    return nextStatus == OutboxMessageStatus.Processing ?
+      (data, SchedulingStates.NotExhausted, null) :
+      (data, SchedulingStates.Exhausted, null);
   }
 
   static (object?[], string, Exception?)
@@ -27,8 +29,8 @@ partial class OutboxFuncs
     (data, SchedulingStates.Error, exception);
 
   internal static Task<(object?[], string, Exception?)>
-    ScheduleOutboxMessageAsync<TKey, TPayload>(
-      SchedulingCapabilities<TKey, TPayload> capabilities,
+    ScheduleOutboxMessageAsync(
+      SchedulingCapabilities capabilities,
       object?[] data,
       CancellationToken ct = default) =>
     TryCatch(

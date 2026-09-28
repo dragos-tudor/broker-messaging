@@ -4,16 +4,16 @@ namespace Operations.Inbound.Envelope;
 partial class EnvelopeFuncs
 {
   static (object?[], string, Exception?)
-    VerifyEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation>(
-      VerifyingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+    VerifyEnvelopeSuccess(
+      VerifyingCapabilities capabilities,
       object?[] data)
     {
-      var envelope = RequireEnvelope(GetEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
-      var error = ValidateEnvelope(envelope);
+      var envelope = RequireEnvelope(GetEnvelope(data));
+      var error = capabilities.ValidateEnvelope(envelope);
 
       if (error is not null)
       {
-        var state = IsValidEnvelopeConfirmation(envelope.Confirmation)
+        var state = IsValidEnvelopeConfirmation(envelope.GetConfirmation())
           ? VerifyingStates.InvalidError
           : VerifyingStates.InvalidConfirmableError;
 
@@ -30,8 +30,8 @@ partial class EnvelopeFuncs
     (data, VerifyingStates.Error, exception);
 
   internal static (object?[], string, Exception?)
-    VerifyEnvelope<TKey, TValue, TMetadata, TConfirmation>(
-      VerifyingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+    VerifyEnvelope(
+      VerifyingCapabilities capabilities,
       object?[] data) =>
     TryCatch(
       capabilities,

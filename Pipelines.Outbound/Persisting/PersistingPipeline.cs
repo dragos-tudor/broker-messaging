@@ -6,7 +6,7 @@ partial class OutboundFuncs
 {
   internal static string AdvancePersistingPipeline(
     string signal,
-    OutboundPipelineConfig config) => signal switch
+    PipelineConfig config) => signal switch
   {
     PersistingEntries.Start => PersistingActions.Validating,
 
@@ -15,7 +15,7 @@ partial class OutboundFuncs
     ValidatingStates.Error => TerminalActions.Exit,
 
     TransactingStates.Success => config.PublishAfterPersist ?
-      OutboundPipelineTypes.Publishing :
+      PipelineTypes.Publishing :
       TerminalActions.Exit,
     TransactingStates.Error => TerminalActions.Exit,
 

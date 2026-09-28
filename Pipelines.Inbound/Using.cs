@@ -2,6 +2,7 @@ global using System;
 global using System.Collections.Generic;
 global using System.Threading;
 global using System.Threading.Tasks;
+global using Foundation.Extensions;
 global using Persistence.DeadLetterMessage;
 global using Persistence.InboxMessage;
 global using Transport.Envelope;
@@ -12,6 +13,7 @@ global using static Operations.Inbound.Inbox.InboxFuncs;
 global using static Persistence.InboxMessage.InboxMessageFuncs;
 global using static Persistence.DeadLetterMessage.DeadLetterMessageFuncs;
 global using static Transport.Envelope.EnvelopeFuncs;
+global using static Transport.DeadLetterEnvelope.DeadLetterEnvelopeFuncs;
 global using static Pipelines.Inbound.InboundFuncs;
 using System.Runtime.CompilerServices;
 

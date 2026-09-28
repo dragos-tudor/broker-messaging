@@ -3,12 +3,12 @@ namespace Operations.Inbound.Envelope;
 partial class EnvelopeFuncs
 {
   static async Task<(object?[], string, Exception?)>
-    ConfirmFinalEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation>(
-      ConfirmingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+    ConfirmFinalEnvelopeSuccess(
+      ConfirmingCapabilities capabilities,
       object?[] data,
       CancellationToken ct = default)
     {
-      var envelope = RequireEnvelope(GetEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
+      var envelope = RequireEnvelope(GetEnvelope(data));
       await capabilities.ConfirmEnvelope(envelope, ct);
       return (data, ConfirmingFinalStates.Success, null);
     }
@@ -20,8 +20,8 @@ partial class EnvelopeFuncs
     (data, ConfirmingFinalStates.Error, exception);
 
   internal static Task<(object?[], string, Exception?)>
-    ConfirmFinalEnvelope<TKey, TValue, TMetadata, TConfirmation>(
-      ConfirmingCapabilities<TKey, TValue, TMetadata, TConfirmation> capabilities,
+    ConfirmFinalEnvelopeAsync(
+      ConfirmingCapabilities capabilities,
       object?[] data,
       CancellationToken ct = default) =>
     TryCatch(

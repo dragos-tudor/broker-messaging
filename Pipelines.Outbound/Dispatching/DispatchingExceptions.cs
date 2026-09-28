@@ -6,10 +6,13 @@ public static partial class OutboundFuncs
 {
   internal const string BrokerMessageError = "Broker message was not acknowledged";
 
-  internal static string? PropagateDispatchingException<TKey, TPayload>(object?[] data, string signal, Exception? exception)
+  internal static string? PropagateDispatchingException(
+    object?[] data,
+    string signal,
+    Exception? exception)
   {
     if (exception is OperationCanceledException) return default;
-    var message = GetOutboxMessage<TKey, TPayload>(data);
+    var message = GetOutboxMessage(data);
 
     return signal switch
     {

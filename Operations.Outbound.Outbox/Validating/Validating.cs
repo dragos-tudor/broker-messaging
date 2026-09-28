@@ -5,12 +5,12 @@ namespace Operations.Outbound.Outbox;
 partial class OutboxFuncs
 {
   static (object?[], string, Exception?)
-    ValidateOutboxMessageSuccess<TKey, TPayload>(
-      ValidatingCapabilities<TKey, TPayload> capabilities,
+    ValidateOutboxMessageSuccess(
+      ValidatingCapabilities capabilities,
       object?[] data)
   {
-    var message = RequireOutboxMessage(GetOutboxMessage<TKey, TPayload>(data));
-    var error = Funcs.ValidateOutboxMessage(message);
+    var message = RequireOutboxMessage(GetOutboxMessage(data));
+    var error = capabilities.ValidateOutboxMessage(message);
 
     return error is null ?
       (data, ValidatingStates.Success, null) :
@@ -24,8 +24,8 @@ partial class OutboxFuncs
     (data, ValidatingStates.Error, exception);
 
   internal static (object?[], string, Exception?)
-    ValidateOutboxMessage<TKey, TPayload>(
-      ValidatingCapabilities<TKey, TPayload> capabilities,
+    ValidateOutboxMessage(
+      ValidatingCapabilities capabilities,
       object?[] data) =>
     TryCatch(
       capabilities,

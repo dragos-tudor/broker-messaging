@@ -3,13 +3,13 @@ namespace Operations.Outbound.Outbox;
 partial class OutboxFuncs
 {
   static async Task<(object?[], string, Exception?)>
-    TransactOutboxMessageSuccessAsync<TKey, TPayload, TSession>(
-      TransactingCapabilities<TKey, TPayload, TSession> capabilities,
+    TransactOutboxMessageSuccessAsync<TSession>(
+      TransactingCapabilities<TSession> capabilities,
       object?[] data,
       CancellationToken ct = default)
     where TSession : ISessionService
   {
-    var message = RequireOutboxMessage(GetOutboxMessage<TKey, TPayload>(data));
+    var message = RequireOutboxMessage(GetOutboxMessage(data));
     var model = RequireDomainModel(GetDomainModel(data));
 
     using var session = capabilities.GetSession();
@@ -27,8 +27,8 @@ partial class OutboxFuncs
     (data, TransactingStates.Error, exception);
 
   internal static Task<(object?[], string, Exception?)>
-    TransactOutboxMessageAsync<TKey, TPayload, TSession>(
-      TransactingCapabilities<TKey, TPayload, TSession> capabilities,
+    TransactOutboxMessageAsync<TSession>(
+      TransactingCapabilities<TSession> capabilities,
       object?[] data,
       CancellationToken ct = default)
     where TSession : ISessionService =>

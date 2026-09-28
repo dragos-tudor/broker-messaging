@@ -2,13 +2,13 @@ namespace Persistence.DeadLetterMessage;
 
 public delegate DeadLetterRetryOptions GetDeadLetterRetryOptions();
 
-public delegate Task<bool> InsertDeadLetterMessageAsync<TKey, TPayload>(
-  IDeadLetterMessage<TKey, TPayload> message,
+public delegate Task<bool> InsertDeadLetterMessageAsync(
+  IDeadLetterMessage message,
   CancellationToken ct = default
 );
 
-public delegate Task UpdateDeadLetterMessageAsync<TKey, TPayload, TParam>(
-  IDeadLetterMessage<TKey, TPayload> message,
+public delegate Task UpdateDeadLetterMessageAsync<TParam>(
+  IDeadLetterMessage message,
   TParam parameters,
   CancellationToken ct = default
 )

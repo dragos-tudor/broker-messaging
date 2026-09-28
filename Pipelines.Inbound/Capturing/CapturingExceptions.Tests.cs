@@ -13,7 +13,7 @@ public partial class InboundTests
     var signal = VerifyingStates.InvalidConfirmableError;
     SetEnvelope(data, envelope);
 
-    PropagateCapturingException<string, byte[], object, string, string>
+    PropagateCapturingException
       (data, signal, new InvalidOperationException("invalid"));
 
     GetEnvelope<string, byte[], object, string>(data)!.FailureReason.ShouldBe("invalid");
@@ -28,7 +28,7 @@ public partial class InboundTests
     SetEnvelope(data, envelope);
 
     envelope.FailureReason.Returns("existing reason");
-    PropagateCapturingException<string, byte[], object, string, string>
+    PropagateCapturingException
       (data, signal, new OperationCanceledException());
 
     GetEnvelope<string, byte[], object, string>(data)!.FailureReason.ShouldBe("existing reason");
@@ -42,7 +42,7 @@ public partial class InboundTests
     var signal = VerifyingStates.InvalidError;
     SetEnvelope(data, envelope);
 
-    PropagateCapturingException<string, byte[], object, string, string>
+    PropagateCapturingException
       (data, signal, new InvalidOperationException("verification failed"));
 
     GetEnvelope<string, byte[], object, string>(data)!.FailureReason.ShouldBe("verification failed");
@@ -58,7 +58,7 @@ public partial class InboundTests
     SetInboxMessage(data, message);
 
 
-    PropagateCapturingException<string, byte[], object, string, string>
+    PropagateCapturingException
       (data, signal, new InvalidOperationException("validation failed"));
 
     GetInboxMessage<string, string>(data)!.FailureReason.ShouldBe("validation failed");
@@ -73,7 +73,7 @@ public partial class InboundTests
     var signal = ValidatingStates.Error;
     SetInboxMessage(data, message);
 
-    PropagateCapturingException<string, byte[], object, string, string>
+    PropagateCapturingException
       (data, signal, new InvalidOperationException("validation failed"));
 
     GetInboxMessage<string, string>(data)!.FailureReason.ShouldBe("validation failed");

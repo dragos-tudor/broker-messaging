@@ -6,16 +6,16 @@ public partial class EnvelopeTests
   public async Task publish_envelope__publisher_succeeds__returns_success()
   {
     var capabilities =
-      Fixture.Create<PublishingCapabilities<string, byte[], object, string>>();
+      Fixture.Create<PublishingCapabilities>();
 
     var envelope =
-      Fixture.Create<IEnvelope<string, byte[], object, string>>();
+      Fixture.Create<IEnvelope>();
 
     var inputData =
       CreateEnvelopeData(envelope);
 
     capabilities.PublishEnvelopeAsync(
-        GetEnvelope<string, byte[], object, string>(inputData)!,
+        GetEnvelope(inputData)!,
         default)
       .Returns(Task.CompletedTask);
 
@@ -27,17 +27,17 @@ public partial class EnvelopeTests
     exception.ShouldBeNull();
 
     capabilities.PublishEnvelopeAsync
-      .Received(1)(GetEnvelope<string, byte[], object, string>(inputData)!, default);
+      .Received(1)(GetEnvelope(inputData)!, default);
   }
 
   [TestMethod]
   public async Task publish_envelope__publisher_throws__returns_error_with_exception()
   {
     var capabilities =
-      Fixture.Create<PublishingCapabilities<string, byte[], object, string>>();
+      Fixture.Create<PublishingCapabilities>();
 
     var envelope =
-      Fixture.Create<IEnvelope<string, byte[], object, string>>();
+      Fixture.Create<IEnvelope>();
 
     var inputData =
       CreateEnvelopeData(envelope);
@@ -45,7 +45,7 @@ public partial class EnvelopeTests
     var expectedException = new InvalidOperationException("publish failed");
 
     capabilities.PublishEnvelopeAsync(
-        GetEnvelope<string, byte[], object, string>(inputData)!,
+        GetEnvelope(inputData)!,
         default)
       .ThrowsAsync(expectedException);
 
@@ -57,16 +57,16 @@ public partial class EnvelopeTests
     exception.ShouldBeSameAs(expectedException);
 
     capabilities.PublishEnvelopeAsync
-      .Received(1)(GetEnvelope<string, byte[], object, string>(inputData)!, default);
+      .Received(1)(GetEnvelope(inputData)!, default);
   }
 
   [TestMethod]
   public async Task publish_envelope__envelope_missing__returns_error()
   {
     var capabilities =
-      Fixture.Create<PublishingCapabilities<string, byte[], object, string>>();
+      Fixture.Create<PublishingCapabilities>();
 
-    var inputData = CreateEnvelopeData<string, byte[], object, string>(null);
+    var inputData = CreateEnvelopeData(null);
 
     var (data, state, exception) =
       await EnvelopeFuncs.PublishEnvelopeAsync(capabilities, inputData);

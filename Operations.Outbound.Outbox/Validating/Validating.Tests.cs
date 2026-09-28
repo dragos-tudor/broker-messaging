@@ -5,10 +5,11 @@ public partial class OutboxTests
   [TestMethod]
   public void validate_outbox_message__message_is_valid__returns_success()
   {
-    var capabilities = Fixture.Create<ValidatingCapabilities<string, string>>();
-    var message = Fixture.Create<IOutboxMessage<string, string>>();
+    var capabilities = Fixture.Create<ValidatingCapabilities>();
+    var message = Fixture.Create<IOutboxMessage>();
     var inputData = CreateOutboxData(message);
 
+    capabilities.ValidateOutboxMessage(message).Returns(default(string));
     var (data, state, exception) = ValidateOutboxMessage(capabilities, inputData);
 
     data.ShouldBe(inputData);
@@ -19,8 +20,8 @@ public partial class OutboxTests
   [TestMethod]
   public void validate_outbox_message__message_missing__returns_error()
   {
-    var capabilities = Fixture.Create<ValidatingCapabilities<string, string>>();
-    var inputData = CreateOutboxData<string, string>(default);
+    var capabilities = Fixture.Create<ValidatingCapabilities>();
+    var inputData = CreateOutboxData(default);
 
     var (data, state, exception) = ValidateOutboxMessage(capabilities, inputData);
 
@@ -32,16 +33,15 @@ public partial class OutboxTests
   [TestMethod]
   public void validate_outbox_message__message_is_invalid__returns_invalid_error()
   {
-    var capabilities = Fixture.Create<ValidatingCapabilities<string, string>>();
-    var message = Fixture.Build<OutboxMessage<string, string>>()
-      .With(message => message.MessageId, Guid.Empty)
-      .Create();
+    var capabilities = Fixture.Create<ValidatingCapabilities>();
+    var message = Fixture.Create<IOutboxMessage>();
     var inputData = CreateOutboxData(message);
 
+    capabilities.ValidateOutboxMessage(message).Returns("invalid");
     var (data, state, exception) = ValidateOutboxMessage(capabilities, inputData);
 
     data.ShouldBe(inputData);
     state.ShouldBe(ValidatingStates.InvalidError);
-    exception.ShouldNotBeNull();
+    exception!.Message.ShouldBe("invalid");
   }
 }

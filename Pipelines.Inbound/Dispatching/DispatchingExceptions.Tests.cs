@@ -12,7 +12,7 @@ public partial class InboundTests
     var signal = DispatchingStates.NotAck;
     SetDeadLetterMessage(data, message);
 
-    PropagateDispatchingException<string, string>
+    PropagateDispatchingException
       (data, signal, null);
 
     message.LastError.ShouldBe(BrokerMessageException);
@@ -26,7 +26,7 @@ public partial class InboundTests
     var signal = DispatchingStates.NotAck;
     SetDeadLetterMessage(data, message);
 
-    PropagateDispatchingException<string, string>
+    PropagateDispatchingException
       (data, signal, new InvalidOperationException("broker rejected"));
 
     message.LastError.ShouldBe("broker rejected");

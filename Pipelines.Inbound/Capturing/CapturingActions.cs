@@ -3,8 +3,7 @@ namespace Pipelines.Inbound;
 
 internal static class CapturingActions
 {
-  const string Scope = $"{nameof(CapturingActions)}";
-  internal const string None = $"{Scope}.{nameof(None)}";
+  internal const string Scope = $"{nameof(CapturingActions)}";
   internal const string Capturing = $"{Scope}.{nameof(Capturing)}";
   internal const string Verifying = $"{Scope}.{nameof(Verifying)}";
   internal const string Mapping = $"{Scope}.{nameof(Mapping)}";

@@ -2,10 +2,10 @@ using Operations.Inbound.Inbox;
 
 namespace Pipelines.Inbound;
 
-public sealed record DeadLetteringCapabilities<TKey, TPayload>
+public sealed record DeadLetteringCapabilities
 (
-  ConvertingCapabilities<TKey, TPayload> Converting,
-  Operations.Inbound.DeadLetter.InsertingCapabilities<TKey, TPayload> Inserting,
-  AbandoningCapabilities<TKey, TPayload> Abandoning,
-  ClosingCapabilities<TKey, TPayload> Closing
+  ConvertingCapabilities Converting,
+  Operations.Inbound.DeadLetter.InsertingCapabilities Inserting,
+  AbandoningCapabilities Abandoning,
+  ClosingCapabilities Closing
 );

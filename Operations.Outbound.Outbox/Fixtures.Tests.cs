@@ -3,8 +3,8 @@ namespace Operations.Outbound.Outbox;
 
 partial class OutboxTests
 {
-  static object?[] CreateOutboxData<TKey, TPayload>(
-    IOutboxMessage<TKey, TPayload>? message,
+  static object?[] CreateOutboxData(
+    IOutboxMessage? message,
     object? model = null)
   {
     object?[] data = new object?[4];
@@ -15,9 +15,9 @@ partial class OutboxTests
     return data;
   }
 
-  static object?[] CreateOutboxMappingData<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-    IOutboxMessage<TKey, TPayload>? message,
-    IEnvelope<TKey, TValue, TMetadata, TConfirmation>? envelope = null)
+  static object?[] CreateOutboxMappingData(
+    IOutboxMessage? message,
+    IEnvelope? envelope = null)
   {
     var data = CreateOutboxData(message);
     if (envelope is not null)

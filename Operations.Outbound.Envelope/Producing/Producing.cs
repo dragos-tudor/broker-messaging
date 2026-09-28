@@ -3,12 +3,12 @@ namespace Operations.Outbound.Envelope;
 partial class EnvelopeFuncs
 {
   static (object?[], string, Exception?)
-    ProduceEnvelopeSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+    ProduceEnvelopeSuccess(
+      ProducingCapabilities capabilities,
       object?[] data)
   {
-    var envelope = RequireEnvelope(GetEnvelope<TKey, TValue, TMetadata, TConfirmation>(data));
-    var message = RequireOutboxMessage(GetOutboxMessage<TKey, TPayload>(data));
+    var envelope = RequireEnvelope(GetEnvelope(data));
+    var message = RequireOutboxMessage(GetOutboxMessage(data));
     var result = CreateProduceResult(message.MessageId);
 
     var isEnqueued =
@@ -33,8 +33,8 @@ partial class EnvelopeFuncs
     (data, ProducingStates.Error, exception);
 
   internal static (object?[], string, Exception?)
-    ProduceEnvelope<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      ProducingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+    ProduceEnvelope(
+      ProducingCapabilities capabilities,
       object?[] data) =>
     TryCatch(
       capabilities,

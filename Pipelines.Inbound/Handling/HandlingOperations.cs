@@ -5,8 +5,8 @@ namespace Pipelines.Inbound;
 partial class InboundFuncs
 {
   internal static Task<(object?[], string, Exception?)>
-    ExecuteHandlingOperationAsync<TKey, TPayload, TSession>(
-      HandlingCapabilities<TKey, TPayload, TSession> capabilities,
+    ExecuteHandlingOperationAsync<TSession>(
+      HandlingCapabilities<TSession> capabilities,
       object?[] data,
       string decision,
       CancellationToken ct = default)

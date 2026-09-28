@@ -3,12 +3,12 @@ namespace Operations.Outbound.Outbox;
 partial class OutboxFuncs
 {
   static async Task<(object?[], string, Exception?)>
-    AbandonOutboxMessageSuccessAsync<TKey, TPayload>(
-      AbandoningCapabilities<TKey, TPayload> capabilities,
+    AbandonOutboxMessageSuccessAsync(
+      AbandoningCapabilities capabilities,
       object?[] data,
       CancellationToken ct = default)
   {
-    var message = RequireOutboxMessage(GetOutboxMessage<TKey, TPayload>(data));
+    var message = RequireOutboxMessage(GetOutboxMessage(data));
     var @param  =new AbandoningUpdate(OutboxMessageStatus.Abandoned, message.LastError);
 
     await capabilities.UpdateOutboxMessageAsync(message, @param, ct);
@@ -21,8 +21,8 @@ partial class OutboxFuncs
   (data, AbandoningStates.Error, exception);
 
   internal static Task<(object?[], string, Exception?)>
-    AbandonOutboxMessageAsync<TKey, TPayload>(
-      AbandoningCapabilities<TKey, TPayload> capabilities,
+    AbandonOutboxMessageAsync(
+      AbandoningCapabilities capabilities,
       object?[] data,
       CancellationToken ct = default) =>
     TryCatch(

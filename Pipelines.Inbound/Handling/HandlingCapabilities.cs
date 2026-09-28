@@ -1,13 +1,12 @@
-using Foundation.Extensions;
 using Operations.Inbound.Inbox;
 
 namespace Pipelines.Inbound;
 
-public sealed record HandlingCapabilities<TKey, TPayload, TSession>
+public sealed record HandlingCapabilities<TSession>
 (
-  HandlingCapabilities<TKey, TPayload> Handling,
-  TransactingCapabilities<TKey, TPayload, TSession> Transacting,
-  SchedulingCapabilities<TKey, TPayload> Scheduling,
-  AbandoningCapabilities<TKey, TPayload> Abandoning
+  HandlingCapabilities Handling,
+  TransactingCapabilities<TSession> Transacting,
+  SchedulingCapabilities Scheduling,
+  AbandoningCapabilities Abandoning
 )
 where TSession: ISessionService;

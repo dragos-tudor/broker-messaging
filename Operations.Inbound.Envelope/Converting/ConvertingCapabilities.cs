@@ -1,7 +1,7 @@
 namespace Operations.Inbound.Envelope;
 
-public sealed record ConvertingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-  FromEnvelopeToDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation>
+public sealed record ConvertingCapabilities(
+  FromEnvelopeToDeadLetterEnvelope
     FromEnvelope,
   GetUtcDateTime GetUtcDateTime
 );

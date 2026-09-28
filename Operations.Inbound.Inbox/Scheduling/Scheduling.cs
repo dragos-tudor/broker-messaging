@@ -4,12 +4,12 @@ namespace Operations.Inbound.Inbox;
 partial class InboxFuncs
 {
   static async Task<(object?[], string, Exception?)>
-    ScheduleInboxMessageSuccessAsync<TKey, TPayload>(
-      SchedulingCapabilities<TKey, TPayload> capabilities,
+    ScheduleInboxMessageSuccessAsync(
+      SchedulingCapabilities capabilities,
       object?[] data,
       CancellationToken ct)
     {
-      var message = RequireInboxMessage(GetInboxMessage<TKey, TPayload>(data));
+      var message = RequireInboxMessage(GetInboxMessage(data));
       var options = capabilities.GetInboxRetryOptions();
 
       var nextRetryCount = IncrementInboxRetryCount(message.RetryCount);
@@ -33,8 +33,8 @@ partial class InboxFuncs
     (data, SchedulingStates.Error, exception);
 
   internal static Task<(object?[], string, Exception?)>
-    ScheduleInboxMessageAsync<TKey, TPayload>(
-      SchedulingCapabilities<TKey, TPayload> capabilities,
+    ScheduleInboxMessageAsync(
+      SchedulingCapabilities capabilities,
       object?[] data,
       CancellationToken ct) =>
     TryCatch(

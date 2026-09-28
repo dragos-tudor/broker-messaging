@@ -6,9 +6,9 @@ namespace Pipelines.Outbound;
 partial class OutboundTests
 {
   static void RunPublishingPipeline(string[] path, string end) =>
-    RunPublishingPipeline(path, end, new OutboundPipelineConfig());
+    RunPublishingPipeline(path, end, new PipelineConfig());
 
-  static void RunPublishingPipeline(string[] path, string end, OutboundPipelineConfig config)
+  static void RunPublishingPipeline(string[] path, string end, PipelineConfig config)
   {
     string[] possibleSignals = [PublishingEntries.Start];
     foreach (var signal in path)

@@ -4,12 +4,12 @@ namespace Operations.Inbound.Inbox;
 partial class InboxFuncs
 {
   static async Task<(object?[], string, Exception?)>
-    CloseInboxMessageSuccessAsync<TKey, TPayload>(
-      ClosingCapabilities<TKey, TPayload> capabilities,
+    CloseInboxMessageSuccessAsync(
+      ClosingCapabilities capabilities,
       object?[] data,
       CancellationToken ct = default)
     {
-      var message = RequireInboxMessage(GetInboxMessage<TKey, TPayload>(data));
+      var message = RequireInboxMessage(GetInboxMessage(data));
       var @params = new ClosingUpdate(InboxMessageStatus.Closed);
 
       await capabilities.UpdateInboxMessageAsync(message, @params, ct);
@@ -24,8 +24,8 @@ partial class InboxFuncs
     (data, ClosingStates.Error, exception);
 
   internal static Task<(object?[], string, Exception?)>
-    CloseInboxMessageAsync<TKey, TPayload>(
-      ClosingCapabilities<TKey, TPayload> capabilities,
+    CloseInboxMessageAsync(
+      ClosingCapabilities capabilities,
       object?[] data,
       CancellationToken ct = default) =>
     TryCatch(

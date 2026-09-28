@@ -1,5 +1,5 @@
 namespace Operations.Inbound.Envelope;
 
-public sealed record ConfirmingCapabilities<TKey, TValue, TMetadata, TConfirmation>(
-  ConfirmEnvelope<TKey, TValue, TMetadata, TConfirmation> ConfirmEnvelope
+public sealed record ConfirmingCapabilities(
+  ConfirmEnvelope ConfirmEnvelope
 );

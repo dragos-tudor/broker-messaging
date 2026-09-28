@@ -3,11 +3,11 @@ namespace Operations.Inbound.DeadLetter;
 partial class DeadLetterFuncs
 {
   static (object?[], string, Exception?)
-    MapDeadLetterMessageSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+    MapDeadLetterMessageSuccess(
+      MappingCapabilities capabilities,
       object?[] data)
   {
-    var message = RequireDeadLetterMessage(GetDeadLetterMessage<TKey, TPayload>(data));
+    var message = RequireDeadLetterMessage(GetDeadLetterMessage(data));
     var envelope = capabilities.FromDeadLetterMessage(message, message.OriginatedAt);
     SetDeadLetterEnvelope(data, envelope);
     return (data, MappingStates.Success, null);
@@ -20,8 +20,8 @@ partial class DeadLetterFuncs
     (data, MappingStates.Error, exception);
 
   internal static (object?[], string, Exception?)
-    MapDeadLetterMessage<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+    MapDeadLetterMessage(
+      MappingCapabilities capabilities,
       object?[] data) =>
     TryCatch(
       capabilities,

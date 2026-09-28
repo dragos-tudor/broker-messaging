@@ -3,11 +3,11 @@ namespace Operations.Outbound.Outbox;
 partial class OutboxFuncs
 {
   static (object?[], string, Exception?)
-    MapOutboxMessageSuccess<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+    MapOutboxMessageSuccess(
+      MappingCapabilities capabilities,
       object?[] data)
   {
-    var message = RequireOutboxMessage(GetOutboxMessage<TKey, TPayload>(data));
+    var message = RequireOutboxMessage(GetOutboxMessage(data));
 
     var envelope = capabilities.FromOutboxMessage(message, message.CreatedAt);
     SetEnvelope(data, envelope);
@@ -21,8 +21,8 @@ partial class OutboxFuncs
     (data, MappingStates.Error, exception);
 
   internal static (object?[], string, Exception?)
-    MapOutboxMessage<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      MappingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+    MapOutboxMessage(
+      MappingCapabilities capabilities,
       object?[] data) =>
     TryCatch(
       capabilities,

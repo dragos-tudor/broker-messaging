@@ -4,12 +4,12 @@ namespace Operations.Inbound.Inbox;
 partial class InboxFuncs
 {
   static (object?[], string, Exception?)
-    ConvertInboxMessageSuccess<TKey, TPayload>(
-      ConvertingCapabilities<TKey, TPayload> capabilities,
+    ConvertInboxMessageSuccess(
+      ConvertingCapabilities capabilities,
       object?[] data)
   {
-    var message = RequireInboxMessage(GetInboxMessage<TKey, TPayload>(data));
-    var deadLetter = FromInboxMessage(message, capabilities.GetUtcDateTime());
+    var message = RequireInboxMessage(GetInboxMessage(data));
+    var deadLetter = capabilities.FromInboxMessage(message, capabilities.GetUtcDateTime());
     SetDeadLetterMessage(data, deadLetter);
     return (data, ConvertingStates.Success, null);
   }
@@ -21,8 +21,8 @@ partial class InboxFuncs
     (data, ConvertingStates.Error, exception);
 
   internal static (object?[], string, Exception?)
-    ConvertInboxMessage<TKey, TPayload>(
-      ConvertingCapabilities<TKey, TPayload> capabilities,
+    ConvertInboxMessage(
+      ConvertingCapabilities capabilities,
       object?[] data) =>
     TryCatch(
       capabilities,

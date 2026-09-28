@@ -8,6 +8,7 @@ public interface IEnvelope
   string Type { get; init; }
   string Queue { get; init; }
   string? FailureReason { get; set; }
+  object GetConfirmation();
 }
 
 public interface IEnvelope<TKey, TValue, TMetadata, TConfirmation> : IEnvelope

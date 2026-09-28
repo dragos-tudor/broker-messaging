@@ -14,7 +14,7 @@ partial class OutboxMessageFuncs
     if (!IsValidOutboxMessageLastError(message.LastError)) yield return $"LastError exceeds max length of {LastErrorMaxLength} (was {message.LastError?.Length}).";
   }
 
-  internal static string? ValidateOutboxMessage<TKey, TPayload>(IOutboxMessage<TKey, TPayload> message) =>
+  public static string? ValidateOutboxMessage<TKey, TPayload>(IOutboxMessage<TKey, TPayload> message) =>
     IsValidOutboxMessage(message)?
       default:
       JoinValidationErrors(GetValidationOutboxMessageErrors(message));

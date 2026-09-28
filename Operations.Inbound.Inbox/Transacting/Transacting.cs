@@ -4,14 +4,14 @@ namespace Operations.Inbound.Inbox;
 partial class InboxFuncs
 {
   static async Task<(object?[], string, Exception?)>
-    TransactInboxMessageSuccessAsync<TKey, TPayload, TSession>(
-      TransactingCapabilities<TKey, TPayload, TSession> capabilities,
+    TransactInboxMessageSuccessAsync< TSession>(
+      TransactingCapabilities< TSession> capabilities,
       object?[] data,
       CancellationToken ct = default)
     where TSession : ISessionService
     {
-      var message = RequireInboxMessage(GetInboxMessage<TKey, TPayload>(data));
-      var model = RequireDomainModel(GetDomainModel<TKey, TPayload>(data));
+      var message = RequireInboxMessage(GetInboxMessage(data));
+      var model = RequireDomainModel(GetDomainModel(data));
       var @param = new TransactingUpdate(InboxMessageStatus.Handled);
 
       using var session = capabilities.GetSession();
@@ -29,8 +29,8 @@ partial class InboxFuncs
     (data, TransactingStates.Error, exception);
 
   internal static Task<(object?[], string, Exception?)>
-    TransactInboxMessageAsync<TKey, TPayload, TSession>(
-      TransactingCapabilities<TKey, TPayload, TSession> capabilities,
+    TransactInboxMessageAsync< TSession>(
+      TransactingCapabilities< TSession> capabilities,
       object?[] data,
       CancellationToken ct = default)
     where TSession : ISessionService =>

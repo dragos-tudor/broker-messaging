@@ -6,9 +6,9 @@ namespace Pipelines.Outbound;
 partial class OutboundTests
 {
   static void RunDispatchingPipeline(string[] path, string end) =>
-    RunDispatchingPipeline(path, end, new OutboundPipelineConfig());
+    RunDispatchingPipeline(path, end, new PipelineConfig());
 
-  static void RunDispatchingPipeline(string[] path, string end, OutboundPipelineConfig config)
+  static void RunDispatchingPipeline(string[] path, string end, PipelineConfig config)
   {
     string[] possibleSignals = [DispatchingEntries.Start];
     foreach (var signal in path)

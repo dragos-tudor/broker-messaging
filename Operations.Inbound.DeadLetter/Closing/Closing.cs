@@ -3,12 +3,12 @@ namespace Operations.Inbound.DeadLetter;
 partial class DeadLetterFuncs
 {
   static async Task<(object?[], string, Exception?)>
-    CloseDeadLetterMessageSuccessAsync<TKey, TPayload>(
-      ClosingCapabilities<TKey, TPayload> capabilities,
+    CloseDeadLetterMessageSuccessAsync(
+      ClosingCapabilities capabilities,
       object?[] data,
       CancellationToken ct)
   {
-    var message = RequireDeadLetterMessage(GetDeadLetterMessage<TKey, TPayload>(data));
+    var message = RequireDeadLetterMessage(GetDeadLetterMessage(data));
     var parameters = new ClosingUpdate(DeadLetterMessageStatus.Published);
     await capabilities.UpdateDeadLetterMessageAsync(message, parameters, ct);
     return (data, ClosingStates.Success, null);
@@ -21,8 +21,8 @@ partial class DeadLetterFuncs
     (data, ClosingStates.Error, exception);
 
   internal static Task<(object?[], string, Exception?)>
-    CloseDeadLetterMessageAsync<TKey, TPayload>(
-      ClosingCapabilities<TKey, TPayload> capabilities,
+    CloseDeadLetterMessageAsync(
+      ClosingCapabilities capabilities,
       object?[] data,
       CancellationToken ct) =>
     TryCatch(

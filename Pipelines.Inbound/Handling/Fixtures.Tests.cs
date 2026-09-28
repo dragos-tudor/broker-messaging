@@ -1,5 +1,4 @@
 using Operations.Inbound.Inbox;
-using Inbox = Operations.Inbound.Inbox;
 
 namespace Pipelines.Inbound;
 

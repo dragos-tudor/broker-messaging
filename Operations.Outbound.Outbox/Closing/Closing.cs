@@ -3,12 +3,12 @@ namespace Operations.Outbound.Outbox;
 partial class OutboxFuncs
 {
   static async Task<(object?[], string, Exception?)>
-    CloseOutboxMessageSuccessAsync<TKey, TPayload>(
-      ClosingCapabilities<TKey, TPayload> capabilities,
+    CloseOutboxMessageSuccessAsync(
+      ClosingCapabilities capabilities,
       object?[] data,
       CancellationToken ct = default)
   {
-    var message = RequireOutboxMessage(GetOutboxMessage<TKey, TPayload>(data));
+    var message = RequireOutboxMessage(GetOutboxMessage(data));
     var @param =  new ClosingUpdate(OutboxMessageStatus.Published);
 
     await capabilities.UpdateOutboxMessageAsync(message, @param, ct);
@@ -22,8 +22,8 @@ partial class OutboxFuncs
     (data, ClosingStates.Error, exception);
 
   internal static Task<(object?[], string, Exception?)>
-    CloseOutboxMessageAsync<TKey, TPayload>(
-      ClosingCapabilities<TKey, TPayload> capabilities,
+    CloseOutboxMessageAsync(
+      ClosingCapabilities capabilities,
       object?[] data,
       CancellationToken ct = default) =>
     TryCatch(

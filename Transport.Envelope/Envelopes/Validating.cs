@@ -13,7 +13,7 @@ partial class EnvelopeFuncs
     if (!IsValidEnvelopeConfirmation(envelope.Confirmation)) yield return "Envelope confirmation is null.";
   }
 
-  internal static string? ValidateEnvelope<TKey, TValue, TMetadata, TConfirmation>(
+  public static string? ValidateEnvelope<TKey, TValue, TMetadata, TConfirmation>(
     IEnvelope<TKey, TValue, TMetadata, TConfirmation> envelope) =>
       IsValidEnvelope(envelope)?
         default:

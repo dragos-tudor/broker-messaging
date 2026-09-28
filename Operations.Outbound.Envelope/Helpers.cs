@@ -3,12 +3,12 @@ namespace Operations.Outbound.Envelope;
 
 partial class EnvelopeFuncs
 {
-  static IEnvelope<TKey, TValue, TMetadata, TConfirmation> RequireEnvelope<TKey, TValue, TMetadata, TConfirmation>(
-    IEnvelope<TKey, TValue, TMetadata, TConfirmation>? message) =>
+  static IEnvelope RequireEnvelope(
+    IEnvelope? message) =>
       message ?? throw new InvalidOperationException("Envelope is required.");
 
-  static IOutboxMessage<TKey, TPayload> RequireOutboxMessage<TKey, TPayload>(
-    IOutboxMessage<TKey, TPayload>? message) =>
+  static IOutboxMessage RequireOutboxMessage(
+    IOutboxMessage? message) =>
       message ?? throw new InvalidOperationException("Outbox message is required.");
 
   static ProduceResult RequireProduceResult(

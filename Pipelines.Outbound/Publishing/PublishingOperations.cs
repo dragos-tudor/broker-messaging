@@ -4,8 +4,8 @@ namespace Pipelines.Outbound;
 partial class OutboundFuncs
 {
   internal static Task<(object?[], string, Exception?)>
-    ExecutePublishingOperationAsync<TKey, TValue, TMetadata, TConfirmation, TPayload>(
-      PublishingCapabilities<TKey, TValue, TMetadata, TConfirmation, TPayload> capabilities,
+    ExecutePublishingOperationAsync(
+      PublishingCapabilities capabilities,
       object?[] data,
       string decision,
       CancellationToken ct = default) => decision switch
