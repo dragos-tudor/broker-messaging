@@ -2,12 +2,10 @@ using static Persistence.InboxMessage.FieldConstraints;
 
 namespace Persistence.InboxMessage;
 
-public interface IInboxMessage<TKey, TPayload>
+public interface IInboxMessage
 {
   Guid MessageId { get; init; }
   string TransportMessageId { get; init; }
-  TKey MessageKey { get; init; }
-  TPayload Payload { get; init; }
   DateTime CreatedAt { get; init; }
   InboxMessageStatus Status { get; set; }
   DateTime ReceivedAt { get; init; }
@@ -19,6 +17,12 @@ public interface IInboxMessage<TKey, TPayload>
   int? RetryCount { get; set; }
   DateTimeOffset? NextAttemptAt { get; set; }
   string? LastError { get; set; }
+}
+
+public interface IInboxMessage<TKey, TPayload> : IInboxMessage
+{
+  TKey MessageKey { get; init; }
+  TPayload Payload { get; init; }
 }
 
 public record InboxMessage<TKey, TPayload> : IInboxMessage<TKey, TPayload>

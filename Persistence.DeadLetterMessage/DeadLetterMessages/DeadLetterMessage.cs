@@ -1,11 +1,9 @@
 
 namespace Persistence.DeadLetterMessage;
 
-public interface IDeadLetterMessage<TKey, TPayload>
+public interface IDeadLetterMessage
 {
   Guid MessageId { get; init; }
-  TKey MessageKey { get; init; }
-  TPayload Payload { get; init; }
   DeadLetterMessageStatus Status { get; set; }
   DateTime CreatedAt { get; init; }
   DateTime OriginatedAt { get; init; }
@@ -18,6 +16,12 @@ public interface IDeadLetterMessage<TKey, TPayload>
   int? RetryCount { get; set; }
   DateTimeOffset? NextAttemptAt { get; set; }
   string? LastError { get; set; }
+}
+
+public interface IDeadLetterMessage<TKey, TPayload> : IDeadLetterMessage
+{
+  TKey MessageKey { get; init; }
+  TPayload Payload { get; init; }
 }
 
 public record DeadLetterMessage<TKey, TPayload>: IDeadLetterMessage<TKey, TPayload>

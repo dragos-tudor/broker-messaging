@@ -1,15 +1,19 @@
 
 namespace Transport.Envelope;
 
-public interface IEnvelope<TKey, TValue, TMetadata, TConfirmation>
+public interface IEnvelope
 {
-  TKey Key { get; }
   string? TransportMessageId { get; }
-  TValue Value { get; }
   DateTime CreatedAt { get; }
   string Type { get; init; }
-  TMetadata Metadata { get; }
   string Queue { get; init; }
   string? FailureReason { get; set; }
+}
+
+public interface IEnvelope<TKey, TValue, TMetadata, TConfirmation> : IEnvelope
+{
+  TKey Key { get; }
+  TValue Value { get; }
+  TMetadata Metadata { get; }
   TConfirmation? Confirmation { get; }
 }

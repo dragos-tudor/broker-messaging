@@ -2,11 +2,9 @@ using static Persistence.OutboxMessage.FieldConstraints;
 
 namespace Persistence.OutboxMessage;
 
-public interface IOutboxMessage<TKey, TPayload>
+public interface IOutboxMessage
 {
   Guid MessageId { get; init; }
-  TKey MessageKey { get; init; }
-  TPayload Payload { get; init; }
   DateTime CreatedAt { get; init; }
   OutboxMessageStatus Status { get; set; }
   string Type { get; init; }
@@ -16,6 +14,12 @@ public interface IOutboxMessage<TKey, TPayload>
   int? RetryCount { get; set; }
   DateTimeOffset? NextAttemptAt { get; set; }
   string? LastError { get; set; }
+}
+
+public interface IOutboxMessage<TKey, TPayload> : IOutboxMessage
+{
+  TKey MessageKey { get; init; }
+  TPayload Payload { get; init; }
 }
 
 public record OutboxMessage<TKey, TPayload>: IOutboxMessage<TKey, TPayload>

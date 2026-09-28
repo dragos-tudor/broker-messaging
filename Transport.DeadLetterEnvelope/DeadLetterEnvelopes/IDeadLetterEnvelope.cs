@@ -1,16 +1,20 @@
 
 namespace Transport.DeadLetterEnvelope;
 
-public interface IDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation>
+public interface IDeadLetterEnvelope
 {
-  TKey Key { get; }
   string? OriginalTransportMessageId { get; }
-  TValue Value { get; }
   DateTime CreatedAt { get; init; }
   DateTime OriginatedAt { get; init; }
   string Type { get; init; }
-  TMetadata Metadata { get; }
   string Queue { get; init; }
   string FailureReason { get; init; }
+}
+
+public interface IDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation> : IDeadLetterEnvelope
+{
+  TKey Key { get; }
+  TValue Value { get; }
+  TMetadata Metadata { get; }
   TConfirmation? Confirmation { get; }
 }
