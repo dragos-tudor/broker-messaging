@@ -5,13 +5,13 @@ TOKEN=${1:?missing token}
 mkdir -p ./.runner && cd ./.runner
 
 echo download the runner package
-curl -o actions-runner-linux-x64-2.336.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.336.0/actions-runner-linux-x64-2.336.0.tar.gz
+curl -o actions-runner-linux-x64-2.337.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.337.0/actions-runner-linux-x64-2.337.0.tar.gz
 
 echo extract the installer
-tar xzf ./actions-runner-linux-x64-2.336.0.tar.gz
+tar xzf ./actions-runner-linux-x64-2.337.0.tar.gz
 
 echo remove the installer
-rm ./actions-runner-linux-x64-2.336.0.tar.gz
+rm ./actions-runner-linux-x64-2.337.0.tar.gz
 
 echo change mod for bash scripts
 chmod u+x ./*.sh
