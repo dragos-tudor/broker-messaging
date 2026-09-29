@@ -1,4 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../Directory.Testing.props" />
 
   <PropertyGroup>
     <Description>Routing outbound project.</Description>
@@ -6,6 +8,8 @@
 
   <ItemGroup>
     <ProjectReference Include="../Pipelines.Outbound/Pipelines.Outbound.csproj" />
+    <ProjectReference Include="../Reliability.Resiliency/Reliability.Resiliency.csproj" />
+    <ProjectReference Include="../Observability.Instrumentation/Observability.Instrumentation.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,19 @@
+namespace Routing.Outbound;
+
+public delegate void InstrumentPipeline(
+  string signal,
+  string decision,
+  PipelineContext context);
+
+public delegate void InstrumentOperation(
+  string signal,
+  PipelineContext context,
+  Exception? exception);
+
+public delegate Task<(object?[], string, string)> RoutePipeline<TSession>(
+  RoutingCapabilities<TSession> capabilities,
+  object?[] data,
+  string pipelineType,
+  string? signal = default,
+  CancellationToken ct = default)
+where TSession : ISessionService;
