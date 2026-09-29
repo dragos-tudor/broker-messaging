@@ -14,4 +14,5 @@ public class Envelope<TKey, TValue> :
   public required string Queue { get; init; }
   public TopicPartitionOffset? Confirmation { get; init; }
   public string? FailureReason { get; set; }
+  object? IEnvelope.Confirmation => Confirmation;
 }

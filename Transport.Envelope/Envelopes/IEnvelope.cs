@@ -8,7 +8,7 @@ public interface IEnvelope
   string Type { get; init; }
   string Queue { get; init; }
   string? FailureReason { get; set; }
-  object GetConfirmation();
+  object? Confirmation { get; }
 }
 
 public interface IEnvelope<TKey, TValue, TMetadata, TConfirmation> : IEnvelope
@@ -16,5 +16,5 @@ public interface IEnvelope<TKey, TValue, TMetadata, TConfirmation> : IEnvelope
   TKey Key { get; }
   TValue Value { get; }
   TMetadata Metadata { get; }
-  TConfirmation? Confirmation { get; }
+  new TConfirmation? Confirmation { get; }
 }

@@ -13,7 +13,7 @@ partial class EnvelopeFuncs
 
       if (error is not null)
       {
-        var state = IsValidEnvelopeConfirmation(envelope.GetConfirmation())
+        var state = IsValidEnvelopeConfirmation(envelope.Confirmation)
           ? VerifyingStates.InvalidError
           : VerifyingStates.InvalidConfirmableError;
 

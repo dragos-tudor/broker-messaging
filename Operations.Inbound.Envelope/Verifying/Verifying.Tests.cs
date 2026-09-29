@@ -42,7 +42,7 @@ public partial class EnvelopeTests
     var envelope = Fixture.Create<IEnvelope>();
     SetEnvelope(inputData, envelope);
 
-    envelope.GetConfirmation().Returns(default(string));
+    envelope.Confirmation.Returns(default(string));
     capabilities.ValidateEnvelope(envelope).Returns("invalid");
 
     var (data, state, exception) = VerifyEnvelope(capabilities, inputData);
