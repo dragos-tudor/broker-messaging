@@ -25,7 +25,7 @@
 - envelopes are created by:
   - inbound pipeline wrapping and mapping broker specific messages.
   - outbound pipeline mapping outbox messages.
-- envelope interface has 4 open generics: `<TKey, TValue, TMetadata, TConfirmation>`.
+- envelope interaces: `IEnvelope`, `IEnvelope<TKey, TValue, TMetadata, TConfirmation>`.
   - `TKey` the envelope `Key` type.
   - `TValue` the envelope `Value` type [usually `byte[]`].
   - `TMetadata` contains transport metadata required by the broker-specific envelope implementation.
@@ -42,7 +42,7 @@
 - dead letter envelopes are created by the inbound pipeline:
   - converting invalid envelopes.
   - mapping invalid inbox messages.
-- dead letter envelope interface has 4 open generics `<TKey, TValue, TMetadata, TConfirmation>`:
+- dead letter envelope interfaces: `IDeadLetterEnvelope`, `IDeadLetterEnvelope<TKey, TValue, TMetadata, TConfirmation>`:
   - `TKey` the originated envelope `Key` type.
   - `TValue` the originated envelope `Value` type [usually byte[]].
   - `TMetadata` the originated envelope `Metadata`.
@@ -63,7 +63,7 @@
 ### Persistence.InboxMessage
 
 - inbox messages are created by the inbound pipeline mapping envelopes.
-- inbox message class has 2 open generics `<TKey, TPayload>`.
+- inbox message interfaces: `IInboxMessage`, `IInboxMessage<TKey, TPayload>`.
   - `TKey` the inbox message type mapped from envelope `TKey`.
   - `TPayload` the inbox message payload type [usually `byte[]` or JSON `string`].
 - `Metadata` field should keep the JSON serialized envelope `Metadata`.
@@ -76,7 +76,7 @@
 ### Persistence.DeadLetterMessage
 
 - dead letter messages are created by the inbound pipeline converting invalid inbox messages.
-- dead letter message class has 2 open generics `<TKey, TPayload>`:
+- dead letter message interfaces: `IDeadLetterMessage`, `IDeadLetterMessage<TKey, TPayload>`:
   - `TKey` the dead letter message type mapped from inbox message `TKey`.
   - `TPayload` the dead letter message payload mapped from inbox message `TPayload`.
 - dead letter message statuses are: Processing, Published, Abandoned.
@@ -84,7 +84,7 @@
 ### Persistence.OutboxMessage
 
 - outbox messages are created by the user to publish them to brokers.
-- outbox message class has 2 open generics `<TKey, TPayload>`:
+- outbox message interfaces: `IOutboxMessage`, `IOutboxMessage<TKey, TPayload>`:
   - `TKey` the outbox message type should be the same as the inbox message `TKey`.
   - `TPayload` the outbox message payload should be the same as the inbox message `TPayload`.
 - outbox message statuses are: Processing, Published, Abandoned.
@@ -198,23 +198,6 @@ Pipelines define semantic processing flow by mapping operation outcomes to the n
 - pipeline and operation identifiers are unique within their owning component; exact outcome-state names remain source-code implementation details.\
 - each pipeline must define its entry action by mapping it to the first action. Subsequent mappings are driven by operation outcomes.
 
-## Routing
-- inbound workflow [same as outbound]:
-  - `RouteInboundPipelinesAsync`: routes across pipeline boundaries until a terminal action.
-  - `RouteInboundPipelineAsync`: routes one PipelineTypes value to the corresponding pipeline runner.
-  - `RunXxxPipelineAsync`: starts one concrete pipeline from its canonical entry.
-  - `RunInboundPipelineAsync`: generically drives one pipeline by repeatedly [Xxx mans pipeline segment]:
-      - `AdvanceXxxPipeline`
-      - `ExecuteXxxOperationAsync`
-      - `PropagateXxxException`
-      - `CanFastRetryXxx`
-      - `RunFastRetryAsync` when applicable.
-  - `AdvanceXxxPipeline`: maps the current signal to the next decision
-  - `ExecuteXxxOperationAsync`: executes the operation represented by that decision
-    and adapts the operation-specific state back to the pipeline signal.
-  - `PropagateXxxException`: propagate pipeline exceptions throught data members [inbox, envelope, dead letter so].
-  - `CanFastRetryXxx`: decide pipeline fast retry execution continuation.
-
 ### Exception propagation
 - each [almost] pipeline segment owns its specific error-propagation rules.
 - operations success paths skip propagation entirely.
@@ -222,6 +205,13 @@ Pipelines define semantic processing flow by mapping operation outcomes to the n
 - router calls only the propagation function required by the current pipeline segment.
 - structures mappers/converters transfer existing FailureReason themselves.
 - `OutboxMessage` no longer carries FailureReason.
+
+## Routing
+- inbound workflow [same as outbound]:
+  - `RoutePipelinesAsync`: routes across pipeline boundaries while pipeline transitions are produced; returns terminal or resumable execution state to the consumer.
+  - `RoutePipelineAsync`: selects the capabilities and function bundle for one PipelineType, using an explicit entry signal when supplied or the pipeline's canonical entry otherwise.
+  - `RunPipelineAsync`: drives one pipeline by repeatedly advancing signals into decisions and executing operation decisions, including fast retry, exception propagation, and instrumentation.
+  - `PipelineFunctions<TCapabilities>`: binds the pipeline-specific advancement, execution, exception-propagation, and fast-retry behaviors required by the generic runner.
 
 ## Design Vocabulary
 - structures:
@@ -240,3 +230,7 @@ Pipelines define semantic processing flow by mapping operation outcomes to the n
   - execute = invoke one concrete operation.
   - run     = drive one pipeline execution flow.
   - route   = choose between pipelines.
+- pipelines:
+  - Signal and Decision are protocol roles, not concrete types.
+  - an Entry or operation State is used as a Signal.
+  - an operation Action, PipelineType, or TerminalAction is used as a Decision.

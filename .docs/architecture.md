@@ -45,12 +45,9 @@
   - publishing [from outbox messages].
 
 ## Routers
-- router: orchestrates pipeline operations by:
-  - identifying/using current pipeline.
-  - getting the pipeline operation.
-  - executing the operation.
-  - processing the operation result.
-  - repeating the process [identify/get/execute/process].
+- router:
+  - route pipelines.
+  - run pipeline operations.
 - routers:
   - inbound.
   - outbound.
