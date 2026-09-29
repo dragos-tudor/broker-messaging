@@ -9,5 +9,6 @@ for SOLUTION in \
 do
   dotnet build "$SOLUTION" \
     --configuration "$CONFIGURATION" \
-    --no-restore
+    --no-restore \
+    -m
 done
