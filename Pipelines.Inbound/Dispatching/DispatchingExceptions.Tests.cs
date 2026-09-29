@@ -8,7 +8,7 @@ public partial class InboundTests
   public void dispatching_exception__not_ack_without_exception__sets_default_last_error()
   {
     var data = CreateData();
-    var message = Fixture.Create<DeadLetterMessage<string, string>>();
+    var message = Substitute.For<DeadLetterMessage<string, string>>();
     var signal = DispatchingStates.NotAck;
     SetDeadLetterMessage(data, message);
 
@@ -22,7 +22,7 @@ public partial class InboundTests
   public void dispatching_exception__not_ack_with_exception__sets_exception_message()
   {
     var data = CreateData();
-    var message = Fixture.Create<DeadLetterMessage<string, string>>();
+    var message = Substitute.For<DeadLetterMessage<string, string>>();
     var signal = DispatchingStates.NotAck;
     SetDeadLetterMessage(data, message);
 

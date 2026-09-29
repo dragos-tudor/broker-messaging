@@ -8,7 +8,7 @@ public partial class InboundTests
   public void handling_exception__technical_error__sets_last_error()
   {
     var data = CreateData();
-    var message = Fixture.Create<InboxMessage<string, string>>();
+    var message = Substitute.For<IInboxMessage>();
     var signal = HandlingStates.Error;
     SetInboxMessage(data, message);
 
@@ -24,7 +24,7 @@ public partial class InboundTests
   public void handling_exception__domain_error__sets_failure_reason()
   {
     var data = CreateData();
-    var message = Fixture.Create<InboxMessage<string, string>>();
+    var message = Substitute.For<IInboxMessage>();
     var signal = HandlingStates.DomainError;
     SetInboxMessage(data, message);
 
@@ -40,7 +40,7 @@ public partial class InboundTests
   public void handling_exception__transacting_error__sets_last_error()
   {
     var data = CreateData();
-    var message = Fixture.Create<InboxMessage<string, string>>();
+    var message = Substitute.For<IInboxMessage>();
     var signal = TransactingStates.Error;
     SetInboxMessage(data, message);
 
@@ -56,7 +56,7 @@ public partial class InboundTests
   public void handling_exception__scheduling_error__does_not_change_last_error()
   {
     var data = CreateData();
-    var message = Fixture.Create<InboxMessage<string, string>>();
+    var message = Substitute.For<IInboxMessage>();
     var signal = SchedulingStates.Error;
     SetInboxMessage(data, message);
 

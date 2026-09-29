@@ -8,12 +8,12 @@ public partial class OutboundTests
   [TestMethod]
   public void publishing_exception__mapping_error__sets_outbox_last_error()
   {
-    var message = Fixture.Create<OutboxMessage<string, string>>();
+    var message = Substitute.For<IOutboxMessage>();
     message.LastError = "old error";
     var data = CreateData();
     SetOutboxMessage(data, message);
 
-    PropagatePublishingException<string, string>(data, MappingStates.Error, new InvalidOperationException("mapping failed"));
+    PropagatePublishingException(data, MappingStates.Error, new InvalidOperationException("mapping failed"));
 
     message.LastError.ShouldBe("mapping failed");
   }
@@ -23,12 +23,12 @@ public partial class OutboundTests
   [DataRow(PublishingStates.Error)]
   public void publishing_exception__technical_publish_error__sets_outbox_last_error(string signal)
   {
-    var message = Fixture.Create<OutboxMessage<string, string>>();
+    var message = Substitute.For<IOutboxMessage>();
     message.LastError = "old error";
     var data = CreateData();
     SetOutboxMessage(data, message);
 
-    PropagatePublishingException<string, string>(data, signal, new InvalidOperationException("broker failed"));
+    PropagatePublishingException(data, signal, new InvalidOperationException("broker failed"));
 
     message.LastError.ShouldBe("broker failed");
   }

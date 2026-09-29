@@ -1,12 +1,9 @@
 
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
-global using AutoFixture;
+global using NSubstitute;
 global using Shouldly;
 
 namespace Pipelines.Outbound;
 
 [TestClass]
-public partial class OutboundTests
-{
-  static readonly IFixture Fixture = new Fixture();
-}
+public partial class OutboundTests;

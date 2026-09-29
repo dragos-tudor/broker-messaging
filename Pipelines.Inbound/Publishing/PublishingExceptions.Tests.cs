@@ -10,10 +10,11 @@ public partial class InboundTests
   public void publishing_exception__publish_error__sets_dead_letter_last_error()
   {
     var data = CreateData();
-    var message = Fixture.Create<DeadLetterMessage<string, string>>() with { FailureReason = "reason" };
+    var message = Substitute.For<IDeadLetterMessage>();
     var signal = PublishingStates.Error;
     SetDeadLetterMessage(data, message);
 
+    message.FailureReason.Returns("reason");
     PropagatePublishingException
       (data, signal, new InvalidOperationException("publish failed"));
 
@@ -25,7 +26,7 @@ public partial class InboundTests
   public void publishing_exception__dead_letter_scheduling_error__does_not_set_last_error()
   {
     var data = CreateData();
-    var message = Fixture.Create<DeadLetterMessage<string, string>>();
+    var message = Substitute.For<IDeadLetterMessage>();
     var signal = SchedulingStates.Error;
     SetDeadLetterMessage(data, message);
 

@@ -9,7 +9,7 @@ public partial class InboundTests
   public void dead_lettering_exception__conversion_error__sets_inbox_last_error()
   {
     var data = CreateData();
-    var message = Fixture.Create<InboxMessage<string, string>>();
+    var message = Substitute.For<IInboxMessage>();
     var signal = ConvertingStates.Error;
     SetInboxMessage(data, message);
 
@@ -25,7 +25,7 @@ public partial class InboundTests
   public void dead_lettering_exception__insert_error__does_not_change_inbox_last_error()
   {
     var data = CreateData();
-    var message = Fixture.Create<InboxMessage<string, string>>();
+    var message = Substitute.For<IInboxMessage>();
     var signal = DeadLetter.InsertingStates.Error;
     SetInboxMessage(data, message);
 

@@ -15,6 +15,6 @@ public delegate Task<(object?[], string, string)> RoutePipeline<TSession>(
   RoutingCapabilities<TSession> capabilities,
   object?[] data,
   string pipelineType,
-  string? initialSignal = default,
+  string? signal = default,
   CancellationToken ct = default)
 where TSession : ISessionService;
